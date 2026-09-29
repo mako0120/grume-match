@@ -396,3 +396,98 @@ button {
     width: min(100%, 1040px);
   }
 }
+
+
+.restaurant-panel {
+  margin-top: 16px;
+}
+
+.applicant-card,
+.confirmed-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.applicant-card h2,
+.confirmed-card h2,
+.restaurant-campaign-summary h2 {
+  margin: 7px 0 4px;
+}
+
+.applicant-card p,
+.confirmed-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.applicant-reward {
+  white-space: nowrap;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.applicant-reward small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.section-title {
+  margin: 25px 0 6px;
+  font-size: 21px;
+}
+
+.restaurant-slot-button {
+  min-height: 62px;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  font-weight: 900;
+}
+
+.restaurant-slot-button:hover {
+  border-color: #9c998f;
+  transform: translateY(-1px);
+}
+
+.restaurant-slot-button small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.secondary-button {
+  min-height: 42px;
+  padding: 0 14px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.confirmed-card {
+  display: block;
+  background: var(--positive);
+  border-color: var(--positive-line);
+}
+
+.confirmed-card .secondary-button {
+  margin-top: 12px;
+}
+
+.restaurant-campaign-summary {
+  margin-bottom: 16px;
+}
