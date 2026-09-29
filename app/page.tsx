@@ -14,6 +14,12 @@ export default function HomePage() {
           <Link className="primary-button" href="/creator/campaigns">
             Creatorとして案件を見る
           </Link>
+          <Link
+            className="primary-button"
+            href="/restaurant/campaigns/shinsaibashi-yakiniku-001/applications"
+          >
+            店舗側の採用画面を見る
+          </Link>
           <span className="status-pill">MVP foundation</span>
         </div>
       </section>
