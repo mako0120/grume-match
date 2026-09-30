@@ -1,13 +1,16 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
-import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
+import { buildDirectOfferSchedule } from "@/lib/direct-offer-schedule";
 import { createClient } from "@/lib/supabase/server";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.floor(parsed) : fallback;
+}
+
+function one<T>(value: T | T[] | null | undefined): T | null {
+  return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
 
 export async function createDirectOffer(formData: FormData) {
@@ -18,7 +21,7 @@ export async function createDirectOffer(formData: FormData) {
 
   const { data: membership, error: membershipError } = await supabase
     .from("restaurant_memberships")
-    .select("restaurant_id")
+    .select("restaurant_id,restaurants(name,area)")
     .eq("user_id", authData.user.id)
     .limit(1)
     .single();
@@ -27,26 +30,19 @@ export async function createDirectOffer(formData: FormData) {
     redirect("/onboarding");
   }
 
+  const restaurant = one(membership.restaurants);
   const creatorId = String(formData.get("creatorId") ?? "");
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const category = String(formData.get("category") ?? "").trim();
-  const area = String(formData.get("area") ?? "").trim();
   const cashReward = toInt(formData.get("cashReward"), 0);
-  const foodOffer = String(formData.get("foodOffer") ?? "").trim();
+  const foodOffer = String(formData.get("foodOffer") ?? "1名分提供").trim();
   const maxCompanions = toInt(formData.get("maxCompanions"), 0);
-  const visitStart = String(formData.get("visitStart") ?? "");
-  const visitEnd = String(formData.get("visitEnd") ?? "");
-  const applicationDeadline = String(formData.get("applicationDeadline") ?? "");
-  const startTime = String(formData.get("startTime") ?? "17:00");
-  const endTime = String(formData.get("endTime") ?? "21:00");
-  const intervalMinutes = toInt(formData.get("intervalMinutes"), 30);
-  const visitDurationMinutes = toInt(formData.get("visitDurationMinutes"), 120);
-  const weekdays = formData
-    .getAll("weekdays")
-    .map((value) => Number(value))
-    .filter((value) => Number.isInteger(value) && value >= 0 && value <= 6);
+  const note = String(formData.get("note") ?? "").trim();
+  const durationMinutes = toInt(formData.get("durationMinutes"), 120);
   const platforms = formData.getAll("platforms").map(String).filter(Boolean);
+  const candidateLocalDateTimes = [
+    String(formData.get("candidate1") ?? ""),
+    String(formData.get("candidate2") ?? ""),
+    String(formData.get("candidate3") ?? ""),
+  ];
 
   if (!creatorId) {
     redirect(
@@ -55,58 +51,50 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
-  let slots;
-  try {
-    slots = buildCampaignSlots({
-      startDate: visitStart,
-      endDate: visitEnd,
-      weekdays,
-      startTime,
-      endTime,
-      intervalMinutes,
-      visitDurationMinutes,
-      capacity: 1,
-    });
-  } catch {
+  if (cashReward <= 0) {
     redirect(
       "/restaurant/offers/new?message=" +
-        encodeURIComponent("来店候補日時を確認してください。"),
+        encodeURIComponent("現金報酬を入力してください。"),
     );
   }
 
-  if (!slots.length) {
+  if (!platforms.length) {
     redirect(
       "/restaurant/offers/new?message=" +
-        encodeURIComponent("選択した条件に来店候補がありません。"),
+        encodeURIComponent("投稿先を1つ以上選択してください。"),
     );
   }
 
-  let deadlineIso: string;
+  let schedule;
   try {
-    deadlineIso = japanLocalDateTimeToIso(applicationDeadline);
+    schedule = buildDirectOfferSchedule(candidateLocalDateTimes, durationMinutes);
   } catch {
     redirect(
       "/restaurant/offers/new?message=" +
-        encodeURIComponent("応募期限を確認してください。"),
+        encodeURIComponent("来店候補日時を1〜3つ入力してください。"),
     );
   }
+
+  const restaurantName = restaurant?.name ?? "店舗";
+  const area = restaurant?.area ?? "大阪";
+  const title = restaurantName + " PRご依頼";
 
   const { data, error } = await supabase.rpc("create_direct_offer_with_slots", {
     p_restaurant_id: membership.restaurant_id,
     p_creator_id: creatorId,
     p_title: title,
-    p_description: description,
-    p_category: category,
+    p_description: note,
+    p_category: "グルメ",
     p_area: area,
     p_cash_reward: cashReward,
     p_reward_tax_mode: "tax_included",
     p_food_offer: foodOffer,
     p_max_companions: maxCompanions,
-    p_visit_period_start: visitStart,
-    p_visit_period_end: visitEnd,
-    p_application_deadline: deadlineIso,
+    p_visit_period_start: schedule.visitStart,
+    p_visit_period_end: schedule.visitEnd,
+    p_application_deadline: schedule.deadlineIso,
     p_platforms: platforms,
-    p_slots: slots,
+    p_slots: schedule.slots,
   });
 
   if (error || !data) {
@@ -116,5 +104,5 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
-  redirect(`/restaurant/campaigns/${data}/applications`);
+  redirect("/restaurant/campaigns/" + data + "/applications");
 }
