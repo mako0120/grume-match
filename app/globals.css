@@ -1066,3 +1066,78 @@ button {
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+
+.booking-actions {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 6px;
+}
+
+.booking-actions > * {
+  flex: 1;
+  text-align: center;
+}
+
+.reschedule-review-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.reschedule-review-head h2 {
+  margin: 8px 0 3px;
+}
+
+.reschedule-review-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.reschedule-route {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  background: var(--surface-soft);
+  border-radius: 14px;
+}
+
+.reschedule-route div {
+  display: grid;
+  gap: 4px;
+}
+
+.reschedule-route span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.reschedule-route strong {
+  font-size: 13px;
+}
+
+.reschedule-arrow {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+@media (max-width: 520px) {
+  .booking-actions {
+    display: grid;
+  }
+
+  .reschedule-route {
+    grid-template-columns: 1fr;
+  }
+
+  .reschedule-arrow {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+}
