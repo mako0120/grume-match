@@ -1,5 +1,5 @@
 function japanLocalDateTimeToIso(value: string) {
-  if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(value)) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
     throw new Error("invalid_japan_local_datetime");
   }
 
