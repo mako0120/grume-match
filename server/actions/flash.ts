@@ -1,14 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 import { createClient } from "@/lib/supabase/server";
-
-function japanIso(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
-    throw new Error("invalid_datetime");
-  }
-  return new Date(`${value}:00+09:00`).toISOString();
-}
 
 export async function createFlashCampaign(formData: FormData) {
   const supabase = await createClient();
@@ -33,8 +27,8 @@ export async function createFlashCampaign(formData: FormData) {
   let deadline: string;
 
   try {
-    startsAt = japanIso(String(formData.get("startsAt") ?? ""));
-    deadline = japanIso(String(formData.get("deadline") ?? ""));
+    startsAt = japanLocalDateTimeToIso(String(formData.get("startsAt") ?? ""));
+    deadline = japanLocalDateTimeToIso(String(formData.get("deadline") ?? ""));
   } catch {
     redirect(
       "/restaurant/flash/new?message=" +
