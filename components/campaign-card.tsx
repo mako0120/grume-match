@@ -8,6 +8,9 @@ export function CampaignCard({ campaign }: { campaign: DemoCampaign }) {
         <span className="meta-pill">{campaign.area}</span>
         <span className="meta-pill">{campaign.category}</span>
         <span className="meta-pill">募集 {campaign.creatorSlots}名</span>
+        <span className="meta-pill solo-card-pill">
+          {campaign.maxCompanions === 0 ? "1名限定" : "1名からOK"}
+        </span>
       </div>
 
       <div>
