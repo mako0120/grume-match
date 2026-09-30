@@ -29,6 +29,13 @@ export default async function CreatorCampaignDetailPage({
         ← 案件一覧
       </Link>
 
+      {campaign.visibility === "direct" ? (
+        <section className="direct-offer-notice">
+          <span className="eyebrow">PRIVATE PAID OFFER</span>
+          <strong>この案件は、店舗からあなた1人へ送られた指名オファーです。</strong>
+        </section>
+      ) : null}
+
       <section className="detail-hero">
         <span>{campaign.area}・{campaign.category}</span>
         <h1>{campaign.title}</h1>
