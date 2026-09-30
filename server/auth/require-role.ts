@@ -13,12 +13,16 @@ export async function requireRole(allowed: AppRole[]) {
 
   const { data: userRow, error } = await supabase
     .from("users")
-    .select("role,status")
+    .select("role,status,onboarding_completed_at")
     .eq("id", authData.user.id)
     .single();
 
   if (error || !userRow || userRow.status !== "active") {
     redirect("/login");
+  }
+
+  if (!userRow.onboarding_completed_at) {
+    redirect("/onboarding");
   }
 
   if (!allowed.includes(userRow.role as AppRole)) {
