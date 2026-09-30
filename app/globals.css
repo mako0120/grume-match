@@ -1175,3 +1175,38 @@ button {
 .flash-publish {
   background: #7c2f21;
 }
+
+
+.payment-admin-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.payment-admin-card h2 {
+  margin: 9px 0 4px;
+}
+
+.payment-admin-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.payment-admin-amount {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.payment-admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.payment-admin-actions > * {
+  flex: 1;
+}
