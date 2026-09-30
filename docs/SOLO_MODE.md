@@ -54,3 +54,24 @@ GOURMET DIARY PR OS は、**1人でPR来店するCreator** と **1人で運営�
 `operator_manual_touches / completed_campaign`
 
 案件数が増えても、運営者のDM作業が同じ比率で増えないことを目標にする。
+
+
+## 4. 1人を指名する Direct OFFER
+
+公開募集をせず、店舗がCreatorを1人だけ選んで有償依頼できる。
+
+Flow:
+
+```
+Restaurant
+→ Creatorを1人選択
+→ 現金報酬・提供内容・来店候補を送る
+→ Creatorの「指名オファー」にだけ表示
+→ Creatorが来店日時を選択
+→ 既存Tap Schedule / Bookingへ接続
+```
+
+Direct OFFERは公開MARKETには表示しない。
+対象Creator以外はcampaign IDを知っていても応募できないようDB側で制御する。
+
+また、公開中のPR案件・FLASH・Direct OFFERはいずれも現金報酬0円では公開できない。
