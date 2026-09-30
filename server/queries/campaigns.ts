@@ -108,6 +108,7 @@ export async function listCreatorCampaigns() {
     .from("campaigns")
     .select(campaignSelect)
     .in("status", ["published", "recruiting"])
+    .eq("kind", "market")
     .order("published_at", { ascending: false });
 
   if (error) throw new Error(error.message);
