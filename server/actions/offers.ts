@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
+import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 import { createClient } from "@/lib/supabase/server";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
@@ -80,8 +81,10 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
-  const deadline = new Date(applicationDeadline);
-  if (Number.isNaN(deadline.getTime())) {
+  let deadlineIso: string;
+  try {
+    deadlineIso = japanLocalDateTimeToIso(applicationDeadline);
+  } catch {
     redirect(
       "/restaurant/offers/new?message=" +
         encodeURIComponent("応募期限を確認してください。"),
@@ -101,7 +104,7 @@ export async function createDirectOffer(formData: FormData) {
     p_max_companions: maxCompanions,
     p_visit_period_start: visitStart,
     p_visit_period_end: visitEnd,
-    p_application_deadline: deadline.toISOString(),
+    p_application_deadline: deadlineIso,
     p_platforms: platforms,
     p_slots: slots,
   });
