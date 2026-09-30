@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
 import type { RestaurantApplicationChoice } from "@/server/queries/restaurant-applications";
@@ -42,6 +43,7 @@ export function RestaurantScheduleConfirm({
   choices,
 }: Props) {
   const [confirmedSlotId, setConfirmedSlotId] = useState<string | null>(null);
+  const [bookingId, setBookingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -100,6 +102,7 @@ export function RestaurantScheduleConfirm({
 
       if (result.ok) {
         setConfirmedSlotId(slotId);
+        setBookingId(result.bookingId);
         setMessage("採用と来店日時の確定が完了しました。");
       } else {
         setMessage(result.message);
@@ -126,6 +129,11 @@ export function RestaurantScheduleConfirm({
           <span className="eyebrow">BOOKING CONFIRMED</span>
           <h2>{confirmed.dateLabel} {confirmed.timeLabel}</h2>
           <p>{creatorName}・{partySize}名で確定しました。</p>
+          {bookingId ? (
+            <Link className="primary-button booking-review-link" href={`/restaurant/bookings/${bookingId}`}>
+              投稿・報酬管理へ
+            </Link>
+          ) : null}
         </div>
       ) : (
         <>
