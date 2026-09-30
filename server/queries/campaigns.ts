@@ -101,7 +101,10 @@ const campaignSelect = `
   campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status)
 `;
 
-export async function listCreatorCampaigns(kind: "market" | "flash" = "market") {
+export async function listCreatorCampaigns(
+  kind: "market" | "flash" = "market",
+  visibility: "public" | "direct" = "public",
+) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -109,6 +112,7 @@ export async function listCreatorCampaigns(kind: "market" | "flash" = "market") 
     .select(campaignSelect)
     .in("status", ["published", "recruiting"])
     .eq("kind", kind)
+    .eq("visibility", visibility)
     .order("published_at", { ascending: false });
 
   if (error) throw new Error(error.message);
