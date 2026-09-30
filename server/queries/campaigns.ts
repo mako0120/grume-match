@@ -113,6 +113,7 @@ export async function listCreatorCampaigns(
     .in("status", ["published", "recruiting"])
     .eq("kind", kind)
     .eq("visibility", visibility)
+    .gt("application_deadline", new Date().toISOString())
     .order("published_at", { ascending: false });
 
   if (error) throw new Error(error.message);
