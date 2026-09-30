@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { resolveSignedInDestination } from "@/server/auth/resolve-destination";
 
 function withMessage(path: string, message: string) {
   return `${path}?message=${encodeURIComponent(message)}`;
@@ -22,7 +23,7 @@ export async function signIn(formData: FormData) {
     redirect(withMessage("/login", "ログインできませんでした。入力内容をご確認ください。"));
   }
 
-  redirect("/onboarding");
+  redirect(await resolveSignedInDestination());
 }
 
 export async function signUp(formData: FormData) {
