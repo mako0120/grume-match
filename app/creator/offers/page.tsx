@@ -20,8 +20,8 @@ export default async function CreatorOffersPage() {
         <span className="eyebrow">FOR YOU</span>
         <h1>あなたへの指名PR。</h1>
         <p>
-          店舗があなた1人を指名して送った有償オファーです。
-          条件を確認して、参加したい場合は来店可能時間をタップしてください。
+          店舗があなた1人を指名して送った固定条件の有償オファーです。
+          価格交渉はありません。参加する場合だけ来店可能時間をタップしてください。
         </p>
       </section>
 
