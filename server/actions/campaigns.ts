@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
+import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
@@ -70,7 +71,15 @@ export async function createCampaign(formData: FormData) {
     redirect("/restaurant/campaigns/new?message=" + encodeURIComponent("選択条件に一致する来店枠がありません。"));
   }
 
-  const deadlineIso = new Date(applicationDeadline).toISOString();
+  let deadlineIso: string;
+  try {
+    deadlineIso = japanLocalDateTimeToIso(applicationDeadline);
+  } catch {
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent("応募締切を確認してください。"),
+    );
+  }
 
   const { data, error } = await supabase.rpc("create_campaign_with_slots", {
     p_restaurant_id: membership.restaurant_id,
