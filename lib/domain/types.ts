@@ -36,6 +36,7 @@ export type DemoCampaign = {
   foodOffer: string;
   maxCompanions: number;
   creatorSlots: number;
+  visibility?: "public" | "direct";
   platforms: Platform[];
   visitPeriod: string;
   slots: CampaignSlot[];
