@@ -18,8 +18,9 @@ export function CreatorBottomNav() {
     <nav className="bottom-nav" aria-label="Creator navigation">
       {items.map((item) => {
         const active =
-          pathname === item.href ||
-          (item.href !== "/creator/campaigns" && pathname.startsWith(item.href + "/"));
+          item.href === "/creator/campaigns"
+            ? pathname.startsWith("/creator/campaigns")
+            : pathname === item.href || pathname.startsWith(item.href + "/");
 
         return (
           <Link
