@@ -1603,3 +1603,38 @@ button {
     bottom: 92px;
   }
 }
+
+
+.task-list {
+  display: grid;
+  gap: 8px;
+}
+
+.task-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 68px;
+  padding: 13px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.task-card strong {
+  display: block;
+  font-size: 14px;
+}
+
+.task-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.task-card > span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-weight: 900;
+}
