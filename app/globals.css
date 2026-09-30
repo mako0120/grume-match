@@ -1393,3 +1393,114 @@ button {
   font-size: 12px;
   line-height: 1.6;
 }
+
+
+.standby-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+
+.standby-card.active {
+  background: var(--positive);
+  border-color: var(--positive-line);
+}
+
+.standby-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.standby-state strong {
+  display: block;
+  font-size: 20px;
+}
+
+.standby-state p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.standby-dot {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  background: #c9c6bc;
+  border-radius: 999px;
+}
+
+.standby-dot.active {
+  background: #4f8a59;
+  box-shadow: 0 0 0 6px rgba(79, 138, 89, 0.12);
+}
+
+.standby-toggle {
+  width: 100%;
+  border: 0;
+}
+
+.inline-message {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.standby-info {
+  margin-top: 14px;
+}
+
+.standby-restaurant-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+
+.standby-restaurant-card > div:first-child > strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 34px;
+  letter-spacing: -0.04em;
+}
+
+.standby-restaurant-card > div:first-child > p,
+.standby-empty {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.standby-creator-list {
+  display: grid;
+  gap: 7px;
+}
+
+.standby-creator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  background: var(--surface-soft);
+  border-radius: 13px;
+}
+
+.standby-creator-row strong,
+.standby-creator-row span {
+  display: block;
+}
+
+.standby-creator-row span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 10px;
+}
