@@ -57,6 +57,14 @@ export default async function CreatorCampaignDetailPage({
             {campaign.platforms.map((platform) => platformLabels[platform] ?? platform).join(" / ")}
           </strong>
         </div>
+        <div className="summary-item">
+          <span>来店人数</span>
+          <strong>
+            {campaign.maxCompanions === 0
+              ? "1名限定・ひとりで参加OK"
+              : `1名からOK・最大${campaign.maxCompanions + 1}名`}
+          </strong>
+        </div>
       </section>
 
       {campaign.slots.length > 0 ? (
