@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { StandbyToggle } from "@/components/standby-toggle";
 import { getCreatorStandbyStatus } from "@/server/queries/standby";
 
@@ -9,11 +8,7 @@ export default async function CreatorStandbyPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/creator/campaigns">案件</Link>
-          <Link href="/creator/flash">FLASH</Link>
-          <Link href="/notifications">通知</Link>
-        </nav>
+        <span className="status-pill">Creator</span>
       </header>
 
       <span className="eyebrow">STANDBY</span>
