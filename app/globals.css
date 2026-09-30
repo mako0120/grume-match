@@ -1210,3 +1210,50 @@ button {
 .payment-admin-actions > * {
   flex: 1;
 }
+
+
+.party-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.party-section-head h2 {
+  margin-bottom: 6px;
+}
+
+.solo-badge,
+.solo-card-pill {
+  color: #2f6e38;
+  background: #e7f5e9;
+  border: 1px solid #bdd8c0;
+}
+
+.solo-badge {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.field-help {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 520px) {
+  .party-section-head {
+    display: grid;
+  }
+
+  .solo-badge {
+    justify-self: start;
+  }
+}
