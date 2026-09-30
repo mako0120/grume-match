@@ -21,6 +21,7 @@ type RawCampaign = {
   food_offer: string;
   max_companions: number;
   creator_slots: number;
+  visibility: "public" | "direct";
   visit_period_start: string;
   visit_period_end: string;
   restaurants: RawRestaurant | RawRestaurant[] | null;
@@ -77,6 +78,7 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
     foodOffer: row.food_offer,
     maxCompanions: row.max_companions,
     creatorSlots: row.creator_slots,
+    visibility: row.visibility,
     platforms: (row.campaign_platforms ?? []).map((item) => item.platform),
     visitPeriod: visitPeriod(row.visit_period_start, row.visit_period_end),
     slots: (row.campaign_slots ?? [])
@@ -94,6 +96,7 @@ const campaignSelect = `
   food_offer,
   max_companions,
   creator_slots,
+  visibility,
   visit_period_start,
   visit_period_end,
   restaurants(name),
