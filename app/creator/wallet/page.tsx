@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getCreatorWallet } from "@/server/queries/wallet";
 
 function relationOne<T>(value: T | T[] | null | undefined): T | null {
@@ -20,11 +19,7 @@ export default async function CreatorWalletPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/creator/campaigns">案件</Link>
-          <Link href="/creator/applications">応募</Link>
-          <Link href="/creator/bookings">マイ案件</Link>
-        </nav>
+        <span className="status-pill">Creator</span>
       </header>
 
       <h1 className="page-title">報酬Wallet</h1>
