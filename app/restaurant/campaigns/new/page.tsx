@@ -26,89 +26,108 @@ export default async function NewCampaignPage({
 
       <h1 className="page-title">PR案件を作成</h1>
       <p className="page-subtitle">
-        現金報酬と来店可能時間を最初に設定。公開後はCreatorが空き時間をタップして応募します。
+        必要な項目だけ入力して公開。タイトル・エリア・応募締切などは自動で設定します。
       </p>
 
       {message ? <div className="form-message">{message}</div> : null}
 
       <form action={createCampaign} className="campaign-form">
         <section className="form-section">
-          <span className="eyebrow">01 CAMPAIGN</span>
-          <h2>PR内容</h2>
+          <span className="eyebrow">01 CONTENT</span>
+          <h2>何をPRしてほしい？</h2>
+
           <label>
-            タイトル
-            <input name="title" placeholder="黒毛和牛コース リールPR募集" required />
+            ジャンル
+            <input name="category" placeholder="焼肉" required />
           </label>
-          <div className="field-row">
-            <label>
-              ジャンル
-              <input name="category" placeholder="焼肉" required />
-            </label>
-            <label>
-              エリア
-              <input name="area" placeholder="心斎橋" required />
-            </label>
-          </div>
+
           <label>
-            紹介してほしい内容
-            <textarea name="description" rows={4} placeholder="新コースの特徴、推してほしい料理など" />
+            メモ（任意）
+            <textarea
+              name="description"
+              placeholder="紹介してほしい料理やポイント。空欄でもOKです。"
+              rows={3}
+            />
           </label>
         </section>
 
         <section className="form-section">
-          <span className="eyebrow">02 REWARD</span>
-          <h2>報酬と提供内容</h2>
+          <span className="eyebrow">02 CONDITIONS</span>
+          <h2>条件</h2>
+
           <div className="field-row">
             <label>
               現金報酬（税込）
-              <input defaultValue="6000" min="0" name="cashReward" required type="number" />
+              <input
+                defaultValue="6000"
+                min="1"
+                name="cashReward"
+                required
+                type="number"
+              />
             </label>
+
             <label>
               募集Creator数
-              <input defaultValue="3" min="1" name="creatorSlots" required type="number" />
+              <input
+                defaultValue="3"
+                min="1"
+                name="creatorSlots"
+                required
+                type="number"
+              />
             </label>
           </div>
+
           <label>
             食事提供
-            <input
-              defaultValue="1名分提供"
-              name="foodOffer"
-              placeholder="例：1名分提供 / 2名までコース提供"
-            />
+            <input defaultValue="1名分提供" name="foodOffer" />
           </label>
+
           <label>
             来店人数
-            <select defaultValue="1" name="maxCompanions">
-              <option value="0">1名限定（ひとりで来店）</option>
-              <option value="1">1〜2名（同伴1名まで）</option>
-              <option value="2">1〜3名（同伴2名まで）</option>
+            <select defaultValue="0" name="maxCompanions">
+              <option value="0">1名</option>
+              <option value="1">1〜2名</option>
+              <option value="2">1〜3名</option>
             </select>
           </label>
-          <p className="field-help">
-            1人で参加できる案件を標準にしています。同伴者が必須になる設定はMVPでは作りません。
-          </p>
-        </section>
 
-        <section className="form-section">
-          <span className="eyebrow">03 DELIVERABLE</span>
-          <h2>必須投稿</h2>
           <div className="check-grid">
-            <label><input defaultChecked name="platforms" type="checkbox" value="instagram_reel" /> Instagram Reel</label>
-            <label><input name="platforms" type="checkbox" value="instagram_feed" /> Instagram Feed</label>
-            <label><input name="platforms" type="checkbox" value="instagram_story" /> Story</label>
-            <label><input name="platforms" type="checkbox" value="tiktok" /> TikTok</label>
-            <label><input name="platforms" type="checkbox" value="youtube_shorts" /> YouTube Shorts</label>
+            <label>
+              <input
+                defaultChecked
+                name="platforms"
+                type="checkbox"
+                value="instagram_reel"
+              />
+              Instagram Reel
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="instagram_feed" />
+              Instagram Feed
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="instagram_story" />
+              Story
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="tiktok" />
+              TikTok
+            </label>
           </div>
         </section>
 
         <section className="form-section">
-          <span className="eyebrow">04 TAP SCHEDULE</span>
-          <h2>来店可能枠</h2>
+          <span className="eyebrow">03 DATE</span>
+          <h2>来店できる日</h2>
+
           <div className="field-row">
             <label>
               開始日
               <input name="visitStart" required type="date" />
             </label>
+
             <label>
               終了日
               <input name="visitEnd" required type="date" />
@@ -135,42 +154,20 @@ export default async function NewCampaignPage({
               受付開始
               <input defaultValue="17:00" name="startTime" required type="time" />
             </label>
+
             <label>
               受付終了
               <input defaultValue="21:00" name="endTime" required type="time" />
             </label>
           </div>
 
-          <div className="field-row three">
-            <label>
-              枠間隔
-              <select defaultValue="30" name="intervalMinutes">
-                <option value="30">30分</option>
-                <option value="60">60分</option>
-              </select>
-            </label>
-            <label>
-              滞在時間
-              <select defaultValue="120" name="visitDurationMinutes">
-                <option value="90">90分</option>
-                <option value="120">120分</option>
-                <option value="150">150分</option>
-              </select>
-            </label>
-            <label>
-              各枠の受入組数
-              <input defaultValue="1" min="1" name="slotCapacity" type="number" />
-            </label>
-          </div>
-
-          <label>
-            応募締切
-            <input name="applicationDeadline" required type="datetime-local" />
-          </label>
+          <p className="field-help">
+            来店候補は30分刻み・滞在2時間・1枠1組で自動生成します。応募締切も自動です。
+          </p>
         </section>
 
         <button className="primary-button publish-button" type="submit">
-          この内容で案件を公開
+          この内容で公開
         </button>
       </form>
     </main>
