@@ -867,3 +867,38 @@ button {
 .creator-profile-summary {
   margin-bottom: 15px;
 }
+
+
+.submitted-link {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.pending-box {
+  padding: 12px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.review-actions > * {
+  flex: 1;
+}
+
+.review-approve {
+  min-height: 42px;
+  border: 0;
+}
+
+.booking-review-link {
+  margin-top: 14px;
+}
