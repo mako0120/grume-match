@@ -1141,3 +1141,37 @@ button {
     justify-self: center;
   }
 }
+
+
+.flash-status {
+  color: #7d2b1f;
+  background: #ffe8df;
+}
+
+.flash-hero {
+  padding: 22px;
+  margin-bottom: 16px;
+  color: white;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255,255,255,.2), transparent 32%),
+    linear-gradient(135deg, #7c2f21, #21120e 72%);
+  border-radius: 26px;
+}
+
+.flash-hero h1 {
+  max-width: 520px;
+  margin: 13px 0 8px;
+  font-size: 32px;
+  line-height: 1.08;
+}
+
+.flash-hero p {
+  max-width: 580px;
+  margin: 0;
+  color: rgba(255,255,255,.75);
+  line-height: 1.65;
+}
+
+.flash-publish {
+  background: #7c2f21;
+}
