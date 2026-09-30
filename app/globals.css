@@ -902,3 +902,57 @@ button {
 .booking-review-link {
   margin-top: 14px;
 }
+
+
+.admin-count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 18px;
+  margin-bottom: 14px;
+  color: white;
+  background: var(--accent);
+  border-radius: 22px;
+}
+
+.admin-count span {
+  margin-right: auto;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-count strong {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.admin-count small {
+  font-size: 12px;
+}
+
+.admin-inbox {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.admin-item p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.admin-arrow {
+  color: var(--muted);
+  font-weight: 900;
+}
