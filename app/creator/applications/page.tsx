@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { listCreatorApplications } from "@/server/queries/creator-applications";
 
 const statusLabels: Record<string, string> = {
@@ -28,11 +27,7 @@ export default async function CreatorApplicationsPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/creator/campaigns">案件</Link>
-          <Link href="/creator/bookings">マイ案件</Link>
-          <Link href="/creator/wallet">報酬</Link>
-        </nav>
+        <span className="status-pill">Creator</span>
       </header>
 
       <h1 className="page-title">応募履歴</h1>
