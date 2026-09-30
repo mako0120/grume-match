@@ -36,7 +36,7 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
     () => new Set(),
   );
   const [flexibleChoices, setFlexibleChoices] = useState<FlexibleChoice[]>([]);
-  const [partySize, setPartySize] = useState(Math.min(2, maxCompanions + 1));
+  const [partySize, setPartySize] = useState(1);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -179,7 +179,19 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
       </section>
 
       <section className="schedule-section">
-        <h2>来店人数</h2>
+        <div className="party-section-head">
+          <div>
+            <h2>来店人数</h2>
+            <p className="schedule-hint">
+              1人でも応募できます。同伴可能な案件では必要な場合だけ人数を増やしてください。
+            </p>
+          </div>
+          {maxCompanions === 0 ? (
+            <span className="solo-badge">1名限定</span>
+          ) : (
+            <span className="solo-badge">1名からOK</span>
+          )}
+        </div>
         <div className="party-grid">
           {Array.from({ length: maxCompanions + 1 }, (_, index) => index + 1).map(
             (value) => (
@@ -191,7 +203,7 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
                 onClick={() => setPartySize(value)}
                 type="button"
               >
-                {value}名
+                {value === 1 ? "1名（ひとり）" : `${value}名`}
               </button>
             ),
           )}
