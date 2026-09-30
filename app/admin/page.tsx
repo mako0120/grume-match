@@ -15,7 +15,10 @@ export default async function AdminPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <span className="status-pill">Admin</span>
+        <nav className="mini-nav">
+          <Link href="/admin/payments">報酬支払い</Link>
+          <Link href="/notifications">通知</Link>
+        </nav>
       </header>
 
       <h1 className="page-title">今日あなたが対応すること</h1>
