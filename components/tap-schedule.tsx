@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
+import { buildPartySizes, defaultPartySize, partySizeLabel } from "@/lib/party-size";
 import { submitCampaignApplication } from "@/server/actions/applications";
 
 type FlexibleChoice = {
@@ -36,7 +37,7 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
     () => new Set(),
   );
   const [flexibleChoices, setFlexibleChoices] = useState<FlexibleChoice[]>([]);
-  const [partySize, setPartySize] = useState(1);
+  const [partySize, setPartySize] = useState(defaultPartySize());
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -193,8 +194,7 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
           )}
         </div>
         <div className="party-grid">
-          {Array.from({ length: maxCompanions + 1 }, (_, index) => index + 1).map(
-            (value) => (
+          {buildPartySizes(maxCompanions).map((value) => (
               <button
                 className="party-button"
                 data-selected={partySize === value}
@@ -203,10 +203,9 @@ export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
                 onClick={() => setPartySize(value)}
                 type="button"
               >
-                {value === 1 ? "1名（ひとり）" : `${value}名`}
+                {partySizeLabel(value)}
               </button>
-            ),
-          )}
+            ))}
         </div>
       </section>
 
