@@ -7,6 +7,9 @@ export function CampaignCard({ campaign }: { campaign: DemoCampaign }) {
       <div className="campaign-topline">
         <span className="meta-pill">{campaign.area}</span>
         <span className="meta-pill">{campaign.category}</span>
+        {campaign.visibility === "direct" ? (
+          <span className="meta-pill direct-pill">指名オファー</span>
+        ) : null}
         <span className="meta-pill">募集 {campaign.creatorSlots}名</span>
         <span className="meta-pill solo-card-pill">
           {campaign.maxCompanions === 0 ? "1名限定" : "1名からOK"}
