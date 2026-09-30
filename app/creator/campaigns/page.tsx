@@ -1,7 +1,9 @@
 import { CampaignCard } from "@/components/campaign-card";
-import { demoCampaigns } from "@/lib/demo-data";
+import { listCreatorCampaigns } from "@/server/queries/campaigns";
 
-export default function CreatorCampaignListPage() {
+export default async function CreatorCampaignListPage() {
+  const campaigns = await listCreatorCampaigns();
+
   return (
     <main className="creator-shell">
       <header className="creator-header">
@@ -14,11 +16,18 @@ export default function CreatorCampaignListPage() {
         食事提供とは別に、現金報酬が明示された案件を掲載します。
       </p>
 
-      <section className="campaign-list" aria-label="PR案件一覧">
-        {demoCampaigns.map((campaign) => (
-          <CampaignCard key={campaign.id} campaign={campaign} />
-        ))}
-      </section>
+      {campaigns.length ? (
+        <section className="campaign-list" aria-label="PR案件一覧">
+          {campaigns.map((campaign) => (
+            <CampaignCard key={campaign.id} campaign={campaign} />
+          ))}
+        </section>
+      ) : (
+        <section className="section-card">
+          <strong>現在募集中の案件はありません</strong>
+          <p>新しい有償PR案件が公開されると、ここに表示されます。</p>
+        </section>
+      )}
     </main>
   );
 }
