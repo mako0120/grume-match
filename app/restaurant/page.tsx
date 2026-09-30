@@ -57,10 +57,10 @@ export default async function RestaurantDashboardPage() {
           <span>投稿確認</span>
           <strong>{dashboard.counts.deliverables}</strong>
         </div>
-        <div>
+        <Link href="/restaurant/reschedules">
           <span>日時変更</span>
           <strong>{dashboard.counts.reschedules}</strong>
-        </div>
+        </Link>
       </section>
 
       <section className="dashboard-section">
