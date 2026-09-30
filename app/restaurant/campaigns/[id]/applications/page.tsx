@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RestaurantScheduleConfirm } from "@/components/restaurant-schedule-confirm";
-import { getDemoCampaign } from "@/lib/demo-data";
+import { getRestaurantCampaignApplications } from "@/server/queries/restaurant-applications";
 
 export default async function RestaurantApplicationsPage({
   params,
@@ -9,7 +9,7 @@ export default async function RestaurantApplicationsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const campaign = getDemoCampaign(id);
+  const campaign = await getRestaurantCampaignApplications(id);
 
   if (!campaign) notFound();
 
@@ -20,8 +20,8 @@ export default async function RestaurantApplicationsPage({
         <span className="status-pill">Restaurant</span>
       </header>
 
-      <Link className="back-link" href="/">
-        ← プロダクトトップ
+      <Link className="back-link" href="/restaurant/campaigns/new">
+        ← 新しい案件を作る
       </Link>
 
       <h1 className="page-title">応募者を選ぶ</h1>
@@ -35,18 +35,26 @@ export default async function RestaurantApplicationsPage({
         <p>{campaign.title}</p>
       </section>
 
-      <RestaurantScheduleConfirm
-        cashReward={campaign.cashReward}
-        choices={[
-          { kind: "exact", slotId: "s3" },
-          { kind: "exact", slotId: "s9" },
-          { kind: "flexible", dateLabel: "10月11日（土）", after: "19:00" },
-        ]}
-        creatorName="グルメ日誌"
-        followerCount={4000}
-        partySize={2}
-        slots={campaign.slots}
-      />
+      {campaign.applications.length ? (
+        campaign.applications.map((application) => (
+          <RestaurantScheduleConfirm
+            applicationId={application.applicationId}
+            campaignId={campaign.campaignId}
+            cashReward={campaign.cashReward}
+            choices={application.choices}
+            creatorName={application.creatorName}
+            followerCount={application.followerCount}
+            key={application.applicationId}
+            partySize={application.partySize}
+            slots={campaign.slots}
+          />
+        ))
+      ) : (
+        <section className="section-card">
+          <strong>まだ応募者はいません</strong>
+          <p>Creatorが来店候補日時を選んで応募すると、ここに表示されます。</p>
+        </section>
+      )}
     </main>
   );
 }
