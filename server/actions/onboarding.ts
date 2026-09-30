@@ -32,7 +32,7 @@ export async function completeCreatorOnboarding(formData: FormData) {
     redirect(`/onboarding?message=${encodeURIComponent("Creator登録に失敗しました。入力内容をご確認ください。")}`);
   }
 
-  redirect("/creator/campaigns");
+  redirect("/creator/profile");
 }
 
 export async function completeRestaurantOnboarding(formData: FormData) {
