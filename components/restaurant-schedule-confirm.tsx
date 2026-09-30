@@ -1,31 +1,39 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
-
-type ExactChoice = {
-  kind: "exact";
-  slotId: string;
-};
-
-type FlexibleChoice = {
-  kind: "flexible";
-  dateLabel: string;
-  after: string;
-};
-
-type AvailabilityChoice = ExactChoice | FlexibleChoice;
+import type { RestaurantApplicationChoice } from "@/server/queries/restaurant-applications";
+import { confirmApplicationBooking } from "@/server/actions/bookings";
 
 type Props = {
+  campaignId: string;
+  applicationId: string;
   slots: CampaignSlot[];
   creatorName: string;
   followerCount: number;
   cashReward: number;
   partySize: number;
-  choices: AvailabilityChoice[];
+  choices: RestaurantApplicationChoice[];
 };
 
+function localDateKey(iso: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso));
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 export function RestaurantScheduleConfirm({
+  campaignId,
+  applicationId,
   slots,
   creatorName,
   followerCount,
@@ -34,6 +42,8 @@ export function RestaurantScheduleConfirm({
   choices,
 }: Props) {
   const [confirmedSlotId, setConfirmedSlotId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const eligibleSlots = useMemo(() => {
     const slotMap = new Map(slots.map((slot) => [slot.id, slot]));
@@ -48,7 +58,7 @@ export function RestaurantScheduleConfirm({
 
       for (const slot of slots) {
         if (
-          slot.dateLabel === choice.dateLabel &&
+          localDateKey(slot.startsAt) === choice.dateLocal &&
           slot.timeLabel >= choice.after &&
           slot.isOpen &&
           slot.remaining > 0
@@ -77,6 +87,26 @@ export function RestaurantScheduleConfirm({
     ? slots.find((slot) => slot.id === confirmedSlotId)
     : undefined;
 
+  function confirm(slotId: string) {
+    if (isPending) return;
+    setMessage(null);
+
+    startTransition(async () => {
+      const result = await confirmApplicationBooking(
+        campaignId,
+        applicationId,
+        slotId,
+      );
+
+      if (result.ok) {
+        setConfirmedSlotId(slotId);
+        setMessage("採用と来店日時の確定が完了しました。");
+      } else {
+        setMessage(result.message);
+      }
+    });
+  }
+
   return (
     <section className="restaurant-panel">
       <div className="applicant-card">
@@ -95,17 +125,7 @@ export function RestaurantScheduleConfirm({
         <div className="confirmed-card" aria-live="polite">
           <span className="eyebrow">BOOKING CONFIRMED</span>
           <h2>{confirmed.dateLabel} {confirmed.timeLabel}</h2>
-          <p>
-            {creatorName}・{partySize}名で確定しました。
-            本番ではこの操作がDB transactionで枠数を確保します。
-          </p>
-          <button
-            className="secondary-button"
-            onClick={() => setConfirmedSlotId(null)}
-            type="button"
-          >
-            デモを戻す
-          </button>
+          <p>{creatorName}・{partySize}名で確定しました。</p>
         </div>
       ) : (
         <>
@@ -114,29 +134,42 @@ export function RestaurantScheduleConfirm({
             Creatorが選んだ候補と、現在空いている枠の共通部分だけ表示します。
           </p>
 
-          {grouped.map(([dateLabel, dateSlots]) => (
-            <div className="date-card" key={dateLabel}>
-              <div className="date-head">
-                <strong>{dateLabel}</strong>
-                <span>{dateSlots.length}候補</span>
+          {grouped.length ? (
+            grouped.map(([dateLabel, dateSlots]) => (
+              <div className="date-card" key={dateLabel}>
+                <div className="date-head">
+                  <strong>{dateLabel}</strong>
+                  <span>{dateSlots.length}候補</span>
+                </div>
+                <div className="slot-grid">
+                  {dateSlots.map((slot) => (
+                    <button
+                      className="restaurant-slot-button"
+                      disabled={isPending}
+                      key={slot.id}
+                      onClick={() => confirm(slot.id)}
+                      type="button"
+                    >
+                      {slot.timeLabel}
+                      <small>{isPending ? "確定中..." : "この時間で採用"}</small>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="slot-grid">
-                {dateSlots.map((slot) => (
-                  <button
-                    className="restaurant-slot-button"
-                    key={slot.id}
-                    onClick={() => setConfirmedSlotId(slot.id)}
-                    type="button"
-                  >
-                    {slot.timeLabel}
-                    <small>この時間で採用</small>
-                  </button>
-                ))}
-              </div>
+            ))
+          ) : (
+            <div className="form-message">
+              現在確定できる共通時間がありません。別候補の依頼機能は後続Issueで追加します。
             </div>
-          ))}
+          )}
         </>
       )}
+
+      {message ? (
+        <div className={confirmed ? "inline-success" : "form-message"} aria-live="polite">
+          {message}
+        </div>
+      ) : null}
     </section>
   );
 }
