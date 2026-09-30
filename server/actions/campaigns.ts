@@ -1,13 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
+import { createClient } from "@/lib/supabase/server";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.floor(parsed) : fallback;
+}
+
+function one<T>(value: T | T[] | null | undefined): T | null {
+  return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
 
 export async function createCampaign(formData: FormData) {
@@ -17,31 +21,29 @@ export async function createCampaign(formData: FormData) {
 
   const { data: membership, error: membershipError } = await supabase
     .from("restaurant_memberships")
-    .select("restaurant_id")
+    .select("restaurant_id,restaurants(name,area)")
     .eq("user_id", authData.user.id)
     .limit(1)
     .single();
 
   if (membershipError || !membership) {
-    redirect("/onboarding?message=" + encodeURIComponent("先に店舗情報を登録してください。"));
+    redirect(
+      "/onboarding?message=" +
+        encodeURIComponent("先に店舗情報を登録してください。"),
+    );
   }
 
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const restaurant = one(membership.restaurants);
   const category = String(formData.get("category") ?? "").trim();
-  const area = String(formData.get("area") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
   const cashReward = toInt(formData.get("cashReward"), 0);
-  const foodOffer = String(formData.get("foodOffer") ?? "").trim();
+  const foodOffer = String(formData.get("foodOffer") ?? "1名分提供").trim();
   const maxCompanions = toInt(formData.get("maxCompanions"), 0);
-  const creatorSlots = toInt(formData.get("creatorSlots"), 1);
+  const creatorSlots = toInt(formData.get("creatorSlots"), 3);
   const visitStart = String(formData.get("visitStart") ?? "");
   const visitEnd = String(formData.get("visitEnd") ?? "");
-  const applicationDeadline = String(formData.get("applicationDeadline") ?? "");
   const startTime = String(formData.get("startTime") ?? "17:00");
   const endTime = String(formData.get("endTime") ?? "21:00");
-  const intervalMinutes = toInt(formData.get("intervalMinutes"), 30);
-  const visitDurationMinutes = toInt(formData.get("visitDurationMinutes"), 120);
-  const slotCapacity = toInt(formData.get("slotCapacity"), 1);
   const weekdays = formData
     .getAll("weekdays")
     .map((value) => Number(value))
@@ -51,6 +53,13 @@ export async function createCampaign(formData: FormData) {
     .map(String)
     .filter(Boolean);
 
+  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent("ジャンル・報酬・募集人数・投稿先を確認してください。"),
+    );
+  }
+
   let slots;
   try {
     slots = buildCampaignSlots({
@@ -59,27 +68,37 @@ export async function createCampaign(formData: FormData) {
       weekdays,
       startTime,
       endTime,
-      intervalMinutes,
-      visitDurationMinutes,
-      capacity: slotCapacity,
+      intervalMinutes: 30,
+      visitDurationMinutes: 120,
+      capacity: 1,
     });
   } catch {
-    redirect("/restaurant/campaigns/new?message=" + encodeURIComponent("来店日時の設定を確認してください。"));
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent("来店日時の設定を確認してください。"),
+    );
   }
 
   if (!slots.length) {
-    redirect("/restaurant/campaigns/new?message=" + encodeURIComponent("選択条件に一致する来店枠がありません。"));
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent("選択条件に一致する来店枠がありません。"),
+    );
   }
 
   let deadlineIso: string;
   try {
-    deadlineIso = japanLocalDateTimeToIso(applicationDeadline);
+    deadlineIso = japanLocalDateTimeToIso(visitEnd + "T23:59");
   } catch {
     redirect(
       "/restaurant/campaigns/new?message=" +
-        encodeURIComponent("応募締切を確認してください。"),
+        encodeURIComponent("来店期間を確認してください。"),
     );
   }
+
+  const restaurantName = restaurant?.name ?? "店舗";
+  const area = restaurant?.area ?? "大阪";
+  const title = restaurantName + " " + category + " PR募集";
 
   const { data, error } = await supabase.rpc("create_campaign_with_slots", {
     p_restaurant_id: membership.restaurant_id,
@@ -100,8 +119,11 @@ export async function createCampaign(formData: FormData) {
   });
 
   if (error || !data) {
-    redirect("/restaurant/campaigns/new?message=" + encodeURIComponent("案件を公開できませんでした。入力内容をご確認ください。"));
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent("案件を公開できませんでした。入力内容をご確認ください。"),
+    );
   }
 
-  redirect(`/restaurant/campaigns/${data}/applications`);
+  redirect("/restaurant/campaigns/" + data + "/applications");
 }
