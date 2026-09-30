@@ -65,6 +65,15 @@ export default async function CreatorBookingDetailPage({
         </div>
       </section>
 
+      <section className="booking-actions">
+        <Link className="secondary-button" href={`/creator/bookings/${booking.id}/reschedule`}>
+          来店日時を変更
+        </Link>
+        <Link className="secondary-button" href="/notifications">
+          通知を見る
+        </Link>
+      </section>
+
       <section className="deliverable-section">
         <h2>投稿物を提出</h2>
         <p className="schedule-hint">
