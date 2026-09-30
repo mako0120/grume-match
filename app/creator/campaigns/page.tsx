@@ -10,6 +10,7 @@ export default async function CreatorCampaignListPage() {
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
         <nav className="mini-nav">
+          <Link href="/creator/standby">今行ける</Link>
           <Link href="/creator/offers">指名</Link>
           <Link href="/creator/flash">FLASH</Link>
           <Link href="/creator/applications">応募</Link>
