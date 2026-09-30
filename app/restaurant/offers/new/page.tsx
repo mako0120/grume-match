@@ -2,8 +2,6 @@ import Link from "next/link";
 import { createDirectOffer } from "@/server/actions/offers";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
 
-const weekdays = [["0","日"],["1","月"],["2","火"],["3","水"],["4","木"],["5","金"],["6","土"]] as const;
-
 export default async function NewDirectOfferPage({
   searchParams,
 }: {
@@ -24,11 +22,11 @@ export default async function NewDirectOfferPage({
       </Link>
 
       <section className="direct-offer-hero">
-        <span className="eyebrow">ONE CREATOR</span>
-        <h1>1人を指名して、有償PRを依頼。</h1>
+        <span className="eyebrow">SIMPLE OFFER</span>
+        <h1>1人選ぶ。条件を出す。送る。</h1>
         <p>
-          公開募集ではなく、特定のCreatorだけに報酬・条件・候補日時を提示します。
-          Creatorは条件を確認して、そのまま来店可能日時を選べます。
+          価格交渉はありません。Creatorは提示条件で参加する場合だけ、
+          候補日時をタップして応募します。
         </p>
       </section>
 
@@ -37,7 +35,7 @@ export default async function NewDirectOfferPage({
       <form action={createDirectOffer} className="campaign-form">
         <section className="form-section">
           <span className="eyebrow">01 CREATOR</span>
-          <h2>依頼するCreatorを1人選択</h2>
+          <h2>依頼する人</h2>
 
           {creators.length ? (
             <div className="creator-picker">
@@ -50,7 +48,7 @@ export default async function NewDirectOfferPage({
                     <p>
                       Instagram {creator.followers.toLocaleString()} followers
                       {creator.minReward > 0
-                        ? ` ・ 希望報酬 ¥${creator.minReward.toLocaleString()}〜`
+                        ? " ・ 目安 ¥" + creator.minReward.toLocaleString() + "〜"
                         : ""}
                     </p>
                   </div>
@@ -65,54 +63,20 @@ export default async function NewDirectOfferPage({
         </section>
 
         <section className="form-section">
-          <span className="eyebrow">02 OFFER</span>
-          <h2>依頼内容</h2>
-
-          <label>
-            タイトル
-            <input
-              name="title"
-              placeholder="グルメ日誌様へ 焼肉コースPRのご依頼"
-              required
-            />
-          </label>
-
-          <div className="field-row">
-            <label>
-              ジャンル
-              <input name="category" placeholder="焼肉" required />
-            </label>
-            <label>
-              エリア
-              <input name="area" placeholder="梅田" required />
-            </label>
-          </div>
-
-          <label>
-            依頼内容
-            <textarea
-              name="description"
-              placeholder="新コースの紹介、撮影してほしい料理など"
-              rows={4}
-            />
-          </label>
-        </section>
-
-        <section className="form-section">
-          <span className="eyebrow">03 REWARD</span>
-          <h2>報酬と来店人数</h2>
+          <span className="eyebrow">02 CONDITIONS</span>
+          <h2>条件</h2>
 
           <div className="field-row">
             <label>
               現金報酬（税込）
-              <input defaultValue="6000" min="0" name="cashReward" required type="number" />
+              <input defaultValue="6000" min="1" name="cashReward" required type="number" />
             </label>
             <label>
               来店人数
               <select defaultValue="0" name="maxCompanions">
-                <option value="0">1名限定（Creator本人のみ）</option>
-                <option value="1">1〜2名（同伴1名まで）</option>
-                <option value="2">1〜3名（同伴2名まで）</option>
+                <option value="0">1名</option>
+                <option value="1">1〜2名</option>
+                <option value="2">1〜3名</option>
               </select>
             </label>
           </div>
@@ -121,11 +85,6 @@ export default async function NewDirectOfferPage({
             食事提供
             <input defaultValue="1名分提供" name="foodOffer" />
           </label>
-        </section>
-
-        <section className="form-section">
-          <span className="eyebrow">04 DELIVERABLE</span>
-          <h2>必須投稿</h2>
 
           <div className="check-grid">
             <label>
@@ -133,87 +92,65 @@ export default async function NewDirectOfferPage({
               Instagram Reel
             </label>
             <label>
-              <input name="platforms" type="checkbox" value="instagram_feed" />
-              Instagram Feed
+              <input name="platforms" type="checkbox" value="tiktok" />
+              TikTok
             </label>
             <label>
               <input name="platforms" type="checkbox" value="instagram_story" />
               Story
             </label>
-            <label>
-              <input name="platforms" type="checkbox" value="tiktok" />
-              TikTok
-            </label>
-          </div>
-        </section>
-
-        <section className="form-section">
-          <span className="eyebrow">05 SCHEDULE</span>
-          <h2>来店候補</h2>
-
-          <div className="field-row">
-            <label>
-              開始日
-              <input name="visitStart" required type="date" />
-            </label>
-            <label>
-              終了日
-              <input name="visitEnd" required type="date" />
-            </label>
-          </div>
-
-          <span className="field-caption">候補曜日</span>
-          <div className="weekday-grid">
-            {weekdays.map(([value, label]) => (
-              <label key={value}>
-                <input
-                  defaultChecked={["1","2","3","4"].includes(value)}
-                  name="weekdays"
-                  type="checkbox"
-                  value={value}
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-
-          <div className="field-row">
-            <label>
-              開始時間
-              <input defaultValue="17:00" name="startTime" required type="time" />
-            </label>
-            <label>
-              終了時間
-              <input defaultValue="21:00" name="endTime" required type="time" />
-            </label>
-          </div>
-
-          <div className="field-row">
-            <label>
-              候補間隔
-              <select defaultValue="30" name="intervalMinutes">
-                <option value="30">30分</option>
-                <option value="60">60分</option>
-              </select>
-            </label>
-            <label>
-              滞在時間
-              <select defaultValue="120" name="visitDurationMinutes">
-                <option value="90">90分</option>
-                <option value="120">120分</option>
-                <option value="150">150分</option>
-              </select>
-            </label>
           </div>
 
           <label>
-            オファー回答期限
-            <input name="applicationDeadline" required type="datetime-local" />
+            メモ（任意）
+            <textarea
+              name="note"
+              placeholder="紹介してほしい料理など。空欄でもOKです。"
+              rows={3}
+            />
           </label>
         </section>
 
+        <section className="form-section">
+          <span className="eyebrow">03 DATE</span>
+          <h2>候補日時を1〜3つ</h2>
+          <p className="field-help">
+            Creatorはこの中から行ける時間をタップするだけです。
+          </p>
+
+          <label>
+            候補1
+            <input name="candidate1" required type="datetime-local" />
+          </label>
+          <label>
+            候補2（任意）
+            <input name="candidate2" type="datetime-local" />
+          </label>
+          <label>
+            候補3（任意）
+            <input name="candidate3" type="datetime-local" />
+          </label>
+
+          <label>
+            滞在時間
+            <select defaultValue="120" name="durationMinutes">
+              <option value="90">90分</option>
+              <option value="120">120分</option>
+              <option value="150">150分</option>
+            </select>
+          </label>
+        </section>
+
+        <section className="fixed-offer-note">
+          <strong>固定条件・交渉なし</strong>
+          <p>
+            Creatorは「この条件で参加する」か「見送る」だけ。
+            参加する場合は候補日時を選ぶだけです。
+          </p>
+        </section>
+
         <button className="primary-button publish-button" disabled={!creators.length} type="submit">
-          このCreatorへ有償オファーを送る
+          この条件で送る
         </button>
       </form>
     </main>
