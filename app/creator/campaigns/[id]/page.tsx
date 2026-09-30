@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TapSchedule } from "@/components/tap-schedule";
-import { getDemoCampaign } from "@/lib/demo-data";
+import { getCreatorCampaign } from "@/server/queries/campaigns";
+
+const platformLabels: Record<string, string> = {
+  instagram_feed: "Instagram Feed",
+  instagram_reel: "Instagram Reel",
+  instagram_story: "Instagram Story",
+  tiktok: "TikTok",
+  youtube_shorts: "YouTube Shorts",
+  ugc_photo: "UGC写真",
+  ugc_video: "UGC動画",
+};
 
 export default async function CreatorCampaignDetailPage({
   params,
@@ -9,7 +19,7 @@ export default async function CreatorCampaignDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const campaign = getDemoCampaign(id);
+  const campaign = await getCreatorCampaign(id);
 
   if (!campaign) notFound();
 
@@ -43,19 +53,22 @@ export default async function CreatorCampaignDetailPage({
         </div>
         <div className="summary-item">
           <span>必須投稿</span>
-          <strong>Instagram Reel</strong>
+          <strong>
+            {campaign.platforms.map((platform) => platformLabels[platform] ?? platform).join(" / ")}
+          </strong>
         </div>
       </section>
 
       {campaign.slots.length > 0 ? (
         <TapSchedule
+          campaignId={campaign.id}
           maxCompanions={campaign.maxCompanions}
           slots={campaign.slots}
         />
       ) : (
         <section className="section-card">
-          <strong>来店枠を準備中です</strong>
-          <p>店舗が公開した日時だけを選択できる設計です。</p>
+          <strong>現在選択できる来店枠がありません</strong>
+          <p>店舗が新しい枠を公開すると応募できます。</p>
         </section>
       )}
     </main>
