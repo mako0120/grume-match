@@ -101,14 +101,14 @@ const campaignSelect = `
   campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status)
 `;
 
-export async function listCreatorCampaigns() {
+export async function listCreatorCampaigns(kind: "market" | "flash" = "market") {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("campaigns")
     .select(campaignSelect)
     .in("status", ["published", "recruiting"])
-    .eq("kind", "market")
+    .eq("kind", kind)
     .order("published_at", { ascending: false });
 
   if (error) throw new Error(error.message);
