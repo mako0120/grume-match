@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { CreatorBottomNav } from "@/components/creator-bottom-nav";
 import { requireRole } from "@/server/auth/require-role";
 
 export default async function CreatorLayout({
@@ -7,5 +8,11 @@ export default async function CreatorLayout({
   children: ReactNode;
 }) {
   await requireRole(["creator", "admin"]);
-  return children;
+
+  return (
+    <>
+      {children}
+      <CreatorBottomNav />
+    </>
+  );
 }
