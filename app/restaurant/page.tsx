@@ -39,6 +39,32 @@ export default async function RestaurantDashboardPage() {
         応募・来店・投稿確認など、次に対応するものから確認できます。
       </p>
 
+      <section className="dashboard-section">
+        <div className="section-heading">
+          <h2>今やること</h2>
+          <span className="status-pill">{dashboard.tasks.length}件</span>
+        </div>
+
+        {dashboard.tasks.length ? (
+          <div className="task-list">
+            {dashboard.tasks.slice(0, 8).map((task) => (
+              <Link className="task-card" href={task.href} key={task.id}>
+                <div>
+                  <strong>{task.title}</strong>
+                  <p>{task.detail}</p>
+                </div>
+                <span>→</span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <section className="section-card">
+            <strong>今すぐ対応することはありません</strong>
+            <p>通常案件は自動で進みます。対応が必要な時だけここに表示します。</p>
+          </section>
+        )}
+      </section>
+
       <section className="dashboard-metrics">
         <Link href="/restaurant/campaigns/new">
           <span>募集中</span>
