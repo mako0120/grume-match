@@ -1,25 +1,44 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
+import { submitCampaignApplication } from "@/server/actions/applications";
 
 type FlexibleChoice = {
   dateLabel: string;
+  dateLocal: string;
   after: string;
 };
 
 type Props = {
+  campaignId: string;
   slots: CampaignSlot[];
   maxCompanions: number;
 };
 
-export function TapSchedule({ slots, maxCompanions }: Props) {
+function localDateKey(iso: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso));
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+export function TapSchedule({ campaignId, slots, maxCompanions }: Props) {
   const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string>>(
     () => new Set(),
   );
   const [flexibleChoices, setFlexibleChoices] = useState<FlexibleChoice[]>([]);
   const [partySize, setPartySize] = useState(Math.min(2, maxCompanions + 1));
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const grouped = useMemo(() => {
     const map = new Map<string, CampaignSlot[]>();
@@ -34,7 +53,7 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
   const selectedCount = selectedSlotIds.size + flexibleChoices.length;
 
   function toggleExact(slot: CampaignSlot) {
-    if (!slot.isOpen || slot.remaining <= 0) return;
+    if (!slot.isOpen || slot.remaining <= 0 || isPending) return;
 
     setFlexibleChoices((current) =>
       current.filter((choice) => choice.dateLabel !== slot.dateLabel),
@@ -47,10 +66,12 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
       return next;
     });
 
-    setSubmitted(false);
+    setResult(null);
   }
 
-  function toggleFlexible(dateLabel: string, after = "19:00") {
+  function toggleFlexible(dateLabel: string, dateLocal: string, after = "19:00") {
+    if (isPending) return;
+
     setSelectedSlotIds((current) => {
       const next = new Set(current);
       for (const slot of slots) {
@@ -71,16 +92,37 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
       }
       return [
         ...current.filter((choice) => choice.dateLabel !== dateLabel),
-        { dateLabel, after },
+        { dateLabel, dateLocal, after },
       ];
     });
 
-    setSubmitted(false);
+    setResult(null);
   }
 
-  function submitDemo() {
-    if (selectedCount === 0) return;
-    setSubmitted(true);
+  function submit() {
+    if (selectedCount === 0 || isPending) return;
+
+    startTransition(async () => {
+      const response = await submitCampaignApplication({
+        campaignId,
+        partySize,
+        exactSlotIds: [...selectedSlotIds],
+        flexibleChoices: flexibleChoices.map((choice) => ({
+          dateLocal: choice.dateLocal,
+          afterLocal: choice.after,
+        })),
+      });
+
+      if (response.ok) {
+        setResult({
+          ok: true,
+          message: "応募しました。店舗が候補日時を選ぶと予約が確定します。",
+        });
+        return;
+      }
+
+      setResult({ ok: false, message: response.message });
+    });
   }
 
   return (
@@ -98,6 +140,7 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
           const availableCount = dateSlots.filter(
             (slot) => slot.isOpen && slot.remaining > 0,
           ).length;
+          const dateLocal = localDateKey(dateSlots[0].startsAt);
 
           return (
             <div className="date-card" key={dateLabel}>
@@ -111,7 +154,7 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
                   <button
                     className="slot-button"
                     data-selected={selectedSlotIds.has(slot.id)}
-                    disabled={!slot.isOpen || slot.remaining <= 0}
+                    disabled={!slot.isOpen || slot.remaining <= 0 || isPending}
                     key={slot.id}
                     onClick={() => toggleExact(slot)}
                     type="button"
@@ -123,7 +166,8 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
                 <button
                   className="flex-button"
                   data-selected={flexibleSelected}
-                  onClick={() => toggleFlexible(dateLabel)}
+                  disabled={isPending || availableCount === 0}
+                  onClick={() => toggleFlexible(dateLabel, dateLocal)}
                   type="button"
                 >
                   19:00以降ならいつでも
@@ -142,6 +186,7 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
               <button
                 className="party-button"
                 data-selected={partySize === value}
+                disabled={isPending}
                 key={value}
                 onClick={() => setPartySize(value)}
                 type="button"
@@ -153,12 +198,13 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
         </div>
       </section>
 
-      {submitted ? (
-        <section className="section-card" aria-live="polite">
-          <strong>応募デモを受け付けました</strong>
-          <p>
-            {selectedCount}候補・{partySize}名。次の実装でSupabaseへ保存します。
-          </p>
+      {result ? (
+        <section
+          className={result.ok ? "section-card success-message" : "section-card error-message"}
+          aria-live="polite"
+        >
+          <strong>{result.ok ? "応募完了" : "応募できませんでした"}</strong>
+          <p>{result.message}</p>
         </section>
       ) : null}
 
@@ -169,11 +215,11 @@ export function TapSchedule({ slots, maxCompanions }: Props) {
         </div>
         <button
           className="application-button"
-          disabled={selectedCount === 0}
-          onClick={submitDemo}
+          disabled={selectedCount === 0 || isPending || result?.ok === true}
+          onClick={submit}
           type="button"
         >
-          この候補で応募する
+          {isPending ? "応募中..." : result?.ok ? "応募済み" : "この候補で応募する"}
         </button>
       </div>
     </>
