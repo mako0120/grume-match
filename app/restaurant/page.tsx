@@ -30,6 +30,7 @@ export default async function RestaurantDashboardPage() {
         <strong>GOURMET DIARY</strong>
         <nav className="mini-nav">
           <Link href="/restaurant/campaigns/new">案件作成</Link>
+          <Link href="/restaurant/flash/new">FLASH</Link>
           <Link href="/notifications">通知</Link>
         </nav>
       </header>
