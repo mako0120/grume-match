@@ -28,12 +28,9 @@ export default async function RestaurantDashboardPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/restaurant/campaigns/new">案件作成</Link>
-          <Link href="/restaurant/offers/new">1人を指名</Link>
-          <Link href="/restaurant/flash/new">FLASH</Link>
-          <Link href="/notifications">通知</Link>
-        </nav>
+        <Link className="header-action" href="/notifications">
+          通知
+        </Link>
       </header>
 
       <span className="eyebrow">RESTAURANT DASHBOARD</span>
