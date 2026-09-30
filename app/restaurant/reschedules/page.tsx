@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { RestaurantRescheduleReview } from "@/components/restaurant-reschedule-review";
 import { listRestaurantPendingReschedules } from "@/server/queries/reschedules";
 
@@ -23,10 +22,7 @@ export default async function RestaurantReschedulesPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/restaurant">店舗管理</Link>
-          <Link href="/notifications">通知</Link>
-        </nav>
+        <span className="status-pill">Restaurant</span>
       </header>
 
       <h1 className="page-title">日時変更リクエスト</h1>
