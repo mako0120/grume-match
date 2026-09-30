@@ -4,6 +4,7 @@ import {
   completeCreatorOnboarding,
   completeRestaurantOnboarding,
 } from "@/server/actions/onboarding";
+import { resolveSignedInDestination } from "@/server/auth/resolve-destination";
 
 export default async function OnboardingPage({
   searchParams,
@@ -15,6 +16,9 @@ export default async function OnboardingPage({
   const { data } = await supabase.auth.getUser();
 
   if (!data.user) redirect("/login");
+
+  const destination = await resolveSignedInDestination();
+  if (destination !== "/onboarding") redirect(destination);
 
   return (
     <main className="onboarding-shell">
