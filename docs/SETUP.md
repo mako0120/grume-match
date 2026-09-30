@@ -1,0 +1,194 @@
+# Local / Supabase / Vercel Setup
+
+## 1. Local app
+
+Requirements:
+- Node.js 24
+- npm 11
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+Quality checks:
+
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+```
+
+## 2. Supabase project
+
+Create one Supabase project for the pilot.
+
+Required public values:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+Required server-only value:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+**Never expose the service-role key to the browser or commit it to Git.**
+
+Apply migrations in timestamp order from `supabase/migrations/`.
+
+With Supabase CLI:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase db push
+```
+
+Development seed:
+
+```bash
+npx supabase db reset
+```
+
+The seed contains demonstration restaurant/campaign data only. Do not put real Creator or restaurant personal information in `seed.sql`.
+
+## 3. Supabase Auth
+
+For the pilot:
+- Enable email/password auth.
+- Configure the deployed Site URL.
+- Add local redirect URL when developing locally.
+- Keep email confirmation enabled for external pilot users.
+
+After the first operator account signs up, promote only that account to admin from a trusted SQL session:
+
+```sql
+update public.users
+set
+  role = 'admin',
+  onboarding_completed_at = now()
+where email = '<OPERATOR_EMAIL>';
+```
+
+Do not expose an in-app "make me admin" endpoint.
+
+## 4. Cron reminders
+
+Set a long random value:
+
+```env
+CRON_SECRET=
+```
+
+`vercel.json` invokes:
+
+```
+GET /api/cron/reminders
+```
+
+The route requires:
+
+```
+Authorization: Bearer <CRON_SECRET>
+```
+
+It currently creates in-app reminders for:
+- PR visit roughly 24 hours before
+- required post deadline within 24 hours
+
+Notifications use a dedupe key so an hourly cron does not create repeated copies of the same reminder.
+
+## 5. Vercel
+
+Import the GitHub repository and configure:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `CRON_SECRET`
+
+Do not configure `SUPABASE_SERVICE_ROLE_KEY` with a `NEXT_PUBLIC_` prefix.
+
+Before enabling real restaurant onboarding, verify:
+- production Supabase URL
+- Auth Site URL / redirect URLs
+- RLS migrations
+- admin account
+- cron authorization
+- HTTPS production domain
+
+## 6. Current routes
+
+Creator:
+- `/creator/campaigns`
+- `/creator/flash`
+- `/creator/applications`
+- `/creator/bookings`
+- `/creator/wallet`
+- `/creator/profile`
+
+Restaurant:
+- `/restaurant`
+- `/restaurant/campaigns/new`
+- `/restaurant/flash/new`
+- `/restaurant/reschedules`
+
+Operator:
+- `/admin`
+- `/admin/payments`
+
+Shared:
+- `/login`
+- `/signup`
+- `/onboarding`
+- `/notifications`
+
+## 7. Money handling in SOLO MVP
+
+The app does **not** move money automatically.
+
+Current flow:
+
+```
+Creator submit
+→ Restaurant approve
+→ Payment approved
+→ Operator transfers money outside the app
+→ Admin marks scheduled / paid
+→ Creator Wallet updates
+```
+
+Do not represent `approved` as already paid.
+
+Stripe Connect belongs to a later phase after business/legal/tax handling is confirmed.
+
+## 8. Content policy boundary for the product
+
+The standard paid deliverables are:
+- Instagram
+- TikTok
+- YouTube Shorts
+- UGC
+
+Do not make incentivized Google/Tabelog reviews a required paid deliverable.
+
+## 9. Pilot scope
+
+Start in Osaka.
+
+Recommended first controlled pilot:
+- 1 operator account
+- 1 Creator account (グルメ日誌)
+- 1 test restaurant account
+- 1 paid campaign
+- 1 booking
+- 1 deliverable
+- 1 manual payout
+
+Only after the full transaction succeeds should external Creators/restaurants be invited.
