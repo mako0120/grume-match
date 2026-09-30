@@ -89,12 +89,16 @@ export default async function NewFlashPage({
 
           <label>
             食事提供
-            <input defaultValue="2名まで食事提供" name="foodOffer" />
+            <input defaultValue="1名分提供" name="foodOffer" />
           </label>
 
           <label>
-            同伴者上限
-            <input defaultValue="1" min="0" name="maxCompanions" type="number" />
+            来店人数
+            <select defaultValue="0" name="maxCompanions">
+              <option value="0">1名限定（最速でマッチ）</option>
+              <option value="1">1〜2名（同伴1名まで）</option>
+              <option value="2">1〜3名（同伴2名まで）</option>
+            </select>
           </label>
         </section>
 
