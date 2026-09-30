@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CampaignCard } from "@/components/campaign-card";
 import { listCreatorCampaigns } from "@/server/queries/campaigns";
 
@@ -9,10 +10,10 @@ export default async function CreatorCampaignListPage() {
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
         <nav className="mini-nav">
-          <a href="/creator/flash">FLASH</a>
-          <a href="/creator/applications">応募</a>
-          <a href="/creator/bookings">マイ案件</a>
-          <a href="/creator/wallet">報酬</a>
+          <Link href="/creator/flash">FLASH</Link>
+          <Link href="/creator/applications">応募</Link>
+          <Link href="/creator/bookings">マイ案件</Link>
+          <Link href="/creator/wallet">報酬</Link>
         </nav>
       </header>
 
