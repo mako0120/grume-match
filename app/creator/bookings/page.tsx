@@ -16,10 +16,7 @@ export default async function CreatorBookingsPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <nav className="mini-nav">
-          <Link href="/creator/campaigns">案件</Link>
-          <Link href="/creator/profile">プロフィール</Link>
-        </nav>
+        <span className="status-pill">Creator</span>
       </header>
 
       <h1 className="page-title">マイ案件</h1>
