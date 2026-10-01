@@ -12,13 +12,18 @@ export async function updatePaymentStatus(formData: FormData) {
   if (!id || !allowed.has(status)) return;
 
   const supabase = await createClient();
-  const patch =
-    status === "paid"
-      ? { status, paid_at: new Date().toISOString() }
-      : { status, paid_at: null };
 
-  await supabase.from("payments").update(patch).eq("id", id);
+  const { error } = await supabase.rpc("admin_update_payment_status", {
+    p_payment_id: id,
+    p_status: status,
+  });
+
+  if (error) {
+    throw new Error("支払い状態を更新できませんでした。");
+  }
 
   revalidatePath("/admin/payments");
   revalidatePath("/admin");
+  revalidatePath("/creator/wallet");
+  revalidatePath("/creator/bookings");
 }
