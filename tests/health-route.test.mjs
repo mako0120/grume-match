@@ -12,3 +12,17 @@ test("health route contract never exposes secret values", async () => {
   assert.doesNotMatch(source, /serviceRoleKey\s*:/);
   assert.doesNotMatch(source, /cronSecret\s*:\s*process\.env/);
 });
+
+
+test("health route verifies the core PR OS schema", async () => {
+  const source = await import("node:fs/promises").then((fs) =>
+    fs.readFile("app/api/health/route.ts", "utf8"),
+  );
+
+  assert.match(source, /\.from\("creator_profiles"\)/);
+  assert.match(source, /\.from\("campaigns"\)/);
+  assert.match(source, /\.from\("applications"\)/);
+  assert.match(source, /\.from\("bookings"\)/);
+  assert.match(source, /\.from\("payments"\)/);
+  assert.match(source, /schema_incomplete/);
+});
