@@ -63,7 +63,10 @@ function presentSlot(slot: RawSlot): CampaignSlot {
     startsAt: slot.starts_at,
     timeLabel: timeFormatter.format(new Date(slot.starts_at)),
     remaining: Math.max(0, slot.capacity - slot.reserved_count),
-    isOpen: slot.status === "open" && slot.reserved_count < slot.capacity,
+    isOpen:
+      slot.status === "open" &&
+      slot.reserved_count < slot.capacity &&
+      new Date(slot.starts_at).getTime() > Date.now(),
   };
 }
 
@@ -113,7 +116,7 @@ export async function getBookingRescheduleOptions(bookingId: string) {
     restaurantName: restaurant?.name ?? "店舗",
     slots: (campaign?.campaign_slots ?? [])
       .map(presentSlot)
-      .filter((slot) => slot.id !== row.campaign_slot_id)
+      .filter((slot) => slot.id !== row.campaign_slot_id && slot.isOpen)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
     pendingRequest: (pending as RawRequest | null) ?? null,
   };
