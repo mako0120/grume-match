@@ -8,7 +8,7 @@ type SocialAccount = {
   local_audience_ratio: number | null;
 };
 
-export async function listCreatorsForDirectOffer() {
+export async function listCreatorsForDirectOffer(search = "") {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -33,6 +33,8 @@ export async function listCreatorsForDirectOffer() {
 
   if (error) throw new Error(error.message);
 
+  const normalizedSearch = search.trim().toLocaleLowerCase("ja");
+
   return (data ?? []).map((creator) => {
     const accounts = (creator.creator_social_accounts ?? []) as SocialAccount[];
     const instagram = accounts.find((account) => account.platform === "instagram");
@@ -49,5 +51,15 @@ export async function listCreatorsForDirectOffer() {
       avgViews: instagram?.avg_views ?? null,
       localAudienceRatio: instagram?.local_audience_ratio ?? null,
     };
+  }).filter((creator) => {
+    if (!normalizedSearch) return true;
+
+    return [
+      creator.displayName,
+      creator.baseArea,
+      creator.instagramHandle ?? "",
+    ].some((value) =>
+      String(value).toLocaleLowerCase("ja").includes(normalizedSearch),
+    );
   });
 }
