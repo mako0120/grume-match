@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { campaignStatusLabels } from "@/lib/status-labels";
+import { closeCampaignRecruitment } from "@/server/actions/campaigns";
 import { getRestaurantDashboard } from "@/server/queries/restaurant-dashboard";
 
 function relationOne<T>(value: T | T[] | null | undefined): T | null {
   return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
 
-export default async function RestaurantDashboardPage() {
+export default async function RestaurantDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string; status?: string }>;
+}) {
+  const { message, status } = await searchParams;
   const dashboard = await getRestaurantDashboard();
 
   if (!dashboard) {
@@ -39,6 +45,15 @@ export default async function RestaurantDashboardPage() {
       <p className="page-subtitle">
         応募・来店・投稿確認など、次に対応するものから確認できます。
       </p>
+
+      {message ? (
+        <div
+          className={status === "error" ? "form-message error-message" : "form-message inline-success"}
+          aria-live="polite"
+        >
+          {message}
+        </div>
+      ) : null}
 
       <section className="dashboard-section">
         <div className="section-heading">
@@ -98,23 +113,33 @@ export default async function RestaurantDashboardPage() {
         {dashboard.campaigns.length ? (
           <div className="campaign-list">
             {dashboard.campaigns.map((campaign) => (
-              <Link
-                className="booking-card"
-                href={`/restaurant/campaigns/${campaign.id}/applications`}
-                key={campaign.id}
-              >
-                <div>
-                  <span className="meta-pill">
-                    {campaignStatusLabels[campaign.status] ?? campaign.status}
-                  </span>
-                  <h2>{campaign.title}</h2>
-                  <p>募集 {campaign.creator_slots}名</p>
-                </div>
-                <div className="booking-money">
-                  ¥{Number(campaign.cash_reward).toLocaleString()}
-                  <small>Creator報酬</small>
-                </div>
-              </Link>
+              <article className="campaign-management-card" key={campaign.id}>
+                <Link
+                  className="booking-card campaign-management-link"
+                  href={`/restaurant/campaigns/${campaign.id}/applications`}
+                >
+                  <div>
+                    <span className="meta-pill">
+                      {campaignStatusLabels[campaign.status] ?? campaign.status}
+                    </span>
+                    <h2>{campaign.title}</h2>
+                    <p>募集 {campaign.creator_slots}名</p>
+                  </div>
+                  <div className="booking-money">
+                    ¥{Number(campaign.cash_reward).toLocaleString()}
+                    <small>Creator報酬</small>
+                  </div>
+                </Link>
+
+                {["published", "recruiting"].includes(campaign.status) ? (
+                  <form action={closeCampaignRecruitment}>
+                    <input name="campaignId" type="hidden" value={campaign.id} />
+                    <button className="text-button campaign-close-button" type="submit">
+                      募集を終了
+                    </button>
+                  </form>
+                ) : null}
+              </article>
             ))}
           </div>
         ) : (
