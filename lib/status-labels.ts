@@ -15,6 +15,7 @@ export const verificationStatusLabels: Record<string, string> = {
 export const notificationTypeLabels: Record<string, string> = {
   application_received: "応募",
   application_rejected: "募集結果",
+  application_withdrawn: "応募",
   booking_confirmed: "来店確定",
   reschedule_requested: "日時変更",
   reschedule_approved: "日時変更",
@@ -29,4 +30,17 @@ export const notificationTypeLabels: Record<string, string> = {
   deliverable_due_24h: "投稿期限",
   flash_for_standby: "FLASH",
   direct_offer_received: "指名",
+};
+
+
+export const campaignStatusLabels: Record<string, string> = {
+  draft: "下書き",
+  published: "公開中",
+  recruiting: "募集中",
+  closed: "募集終了",
+  filled: "募集完了",
+  in_progress: "進行中",
+  completed: "完了",
+  cancelled: "キャンセル",
+  suspended: "停止中",
 };
