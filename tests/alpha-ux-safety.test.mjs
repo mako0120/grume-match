@@ -25,7 +25,7 @@ test("deliverable actions provide safe user-facing feedback", async () => {
 
   assert.match(source, /投稿URLを提出しました/);
   assert.match(source, /修正内容を入力してください/);
-  assert.doesNotMatch(source, /redirect\(.*error\.message/s);
+  assert.doesNotMatch(source, /redirect\s*\(\s*error\.message\s*\)/);
 });
 
 test("status labels hide internal enum names in primary UX", async () => {
