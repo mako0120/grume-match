@@ -29,6 +29,9 @@ export async function confirmApplicationBooking(
     if (message.includes("creator_schedule_conflict")) {
       return { ok: false, message: "Creatorの確定済み予定と重複しています。" };
     }
+    if (message.includes("campaign_capacity_reached")) {
+      return { ok: false, message: "この案件の採用枠はすべて確定しました。" };
+    }
     if (message.includes("slot_not_selected_by_creator")) {
       return { ok: false, message: "Creatorが選択していない日時です。" };
     }
