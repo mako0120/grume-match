@@ -5,10 +5,10 @@ import { listCreatorsForDirectOffer } from "@/server/queries/creators";
 export default async function NewDirectOfferPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string }>;
+  searchParams: Promise<{ message?: string; q?: string }>;
 }) {
-  const { message } = await searchParams;
-  const creators = await listCreatorsForDirectOffer();
+  const { message, q = "" } = await searchParams;
+  const creators = await listCreatorsForDirectOffer(q);
 
   return (
     <main className="creator-shell">
@@ -31,6 +31,17 @@ export default async function NewDirectOfferPage({
       </section>
 
       {message ? <div className="form-message">{message}</div> : null}
+
+      <form className="creator-search" method="get">
+        <input
+          defaultValue={q}
+          name="q"
+          placeholder="Creator名・エリア・Instagramで検索"
+        />
+        <button className="secondary-button" type="submit">
+          検索
+        </button>
+      </form>
 
       <form action={createDirectOffer} className="campaign-form">
         <section className="form-section">
@@ -57,7 +68,9 @@ export default async function NewDirectOfferPage({
             </div>
           ) : (
             <div className="form-message">
-              指名できるCreatorがまだ登録されていません。
+              {q
+                ? "条件に合うCreatorが見つかりませんでした。"
+                : "指名できるCreatorがまだ登録されていません。"}
             </div>
           )}
         </section>
