@@ -74,6 +74,13 @@ export default async function CreatorCampaignDetailPage({
         </div>
       </section>
 
+      <section className="pr-disclosure-note">
+        <strong>投稿時はPRであることが分かる表記をしてください</strong>
+        <p>
+          現金報酬や食事提供を受ける案件です。広告・PR関係が読者に分かる形で投稿してください。
+        </p>
+      </section>
+
       {campaign.slots.length > 0 ? (
         <TapSchedule
           campaignId={campaign.id}
