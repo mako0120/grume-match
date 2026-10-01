@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
 import type { RestaurantApplicationChoice } from "@/server/queries/restaurant-applications";
+import { rejectCampaignApplication } from "@/server/actions/applications";
 import { confirmApplicationBooking } from "@/server/actions/bookings";
 
 type Props = {
@@ -44,6 +45,7 @@ export function RestaurantScheduleConfirm({
 }: Props) {
   const [confirmedSlotId, setConfirmedSlotId] = useState<string | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const [rejected, setRejected] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -89,6 +91,22 @@ export function RestaurantScheduleConfirm({
     ? slots.find((slot) => slot.id === confirmedSlotId)
     : undefined;
 
+  function reject() {
+    if (isPending || confirmed || rejected) return;
+    setMessage(null);
+
+    startTransition(async () => {
+      const result = await rejectCampaignApplication(applicationId);
+
+      if (result.ok) {
+        setRejected(true);
+        setMessage("この応募を見送りにしました。");
+      } else {
+        setMessage(result.message);
+      }
+    });
+  }
+
   function confirm(slotId: string) {
     if (isPending) return;
     setMessage(null);
@@ -124,7 +142,12 @@ export function RestaurantScheduleConfirm({
         </div>
       </div>
 
-      {confirmed ? (
+      {rejected ? (
+        <div className="section-card inline-success" aria-live="polite">
+          <strong>見送り済み</strong>
+          <p>{creatorName}さんの応募を見送りにしました。</p>
+        </div>
+      ) : confirmed ? (
         <div className="confirmed-card" aria-live="polite">
           <span className="eyebrow">BOOKING CONFIRMED</span>
           <h2>{confirmed.dateLabel} {confirmed.timeLabel}</h2>
@@ -167,9 +190,18 @@ export function RestaurantScheduleConfirm({
             ))
           ) : (
             <div className="form-message">
-              現在確定できる共通時間がありません。別候補の依頼機能は後続Issueで追加します。
+              現在確定できる共通時間がありません。
             </div>
           )}
+
+          <button
+            className="text-button applicant-reject-button"
+            disabled={isPending}
+            onClick={reject}
+            type="button"
+          >
+            {isPending ? "処理中..." : "今回は見送る"}
+          </button>
         </>
       )}
 
