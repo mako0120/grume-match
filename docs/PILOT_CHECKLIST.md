@@ -4,6 +4,7 @@ Use two separate browser profiles so Creator and Restaurant sessions do not inte
 
 ## A. Account setup
 
+- [ ] /api/health returns database: ok (wrong/partial Supabase schemas must fail).
 - [ ] Operator account is admin.
 - [ ] Creator signs up and completes Creator onboarding.
 - [ ] Creator registers Instagram metrics.
@@ -27,11 +28,14 @@ Creator:
 - [ ] Test "19:00以降ならいつでも".
 - [ ] Select party size.
 - [ ] Apply.
+- [ ] Creator can withdraw a still-pending application and sees a clear result.
 
 Restaurant:
 - [ ] Applicant appears.
 - [ ] Only overlapping/open candidate slots appear.
 - [ ] Confirm one slot.
+- [ ] Restaurant can one-tap reject an application without chat negotiation.
+- [ ] Restaurant can close recruitment without cancelling confirmed bookings.
 
 Both:
 - [ ] Creator sees confirmed booking.
@@ -61,6 +65,8 @@ Restaurant:
 
 Repeat once and reject:
 - [ ] Original booking time remains unchanged after rejection.
+- [ ] Reschedule action disappears after the original visit starts.
+- [ ] Direct RPC attempt after visit start is rejected.
 
 ## E. Deliverable
 
@@ -75,6 +81,8 @@ Restaurant:
 - [ ] Creator sees revision note/notification.
 - [ ] Resubmit.
 - [ ] Approve all required deliverables.
+- [ ] Approved deliverable URL becomes immutable.
+- [ ] Restaurant cannot reverse an approved deliverable after payout approval.
 
 Payment:
 - [ ] Payment becomes approved.
@@ -110,6 +118,8 @@ Creator:
 - [ ] 24h visit reminder is created once.
 - [ ] Re-running cron does not duplicate reminder.
 - [ ] 24h deliverable reminder is created once.
+- [ ] Expired recruitment moves to 募集終了 automatically.
+- [ ] Pending applicants receive their outcome when recruitment closes.
 
 ## I. Operator Inbox Zero
 
