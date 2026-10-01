@@ -147,7 +147,11 @@ export async function getRestaurantCampaignApplications(
       .map(presentSlot)
       .filter((slot) => slot.isOpen)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
-    applications: (row.applications ?? []).map((application) => {
+    applications: (row.applications ?? [])
+      .filter((application) =>
+        ["applied", "shortlisted", "accepted"].includes(application.status),
+      )
+      .map((application) => {
       const creator = single(application.creator_profiles);
       const instagram = creator?.creator_social_accounts?.find(
         (account) => account.platform === "instagram",
