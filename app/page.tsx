@@ -7,35 +7,35 @@ export default function HomePage() {
         <span className="eyebrow">GOURMET DIARY</span>
         <h1>飲食店PRを、DMから解放する。</h1>
         <p>
-          有償PR案件を探し、来店できる日時をタップして応募。
-          店舗も候補日時をタップするだけで採用と予約を同時に確定できます。
+          現金報酬が明示されたPR案件を探して、来店できる時間をタップ。
+          店舗も候補時間をタップするだけで、応募から来店確定まで進められます。
         </p>
+
         <div className="hero-actions">
-          <Link className="primary-button" href="/creator/campaigns">
-            Creatorとして案件を見る
+          <Link className="primary-button" href="/signup">
+            無料で始める
           </Link>
-          <Link
-            className="primary-button"
-            href="/restaurant/campaigns/shinsaibashi-yakiniku-001/applications"
-          >
-            店舗側の採用画面を見る
+          <Link className="secondary-button" href="/login">
+            ログイン
           </Link>
-          <span className="status-pill">MVP foundation</span>
+          <span className="status-pill">Osaka Alpha</span>
         </div>
       </section>
 
       <section className="feature-grid" aria-label="主要機能">
         <article className="feature-card">
-          <strong>MARKET</strong>
-          <p>現金報酬が明示されたPR案件へ応募。</p>
+          <strong>有償PR</strong>
+          <p>食事提供とは別に、Creatorへの現金報酬を明示。</p>
         </article>
+
         <article className="feature-card">
-          <strong>TAP SCHEDULE</strong>
-          <p>候補日時を文章ではなくタップで選択。</p>
+          <strong>時間をタップ</strong>
+          <p>DMでの日程調整を減らし、空いている時間から選択。</p>
         </article>
+
         <article className="feature-card">
-          <strong>OPERATOR ZERO</strong>
-          <p>通常運用を自動化し、運営は例外だけ対応。</p>
+          <strong>1人でもOK</strong>
+          <p>Creator1名での参加と、1人運営の店舗・運営者を前提に設計。</p>
         </article>
       </section>
     </main>
