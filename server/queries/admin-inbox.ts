@@ -24,12 +24,12 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   const now = new Date().toISOString();
 
   const [
-    { data: overdueDeliverables },
-    { data: readyPayments },
-    { data: overduePayments },
-    { data: failedPayments },
-    { data: disputes },
-    { data: noShows },
+    overdueDeliverablesResult,
+    readyPaymentsResult,
+    overduePaymentsResult,
+    failedPaymentsResult,
+    disputesResult,
+    noShowsResult,
   ] = await Promise.all([
     supabase
       .from("deliverables")
@@ -89,9 +89,29 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .limit(20),
   ]);
 
+  const inboxError = [
+    overdueDeliverablesResult.error,
+    readyPaymentsResult.error,
+    overduePaymentsResult.error,
+    failedPaymentsResult.error,
+    disputesResult.error,
+    noShowsResult.error,
+  ].find(Boolean);
+
+  if (inboxError) {
+    throw new Error("運営Inboxを読み込めませんでした。");
+  }
+
+  const overdueDeliverables = overdueDeliverablesResult.data ?? [];
+  const readyPayments = readyPaymentsResult.data ?? [];
+  const overduePayments = overduePaymentsResult.data ?? [];
+  const failedPayments = failedPaymentsResult.data ?? [];
+  const disputes = disputesResult.data ?? [];
+  const noShows = noShowsResult.data ?? [];
+
   const items: AdminInboxItem[] = [];
 
-  for (const row of overdueDeliverables ?? []) {
+  for (const row of overdueDeliverables) {
     const booking = one(row.bookings);
     const creator = one(booking?.creator_profiles);
     const campaign = one(booking?.campaigns);
@@ -113,7 +133,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   }
 
 
-  for (const row of readyPayments ?? []) {
+  for (const row of readyPayments) {
     const creator = one(row.creator_profiles);
     const booking = one(row.bookings);
     const campaign = one(booking?.campaigns);
@@ -134,7 +154,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     });
   }
 
-  for (const row of overduePayments ?? []) {
+  for (const row of overduePayments) {
     const creator = one(row.creator_profiles);
     const booking = one(row.bookings);
     const campaign = one(booking?.campaigns);
@@ -155,7 +175,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     });
   }
 
-  for (const row of failedPayments ?? []) {
+  for (const row of failedPayments) {
     const creator = one(row.creator_profiles);
     const booking = one(row.bookings);
     const campaign = one(booking?.campaigns);
@@ -176,7 +196,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     });
   }
 
-  for (const row of disputes ?? []) {
+  for (const row of disputes) {
     const creator = one(row.creator_profiles);
     const campaign = one(row.campaigns);
     const restaurant = one(campaign?.restaurants);
@@ -196,7 +216,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     });
   }
 
-  for (const row of noShows ?? []) {
+  for (const row of noShows) {
     const creator = one(row.creator_profiles);
     const campaign = one(row.campaigns);
     const restaurant = one(campaign?.restaurants);
