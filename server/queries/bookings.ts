@@ -101,6 +101,10 @@ export async function getCreatorBooking(bookingId: string) {
     restaurantAddress: restaurant?.address ?? "",
     foodOffer: campaign?.food_offer ?? "",
     visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
+    canReschedule:
+      row.status === "confirmed" &&
+      Boolean(slot) &&
+      new Date(slot!.starts_at).getTime() > Date.now(),
     deliverables: row.deliverables ?? [],
     payment: payment
       ? {
