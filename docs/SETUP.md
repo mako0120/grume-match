@@ -32,13 +32,20 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-Required server-only value:
+Required server-only value (preferred):
+
+```env
+SUPABASE_SECRET_KEY=
+```
+
+Legacy fallback:
 
 ```env
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-**Never expose the service-role key to the browser or commit it to Git.**
+Use the modern Supabase secret key for new deployments when available.
+Never expose either server secret to the browser or commit it to Git.
 
 Apply migrations in timestamp order from `supabase/migrations/`.
 
@@ -110,10 +117,10 @@ Import the GitHub repository and configure:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_SECRET_KEY` (preferred) or `SUPABASE_SERVICE_ROLE_KEY` (legacy fallback)
 - `CRON_SECRET`
 
-Do not configure `SUPABASE_SERVICE_ROLE_KEY` with a `NEXT_PUBLIC_` prefix.
+Never configure a Supabase server secret with a `NEXT_PUBLIC_` prefix.
 
 Before enabling real restaurant onboarding, verify:
 - production Supabase URL
