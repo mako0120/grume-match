@@ -3,6 +3,7 @@ import { getAdminInbox } from "@/server/queries/admin-inbox";
 
 const labels = {
   deliverable_overdue: "投稿",
+  payment_ready: "支払",
   payment_overdue: "支払",
   payment_failed: "支払",
   dispute: "紛争",
