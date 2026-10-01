@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createDirectOffer } from "@/server/actions/offers";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
 
@@ -162,9 +163,11 @@ export default async function NewDirectOfferPage({
           </p>
         </section>
 
-        <button className="primary-button publish-button" disabled={!creators.length} type="submit">
-          この条件で送る
-        </button>
+        <PendingSubmitButton
+          disabled={!creators.length}
+          idleLabel="この条件で送る"
+          pendingLabel="送信中..."
+        />
       </form>
     </main>
   );
