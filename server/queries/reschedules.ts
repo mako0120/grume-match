@@ -98,6 +98,13 @@ export async function getBookingRescheduleOptions(bookingId: string) {
   const campaign = single(row.campaigns);
   const restaurant = single(campaign?.restaurants ?? null);
   const creator = single(row.creator_profiles);
+  const currentSlot = (campaign?.campaign_slots ?? []).find(
+    (slot) => slot.id === row.campaign_slot_id,
+  );
+  const canReschedule =
+    row.status === "confirmed" &&
+    Boolean(currentSlot) &&
+    new Date(currentSlot!.starts_at).getTime() > Date.now();
 
   const { data: pending } = await supabase
     .from("booking_reschedule_requests")
@@ -114,10 +121,13 @@ export async function getBookingRescheduleOptions(bookingId: string) {
     creatorName: creator?.display_name ?? "Creator",
     campaignTitle: campaign?.title ?? "PR案件",
     restaurantName: restaurant?.name ?? "店舗",
-    slots: (campaign?.campaign_slots ?? [])
+    canReschedule,
+    slots: canReschedule
+      ? (campaign?.campaign_slots ?? [])
       .map(presentSlot)
-      .filter((slot) => slot.id !== row.campaign_slot_id && slot.isOpen)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+          .filter((slot) => slot.id !== row.campaign_slot_id && slot.isOpen)
+          .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+      : [],
     pendingRequest: (pending as RawRequest | null) ?? null,
   };
 }
