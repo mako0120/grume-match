@@ -73,6 +73,18 @@ export async function getRestaurantDashboard() {
       .limit(20),
   ]);
 
+  const dashboardError = [
+    campaignsResult.error,
+    applicationsResult.error,
+    bookingsResult.error,
+    deliverablesResult.error,
+    reschedulesResult.error,
+  ].find(Boolean);
+
+  if (dashboardError) {
+    throw new Error("店舗ダッシュボードを読み込めませんでした。");
+  }
+
   const campaigns = campaignsResult.data ?? [];
   const applications = applicationsResult.data ?? [];
   const upcomingBookings = bookingsResult.data ?? [];
