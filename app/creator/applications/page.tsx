@@ -1,3 +1,4 @@
+import { withdrawCampaignApplication } from "@/server/actions/applications";
 import { listCreatorApplications } from "@/server/queries/creator-applications";
 
 const statusLabels: Record<string, string> = {
@@ -50,9 +51,24 @@ export default async function CreatorApplicationsPage() {
                   <h2>{restaurant?.name ?? "店舗"}</h2>
                   <p>{campaign?.title ?? "PR案件"}</p>
                 </div>
-                <div className="booking-money">
-                  ¥{Number(campaign?.cash_reward ?? 0).toLocaleString()}
-                  <small>{campaign?.area ?? ""}</small>
+                <div className="application-side">
+                  <div className="booking-money">
+                    ¥{Number(campaign?.cash_reward ?? 0).toLocaleString()}
+                    <small>{campaign?.area ?? ""}</small>
+                  </div>
+
+                  {["applied", "shortlisted", "accepted"].includes(application.status) ? (
+                    <form action={withdrawCampaignApplication}>
+                      <input
+                        name="applicationId"
+                        type="hidden"
+                        value={application.id}
+                      />
+                      <button className="text-button" type="submit">
+                        応募を取り消す
+                      </button>
+                    </form>
+                  ) : null}
                 </div>
               </article>
             );
