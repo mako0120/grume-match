@@ -22,6 +22,7 @@ type RawCampaign = {
   max_companions: number;
   creator_slots: number;
   visibility: "public" | "direct";
+  flash_expires_at: string | null;
   visit_period_start: string;
   visit_period_end: string;
   restaurants: RawRestaurant | RawRestaurant[] | null;
@@ -97,6 +98,7 @@ const campaignSelect = `
   max_companions,
   creator_slots,
   visibility,
+  flash_expires_at,
   visit_period_start,
   visit_period_end,
   restaurants(name),
@@ -121,17 +123,15 @@ export async function listCreatorCampaigns(
 
   if (error) throw new Error(error.message);
 
-  const rows = ((data ?? []) as unknown as RawCampaign[]);
+  const rows = (data ?? []) as unknown as RawCampaign[];
 
   if (kind === "flash") {
     const now = Date.now();
     return rows
-      .filter((row) =>
-        (row as RawCampaign & { flash_expires_at?: string | null }).flash_expires_at
-          ? new Date(
-              (row as RawCampaign & { flash_expires_at?: string | null }).flash_expires_at!,
-            ).getTime() > now
-          : true,
+      .filter(
+        (row) =>
+          !row.flash_expires_at ||
+          new Date(row.flash_expires_at).getTime() > now,
       )
       .map(presentCampaign);
   }
