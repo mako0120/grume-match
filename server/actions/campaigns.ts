@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
@@ -126,4 +127,37 @@ export async function createCampaign(formData: FormData) {
   }
 
   redirect("/restaurant/campaigns/" + data + "/applications");
+}
+
+
+export async function closeCampaignRecruitment(formData: FormData) {
+  const campaignId = String(formData.get("campaignId") ?? "");
+  if (!campaignId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("close_campaign_recruitment", {
+    p_campaign_id: campaignId,
+  });
+
+  if (error) {
+    const reason = error.message ?? "";
+    const message = reason.includes("campaign_not_recruiting")
+      ? "この案件はすでに募集終了しています。"
+      : "募集を終了できませんでした。";
+
+    redirect(
+      "/restaurant?status=error&message=" +
+        encodeURIComponent(message),
+    );
+  }
+
+  revalidatePath("/restaurant");
+  revalidatePath("/creator/campaigns");
+  revalidatePath("/creator/offers");
+  revalidatePath("/creator/flash");
+
+  redirect(
+    "/restaurant?status=ok&message=" +
+      encodeURIComponent("新規応募の受付を終了しました。確定済みの来店はそのままです。"),
+  );
 }
