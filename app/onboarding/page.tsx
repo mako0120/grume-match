@@ -42,7 +42,7 @@ export default async function OnboardingPage({
 
           <label>
             表示名
-            <input defaultValue="グルメ日誌" name="displayName" required />
+            <input name="displayName" placeholder="表示名" required />
           </label>
           <label>
             活動エリア
@@ -51,19 +51,19 @@ export default async function OnboardingPage({
           <label>
             自己紹介
             <textarea
-              defaultValue="大阪を中心にグルメ情報を発信しています。"
               name="bio"
+              placeholder="発信ジャンルや得意な投稿を簡単に入力"
               rows={3}
             />
           </label>
           <div className="field-row">
             <label>
               最低報酬
-              <input defaultValue="6000" min="0" name="minReward" type="number" />
+              <input min="0" name="minReward" placeholder="例：6000" type="number" />
             </label>
             <label>
               移動範囲 km
-              <input defaultValue="30" min="0" name="travelRadiusKm" type="number" />
+              <input defaultValue="20" min="0" name="travelRadiusKm" type="number" />
             </label>
           </div>
           <button className="primary-button form-submit" type="submit">
