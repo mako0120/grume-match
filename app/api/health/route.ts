@@ -27,17 +27,24 @@ export async function GET() {
 
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase
-      .from("users")
-      .select("id", { count: "exact", head: true });
 
-    if (error) {
+    const checks = await Promise.all([
+      supabase.from("users").select("id", { head: true }).limit(1),
+      supabase.from("creator_profiles").select("id", { head: true }).limit(1),
+      supabase.from("restaurants").select("id", { head: true }).limit(1),
+      supabase.from("campaigns").select("id", { head: true }).limit(1),
+      supabase.from("applications").select("id", { head: true }).limit(1),
+      supabase.from("bookings").select("id", { head: true }).limit(1),
+      supabase.from("payments").select("id", { head: true }).limit(1),
+    ]);
+
+    if (checks.some((result) => result.error)) {
       return NextResponse.json(
         {
           ok: false,
           app: "GOURMET DIARY PR OS",
           environment: "ready",
-          database: "unreachable",
+          database: "schema_incomplete",
         },
         { status: 503 },
       );
