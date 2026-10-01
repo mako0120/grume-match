@@ -4,6 +4,7 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/server/actions/notifications";
+import { notificationTypeLabels } from "@/lib/status-labels";
 import { listNotifications } from "@/server/queries/notifications";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -27,7 +28,7 @@ export default async function NotificationsPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <span className="status-pill">{unread} unread</span>
+        <span className="status-pill">未読 {unread}件</span>
       </header>
 
       <div className="section-heading">
@@ -55,7 +56,9 @@ export default async function NotificationsPage() {
               key={item.id}
             >
               <div>
-                <span className="meta-pill">{item.type}</span>
+                <span className="meta-pill">
+                  {notificationTypeLabels[item.type] ?? "お知らせ"}
+                </span>
                 <h2>{item.title}</h2>
                 <p>{item.body}</p>
                 <small>{dateFormatter.format(new Date(item.created_at))}</small>
