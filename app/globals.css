@@ -1828,3 +1828,12 @@ button {
   text-align: center;
   border-top: 1px solid var(--line);
 }
+
+
+.quick-status-link {
+  display: inline-flex;
+  margin: -6px 0 14px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 900;
+}
