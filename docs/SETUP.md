@@ -72,6 +72,15 @@ For the pilot:
 - Configure the deployed Site URL.
 - Add local redirect URL when developing locally.
 - Keep email confirmation enabled for external pilot users.
+- Use the SSR confirmation endpoint already implemented at `/auth/confirm`.
+
+For the **Confirm signup** email template, use a token-hash URL:
+
+```text
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+```
+
+This allows the server route to verify the OTP, set the auth cookie, and continue to onboarding.
 
 After the first operator account signs up, promote only that account to admin from a trusted SQL session:
 
