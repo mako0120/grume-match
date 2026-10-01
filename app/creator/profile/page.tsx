@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { savePrimarySocialAccount } from "@/server/actions/profile";
+import {
+  saveCreatorBasics,
+  savePrimarySocialAccount,
+} from "@/server/actions/profile";
 
 export default async function CreatorProfilePage({
   searchParams,
@@ -12,7 +15,7 @@ export default async function CreatorProfilePage({
 
   const { data: profile } = await supabase
     .from("creator_profiles")
-    .select("id,display_name,base_area,min_reward")
+    .select("id,display_name,bio,base_area,min_reward,travel_radius_km")
     .eq("user_id", authData.user!.id)
     .single();
 
@@ -39,13 +42,66 @@ export default async function CreatorProfilePage({
 
       {message ? <div className="form-message">{message}</div> : null}
 
-      <section className="section-card creator-profile-summary">
-        <span className="eyebrow">PROFILE</span>
-        <h2>{profile?.display_name ?? "Creator"}</h2>
-        <p>
-          {profile?.base_area ?? "未設定"}・最低報酬 ¥{Number(profile?.min_reward ?? 0).toLocaleString()}
-        </p>
-      </section>
+      <form action={saveCreatorBasics} className="campaign-form">
+        <section className="form-section">
+          <span className="eyebrow">PROFILE</span>
+          <h2>基本情報</h2>
+
+          <div className="field-row">
+            <label>
+              表示名
+              <input
+                defaultValue={profile?.display_name ?? ""}
+                name="displayName"
+                required
+              />
+            </label>
+            <label>
+              活動エリア
+              <input
+                defaultValue={profile?.base_area ?? ""}
+                name="baseArea"
+                required
+              />
+            </label>
+          </div>
+
+          <label>
+            自己紹介
+            <textarea
+              defaultValue={profile?.bio ?? ""}
+              name="bio"
+              placeholder="得意なジャンルや投稿スタイル"
+              rows={3}
+            />
+          </label>
+
+          <div className="field-row">
+            <label>
+              最低報酬
+              <input
+                defaultValue={profile?.min_reward ?? 0}
+                min="0"
+                name="minReward"
+                type="number"
+              />
+            </label>
+            <label>
+              移動範囲 km
+              <input
+                defaultValue={profile?.travel_radius_km ?? 20}
+                min="0"
+                name="travelRadiusKm"
+                type="number"
+              />
+            </label>
+          </div>
+
+          <button className="secondary-button" type="submit">
+            基本情報を保存
+          </button>
+        </section>
+      </form>
 
       <form action={savePrimarySocialAccount} className="campaign-form">
         <section className="form-section">
