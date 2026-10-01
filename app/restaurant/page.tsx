@@ -74,10 +74,10 @@ export default async function RestaurantDashboardPage() {
           <span>応募確認</span>
           <strong>{dashboard.counts.applications}</strong>
         </div>
-        <div>
+        <Link href="/restaurant/bookings">
           <span>来店予定</span>
           <strong>{dashboard.counts.upcoming}</strong>
-        </div>
+        </Link>
         <div>
           <span>投稿確認</span>
           <strong>{dashboard.counts.deliverables}</strong>
