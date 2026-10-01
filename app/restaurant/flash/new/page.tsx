@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createFlashCampaign } from "@/server/actions/flash";
 import { listActiveStandbyCreators } from "@/server/queries/standby";
 
@@ -159,9 +160,11 @@ export default async function NewFlashPage({
           </div>
         </section>
 
-        <button className="primary-button publish-button flash-publish" type="submit">
-          FLASHを公開
-        </button>
+        <PendingSubmitButton
+          className="primary-button publish-button flash-publish"
+          idleLabel="FLASHを公開"
+          pendingLabel="公開中..."
+        />
       </form>
     </main>
   );
