@@ -64,7 +64,10 @@ function presentSlot(slot: RawSlot): CampaignSlot {
     startsAt: slot.starts_at,
     timeLabel: timeFormatter.format(new Date(slot.starts_at)),
     remaining: Math.max(0, slot.capacity - slot.reserved_count),
-    isOpen: slot.status === "open" && slot.reserved_count < slot.capacity,
+    isOpen:
+      slot.status === "open" &&
+      slot.reserved_count < slot.capacity &&
+      new Date(slot.starts_at).getTime() > Date.now(),
   };
 }
 
@@ -125,18 +128,26 @@ export async function listCreatorCampaigns(
 
   const rows = (data ?? []) as unknown as RawCampaign[];
 
+  const presented = rows.map(presentCampaign).filter((campaign) =>
+    campaign.slots.some((slot) => slot.isOpen),
+  );
+
   if (kind === "flash") {
     const now = Date.now();
-    return rows
-      .filter(
-        (row) =>
-          !row.flash_expires_at ||
-          new Date(row.flash_expires_at).getTime() > now,
-      )
-      .map(presentCampaign);
+    const visibleIds = new Set(
+      rows
+        .filter(
+          (row) =>
+            !row.flash_expires_at ||
+            new Date(row.flash_expires_at).getTime() > now,
+        )
+        .map((row) => row.id),
+    );
+
+    return presented.filter((campaign) => visibleIds.has(campaign.id));
   }
 
-  return rows.map(presentCampaign);
+  return presented;
 }
 
 export async function getCreatorCampaign(id: string) {
@@ -152,5 +163,6 @@ export async function getCreatorCampaign(id: string) {
 
   if (error || !data) return null;
 
-  return presentCampaign(data as unknown as RawCampaign);
+  const campaign = presentCampaign(data as unknown as RawCampaign);
+  return campaign.slots.some((slot) => slot.isOpen) ? campaign : null;
 }
