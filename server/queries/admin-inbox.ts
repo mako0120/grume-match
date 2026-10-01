@@ -4,6 +4,7 @@ export type AdminInboxItem = {
   id: string;
   kind:
     | "deliverable_overdue"
+    | "payment_ready"
     | "payment_overdue"
     | "payment_failed"
     | "dispute"
@@ -24,6 +25,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
 
   const [
     { data: overdueDeliverables },
+    { data: readyPayments },
     { data: overduePayments },
     { data: failedPayments },
     { data: disputes },
@@ -42,11 +44,20 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     supabase
       .from("payments")
       .select(
+        "id,booking_id,amount,due_at,updated_at,status,creator_profiles(display_name),bookings(campaigns(title,restaurants(name)))",
+      )
+      .eq("status", "approved")
+      .order("updated_at", { ascending: true })
+      .limit(20),
+
+    supabase
+      .from("payments")
+      .select(
         "id,booking_id,amount,due_at,status,creator_profiles(display_name),bookings(campaigns(title,restaurants(name)))",
       )
       .not("due_at", "is", null)
       .lt("due_at", now)
-      .in("status", ["approved", "scheduled"])
+      .eq("status", "scheduled")
       .order("due_at", { ascending: true })
       .limit(20),
 
@@ -98,6 +109,28 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
         String(row.platform),
       href: "/restaurant/bookings/" + row.booking_id,
       occurredAt: row.due_at,
+    });
+  }
+
+
+  for (const row of readyPayments ?? []) {
+    const creator = one(row.creator_profiles);
+    const booking = one(row.bookings);
+    const campaign = one(booking?.campaigns);
+    const restaurant = one(campaign?.restaurants);
+
+    items.push({
+      id: "payment-ready:" + row.id,
+      kind: "payment_ready",
+      title: "報酬の支払い待ち",
+      detail:
+        (creator?.display_name ?? "Creator") +
+        "・" +
+        (restaurant?.name ?? "店舗") +
+        "・¥" +
+        Number(row.amount).toLocaleString(),
+      href: "/admin/payments",
+      occurredAt: row.updated_at,
     });
   }
 
