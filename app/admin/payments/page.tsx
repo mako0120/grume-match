@@ -6,6 +6,12 @@ function relationOne<T>(value: T | T[] | null | undefined): T | null {
   return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
 
+const paymentLabels: Record<string, string> = {
+  approved: "支払承認済み",
+  scheduled: "振込予定",
+  failed: "要確認",
+};
+
 export default async function AdminPaymentsPage() {
   const payments = await listAdminPayments();
 
@@ -34,7 +40,9 @@ export default async function AdminPaymentsPage() {
             return (
               <article className="payment-admin-card" key={payment.id}>
                 <div>
-                  <span className="meta-pill">{payment.status}</span>
+                  <span className="meta-pill">
+                    {paymentLabels[payment.status] ?? payment.status}
+                  </span>
                   <h2>{creator?.display_name ?? "Creator"}</h2>
                   <p>
                     {restaurant?.name ?? "店舗"}・{campaign?.title ?? "PR案件"}
@@ -47,22 +55,39 @@ export default async function AdminPaymentsPage() {
 
                 <form action={updatePaymentStatus} className="payment-admin-actions">
                   <input name="id" type="hidden" value={payment.id} />
-                  <button
-                    className="secondary-button"
-                    name="status"
-                    type="submit"
-                    value="scheduled"
-                  >
-                    振込予定
-                  </button>
-                  <button
-                    className="primary-button review-approve"
-                    name="status"
-                    type="submit"
-                    value="paid"
-                  >
-                    支払済みにする
-                  </button>
+
+                  {payment.status !== "scheduled" ? (
+                    <button
+                      className="secondary-button"
+                      name="status"
+                      type="submit"
+                      value="scheduled"
+                    >
+                      {payment.status === "failed" ? "再度振込予定" : "振込予定"}
+                    </button>
+                  ) : null}
+
+                  {payment.status !== "failed" ? (
+                    <button
+                      className="primary-button review-approve"
+                      name="status"
+                      type="submit"
+                      value="paid"
+                    >
+                      支払済みにする
+                    </button>
+                  ) : null}
+
+                  {payment.status === "scheduled" ? (
+                    <button
+                      className="secondary-button"
+                      name="status"
+                      type="submit"
+                      value="failed"
+                    >
+                      振込エラー
+                    </button>
+                  ) : null}
                 </form>
               </article>
             );
