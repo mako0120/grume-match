@@ -1712,3 +1712,47 @@ button {
     transform: translateX(100%);
   }
 }
+
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-card {
+  display: grid;
+  gap: 14px;
+}
+
+.account-card > div {
+  display: grid;
+  gap: 4px;
+}
+
+.account-card span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.account-card strong {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.account-actions {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.account-actions .secondary-button,
+.account-actions form,
+.account-signout {
+  width: 100%;
+}
+
+.account-signout {
+  min-height: 48px;
+}
