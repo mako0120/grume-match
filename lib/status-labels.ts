@@ -20,6 +20,7 @@ export const notificationTypeLabels: Record<string, string> = {
   reschedule_requested: "日時変更",
   reschedule_approved: "日時変更",
   reschedule_rejected: "日時変更",
+  deliverable_submitted: "投稿提出",
   deliverable_approved: "投稿確認",
   deliverable_revision_requested: "投稿確認",
   payment_approved: "報酬",
