@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { paymentStatusLabels, verificationStatusLabels } from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
 
@@ -15,10 +16,13 @@ const platformLabels: Record<string, string> = {
 
 export default async function RestaurantBookingDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ message?: string; status?: string }>;
 }) {
   const { id } = await params;
+  const { message, status } = await searchParams;
   const booking = await getRestaurantBooking(id);
 
   if (!booking) notFound();
@@ -30,8 +34,8 @@ export default async function RestaurantBookingDetailPage({
         <span className="status-pill">Restaurant</span>
       </header>
 
-      <Link className="back-link" href="/restaurant/campaigns/new">
-        ← 店舗管理
+      <Link className="back-link" href="/restaurant/bookings">
+        ← 来店予定
       </Link>
 
       <section className="booking-hero">
@@ -56,9 +60,20 @@ export default async function RestaurantBookingDetailPage({
         </div>
         <div className="summary-item">
           <span>支払い状態</span>
-          <strong>{booking.paymentStatus}</strong>
+          <strong>
+            {paymentStatusLabels[booking.paymentStatus] ?? booking.paymentStatus}
+          </strong>
         </div>
       </section>
+
+      {message ? (
+        <div
+          className={status === "error" ? "form-message error-message" : "form-message inline-success"}
+          aria-live="polite"
+        >
+          {message}
+        </div>
+      ) : null}
 
       <section className="deliverable-section">
         <h2>投稿確認</h2>
@@ -74,7 +89,8 @@ export default async function RestaurantBookingDetailPage({
             <div className="deliverable-head">
               <strong>{platformLabels[deliverable.platform] ?? deliverable.platform}</strong>
               <span className={`status-chip status-${deliverable.verification_status}`}>
-                {deliverable.verification_status}
+                {verificationStatusLabels[deliverable.verification_status] ??
+                  deliverable.verification_status}
               </span>
             </div>
 
