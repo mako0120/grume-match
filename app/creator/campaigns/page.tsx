@@ -28,6 +28,10 @@ export default async function CreatorCampaignListPage() {
         食事提供とは別に、現金報酬が明示された案件を掲載します。
       </p>
 
+      <Link className="quick-status-link" href="/creator/applications">
+        応募状況を確認 →
+      </Link>
+
       <Link
         className={standby?.active ? "standby-quick active" : "standby-quick"}
         href="/creator/standby"
