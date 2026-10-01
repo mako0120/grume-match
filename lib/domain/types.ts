@@ -11,6 +11,7 @@ export type CampaignStatus =
   | "draft"
   | "published"
   | "recruiting"
+  | "closed"
   | "filled"
   | "in_progress"
   | "completed"
