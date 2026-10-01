@@ -64,9 +64,11 @@ export default async function CreatorBookingDetailPage({
       </section>
 
       <section className="booking-actions">
-        <Link className="secondary-button" href={`/creator/bookings/${booking.id}/reschedule`}>
-          来店日時を変更
-        </Link>
+        {booking.canReschedule ? (
+          <Link className="secondary-button" href={`/creator/bookings/${booking.id}/reschedule`}>
+            来店日時を変更
+          </Link>
+        ) : null}
         <Link className="secondary-button" href="/notifications">
           通知を見る
         </Link>
