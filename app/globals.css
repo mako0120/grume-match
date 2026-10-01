@@ -1777,3 +1777,16 @@ button {
   font-size: 11px;
   line-height: 1.6;
 }
+
+
+.applicant-reject-button {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.applicant-reject-button:disabled {
+  opacity: 0.55;
+}
