@@ -11,6 +11,18 @@ export async function requestReschedule(bookingId: string, slotId: string) {
   });
 
   if (error) {
+    const reason = error.message ?? "";
+
+    if (reason.includes("booking_already_started")) {
+      return { ok: false as const, message: "来店開始後は日時変更できません。" };
+    }
+    if (reason.includes("reschedule_already_pending")) {
+      return { ok: false as const, message: "日時変更はすでに申請中です。" };
+    }
+    if (reason.includes("slot_unavailable")) {
+      return { ok: false as const, message: "その時間は埋まりました。別の時間を選択してください。" };
+    }
+
     return { ok: false as const, message: "日時変更を申請できませんでした。" };
   }
 
