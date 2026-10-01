@@ -147,22 +147,34 @@ export async function listCreatorBookings() {
 
   if (error) throw new Error(error.message);
 
-  return await Promise.all(
-    ((data ?? []) as unknown as RawBooking[]).map(async (row) => {
-      const campaign = single(row.campaigns);
-      const restaurant = single(campaign?.restaurants ?? null);
-      const slot = single(row.campaign_slots);
-      const payment = single(row.payments);
+  const presented = ((data ?? []) as unknown as RawBooking[]).map((row) => {
+    const campaign = single(row.campaigns);
+    const restaurant = single(campaign?.restaurants ?? null);
+    const slot = single(row.campaign_slots);
+    const payment = single(row.payments);
 
-      return {
-        id: row.id,
-        status: row.status,
-        campaignTitle: campaign?.title ?? "PR案件",
-        restaurantName: restaurant?.name ?? "店舗",
-        visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
-        paymentAmount: payment?.amount ?? campaign?.cash_reward ?? 0,
-        paymentStatus: payment?.status ?? "pending",
-      };
-    }),
-  );
+    return {
+      id: row.id,
+      status: row.status,
+      startsAt: slot?.starts_at ?? "",
+      campaignTitle: campaign?.title ?? "PR案件",
+      restaurantName: restaurant?.name ?? "店舗",
+      visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
+      paymentAmount: payment?.amount ?? campaign?.cash_reward ?? 0,
+      paymentStatus: payment?.status ?? "pending",
+    };
+  });
+
+  const now = Date.now();
+
+  return presented.sort((a, b) => {
+    const aTime = a.startsAt ? new Date(a.startsAt).getTime() : 0;
+    const bTime = b.startsAt ? new Date(b.startsAt).getTime() : 0;
+    const aUpcoming = aTime >= now;
+    const bUpcoming = bTime >= now;
+
+    if (aUpcoming !== bUpcoming) return aUpcoming ? -1 : 1;
+    if (aUpcoming) return aTime - bTime;
+    return bTime - aTime;
+  });
 }
