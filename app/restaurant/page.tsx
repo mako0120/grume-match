@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { campaignStatusLabels } from "@/lib/status-labels";
 import { getRestaurantDashboard } from "@/server/queries/restaurant-dashboard";
 
 function relationOne<T>(value: T | T[] | null | undefined): T | null {
@@ -103,7 +104,9 @@ export default async function RestaurantDashboardPage() {
                 key={campaign.id}
               >
                 <div>
-                  <span className="meta-pill">{campaign.status}</span>
+                  <span className="meta-pill">
+                    {campaignStatusLabels[campaign.status] ?? campaign.status}
+                  </span>
                   <h2>{campaign.title}</h2>
                   <p>募集 {campaign.creator_slots}名</p>
                 </div>
