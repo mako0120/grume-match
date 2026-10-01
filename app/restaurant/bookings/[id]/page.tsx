@@ -107,7 +107,8 @@ export default async function RestaurantBookingDetailPage({
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
 
-            {deliverable.submitted_url ? (
+            {deliverable.submitted_url &&
+            deliverable.verification_status !== "approved" ? (
               <>
                 <label>
                   修正依頼メモ（必要な場合のみ）
@@ -132,6 +133,8 @@ export default async function RestaurantBookingDetailPage({
                   </button>
                 </div>
               </>
+            ) : deliverable.verification_status === "approved" ? (
+              <div className="pending-box">承認済みです。</div>
             ) : null}
           </form>
         ))}
