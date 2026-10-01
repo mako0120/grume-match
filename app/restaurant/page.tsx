@@ -28,8 +28,8 @@ export default async function RestaurantDashboardPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <Link className="header-action" href="/notifications">
-          通知
+        <Link className="header-action" href="/account">
+          設定
         </Link>
       </header>
 
