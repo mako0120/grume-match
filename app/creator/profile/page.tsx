@@ -65,15 +65,16 @@ export default async function CreatorProfilePage({
             <label>
               アカウント名
               <input
-                defaultValue={primary?.handle ? `@${primary.handle}` : "@gurunavi_diary"}
+                defaultValue={primary?.handle ? `@${primary.handle}` : ""}
                 name="handle"
+                placeholder="@your_account"
                 required
               />
             </label>
             <label>
               フォロワー数
               <input
-                defaultValue={primary?.followers ?? 4000}
+                defaultValue={primary?.followers ?? 0}
                 min="0"
                 name="followers"
                 type="number"
