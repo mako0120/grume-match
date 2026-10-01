@@ -121,7 +121,22 @@ export async function listCreatorCampaigns(
 
   if (error) throw new Error(error.message);
 
-  return ((data ?? []) as unknown as RawCampaign[]).map(presentCampaign);
+  const rows = ((data ?? []) as unknown as RawCampaign[]);
+
+  if (kind === "flash") {
+    const now = Date.now();
+    return rows
+      .filter((row) =>
+        (row as RawCampaign & { flash_expires_at?: string | null }).flash_expires_at
+          ? new Date(
+              (row as RawCampaign & { flash_expires_at?: string | null }).flash_expires_at!,
+            ).getTime() > now
+          : true,
+      )
+      .map(presentCampaign);
+  }
+
+  return rows.map(presentCampaign);
 }
 
 export async function getCreatorCampaign(id: string) {
@@ -132,6 +147,7 @@ export async function getCreatorCampaign(id: string) {
     .select(campaignSelect)
     .eq("id", id)
     .in("status", ["published", "recruiting"])
+    .gt("application_deadline", new Date().toISOString())
     .single();
 
   if (error || !data) return null;
