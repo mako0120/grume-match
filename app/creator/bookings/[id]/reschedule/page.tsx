@@ -30,7 +30,12 @@ export default async function CreatorReschedulePage({
         <p>{booking.campaignTitle}</p>
       </section>
 
-      {booking.pendingRequest ? (
+      {!booking.canReschedule ? (
+        <section className="section-card">
+          <strong>この来店日時は変更できません</strong>
+          <p>来店開始後の日時変更はアプリから受け付けていません。</p>
+        </section>
+      ) : booking.pendingRequest ? (
         <section className="section-card success-message">
           <strong>日時変更を申請中です</strong>
           <p>店舗が承認または却下すると通知が届きます。</p>
