@@ -36,6 +36,10 @@ export async function GET() {
       supabase.from("applications").select("id", { head: true }).limit(1),
       supabase.from("bookings").select("id", { head: true }).limit(1),
       supabase.from("payments").select("id", { head: true }).limit(1),
+      supabase.from("campaign_target_creators").select("campaign_id", { head: true }).limit(1),
+      supabase.from("creator_standby").select("creator_id", { head: true }).limit(1),
+      supabase.from("booking_reschedule_requests").select("id", { head: true }).limit(1),
+      supabase.from("notifications").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {
