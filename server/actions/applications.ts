@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { applyToCampaign } from "@/server/services/apply-to-campaign";
 
@@ -72,10 +73,22 @@ export async function withdrawCampaignApplication(formData: FormData) {
   });
 
   if (error) {
-    return;
+    const reason = error.message ?? "";
+    const message = reason.includes("application_cannot_be_withdrawn")
+      ? "この応募はすでに確定または処理済みです。"
+      : "応募を取り消せませんでした。もう一度お試しください。";
+
+    redirect(
+      "/creator/applications?status=error&message=" +
+        encodeURIComponent(message),
+    );
   }
 
   revalidatePath("/creator/applications");
+  redirect(
+    "/creator/applications?status=ok&message=" +
+      encodeURIComponent("応募を取り消しました。"),
+  );
 }
 
 export async function rejectCampaignApplication(
