@@ -3,26 +3,22 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-function configured(name: string) {
-  return Boolean(process.env[name]);
+function environmentReady() {
+  return [
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.CRON_SECRET,
+  ].every(Boolean);
 }
 
 export async function GET() {
-  const environment = {
-    supabaseUrl: configured("NEXT_PUBLIC_SUPABASE_URL"),
-    supabasePublishableKey: configured("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
-    supabaseServiceRoleKey: configured("SUPABASE_SERVICE_ROLE_KEY"),
-    cronSecret: configured("CRON_SECRET"),
-  };
-
-  const envReady = Object.values(environment).every(Boolean);
-
-  if (!envReady) {
+  if (!environmentReady()) {
     return NextResponse.json(
       {
         ok: false,
         app: "GOURMET DIARY PR OS",
-        environment,
+        environment: "incomplete",
         database: "not_checked",
       },
       { status: 503 },
@@ -40,7 +36,7 @@ export async function GET() {
         {
           ok: false,
           app: "GOURMET DIARY PR OS",
-          environment,
+          environment: "ready",
           database: "unreachable",
         },
         { status: 503 },
@@ -50,7 +46,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       app: "GOURMET DIARY PR OS",
-      environment,
+      environment: "ready",
       database: "ok",
     });
   } catch {
@@ -58,7 +54,7 @@ export async function GET() {
       {
         ok: false,
         app: "GOURMET DIARY PR OS",
-        environment,
+        environment: "ready",
         database: "unreachable",
       },
       { status: 503 },
