@@ -1756,3 +1756,24 @@ button {
 .account-signout {
   min-height: 48px;
 }
+
+
+.pr-disclosure-note {
+  padding: 14px 15px;
+  margin: 14px 0 4px;
+  background: #fff8e8;
+  border: 1px solid #ead9ad;
+  border-radius: 16px;
+}
+
+.pr-disclosure-note strong {
+  display: block;
+  font-size: 13px;
+}
+
+.pr-disclosure-note p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
