@@ -94,7 +94,10 @@ function presentSlot(slot: RawSlot): CampaignSlot {
     startsAt: slot.starts_at,
     timeLabel: timeFormatter.format(new Date(slot.starts_at)),
     remaining: Math.max(0, slot.capacity - slot.reserved_count),
-    isOpen: slot.status === "open" && slot.reserved_count < slot.capacity,
+    isOpen:
+      slot.status === "open" &&
+      slot.reserved_count < slot.capacity &&
+      new Date(slot.starts_at).getTime() > Date.now(),
   };
 }
 
@@ -142,6 +145,7 @@ export async function getRestaurantCampaignApplications(
     cashReward: row.cash_reward,
     slots: (row.campaign_slots ?? [])
       .map(presentSlot)
+      .filter((slot) => slot.isOpen)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
     applications: (row.applications ?? []).map((application) => {
       const creator = single(application.creator_profiles);
