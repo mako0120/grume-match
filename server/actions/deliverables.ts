@@ -34,6 +34,10 @@ export async function submitDeliverable(formData: FormData) {
       redirect(withMessage(path, "現在この投稿URLは提出できません。", "error"));
     }
 
+    if (reason.includes("deliverable_already_approved")) {
+      redirect(withMessage(path, "この投稿はすでに承認済みのため変更できません。", "error"));
+    }
+
     redirect(withMessage(path, "投稿URLを保存できませんでした。もう一度お試しください。", "error"));
   }
 
@@ -66,6 +70,12 @@ export async function reviewDeliverable(formData: FormData) {
   });
 
   if (error) {
+    const reason = error.message ?? "";
+
+    if (reason.includes("deliverable_review_locked_after_payout_approval")) {
+      redirect(withMessage(path, "報酬承認後の投稿状態は変更できません。", "error"));
+    }
+
     redirect(withMessage(path, "投稿確認を更新できませんでした。もう一度お試しください。", "error"));
   }
 
