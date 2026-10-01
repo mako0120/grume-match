@@ -4,6 +4,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "GOURMET DIARY PR OS",
   description: "飲食店とグルメクリエイターを有償PRでつなぐプラットフォーム",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
