@@ -13,9 +13,14 @@ export default async function CreatorCampaignListPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <Link className="header-action" href="/notifications">
-          通知
-        </Link>
+        <div className="header-actions">
+          <Link className="header-action" href="/notifications">
+            通知
+          </Link>
+          <Link className="header-action" href="/account">
+            設定
+          </Link>
+        </div>
       </header>
 
       <h1 className="page-title">PR案件を探す</h1>
