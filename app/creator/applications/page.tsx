@@ -21,7 +21,12 @@ function relationOne<T>(value: T | T[] | null | undefined): T | null {
   return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
 
-export default async function CreatorApplicationsPage() {
+export default async function CreatorApplicationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string; status?: string }>;
+}) {
+  const { message, status } = await searchParams;
   const applications = await listCreatorApplications();
 
   return (
@@ -35,6 +40,15 @@ export default async function CreatorApplicationsPage() {
       <p className="page-subtitle">
         応募後の状態を、DMではなくアプリ上で確認できます。
       </p>
+
+      {message ? (
+        <div
+          className={status === "error" ? "form-message error-message" : "form-message inline-success"}
+          aria-live="polite"
+        >
+          {message}
+        </div>
+      ) : null}
 
       {applications.length ? (
         <section className="campaign-list">
