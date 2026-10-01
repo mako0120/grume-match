@@ -1790,3 +1790,21 @@ button {
 .applicant-reject-button:disabled {
   opacity: 0.55;
 }
+
+
+.creator-search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.creator-search input {
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .creator-search {
+    grid-template-columns: 1fr;
+  }
+}
