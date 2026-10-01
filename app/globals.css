@@ -1808,3 +1808,23 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+
+.campaign-management-card {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.campaign-management-link {
+  border: 0;
+  border-radius: 0;
+}
+
+.campaign-close-button {
+  width: 100%;
+  padding: 9px 14px 12px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
