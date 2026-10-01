@@ -1,3 +1,4 @@
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createCampaign } from "@/server/actions/campaigns";
 
 const weekdays = [
@@ -166,9 +167,10 @@ export default async function NewCampaignPage({
           </p>
         </section>
 
-        <button className="primary-button publish-button" type="submit">
-          この内容で公開
-        </button>
+        <PendingSubmitButton
+          idleLabel="この内容で公開"
+          pendingLabel="公開中..."
+        />
       </form>
     </main>
   );
