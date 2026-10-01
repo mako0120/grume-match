@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
 import { applyToCampaign } from "@/server/services/apply-to-campaign";
 
 type ApplicationPayload = {
@@ -57,4 +59,47 @@ export async function submitCampaignApplication(
 
     return { ok: false, message: "応募できませんでした。時間を変更して再度お試しください。" };
   }
+}
+
+
+export async function withdrawCampaignApplication(formData: FormData) {
+  const applicationId = String(formData.get("applicationId") ?? "");
+  if (!applicationId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("withdraw_application", {
+    p_application_id: applicationId,
+  });
+
+  if (error) {
+    return;
+  }
+
+  revalidatePath("/creator/applications");
+}
+
+export async function rejectCampaignApplication(
+  applicationId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!applicationId) {
+    return { ok: false, message: "応募情報を確認できませんでした。" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reject_application", {
+    p_application_id: applicationId,
+  });
+
+  if (error) {
+    const reason = error.message ?? "";
+
+    if (reason.includes("application_not_rejectable")) {
+      return { ok: false, message: "この応募はすでに処理済みです。" };
+    }
+
+    return { ok: false, message: "応募を見送りにできませんでした。" };
+  }
+
+  revalidatePath("/restaurant");
+  return { ok: true };
 }
