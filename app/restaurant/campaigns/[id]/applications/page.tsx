@@ -20,8 +20,8 @@ export default async function RestaurantApplicationsPage({
         <span className="status-pill">Restaurant</span>
       </header>
 
-      <Link className="back-link" href="/restaurant/campaigns/new">
-        ← 新しい案件を作る
+      <Link className="back-link" href="/restaurant">
+        ← 店舗ホーム
       </Link>
 
       <h1 className="page-title">応募者を選ぶ</h1>
@@ -51,8 +51,8 @@ export default async function RestaurantApplicationsPage({
         ))
       ) : (
         <section className="section-card">
-          <strong>まだ応募者はいません</strong>
-          <p>Creatorが来店候補日時を選んで応募すると、ここに表示されます。</p>
+          <strong>確認待ちの応募はありません</strong>
+          <p>新しい応募が届いた時だけ、ここに表示されます。</p>
         </section>
       )}
     </main>
