@@ -18,6 +18,21 @@ export async function GET(request: NextRequest) {
   const visitWindowStart = new Date(now + 23 * 60 * 60 * 1000).toISOString();
   const visitWindowEnd = new Date(now + 25 * 60 * 60 * 1000).toISOString();
   const dueWindowEnd = new Date(now + 24 * 60 * 60 * 1000).toISOString();
+  const nowIso = new Date(now).toISOString();
+
+  const { data: closedCampaigns, error: closeError } = await supabase
+    .from("campaigns")
+    .update({ status: "closed" })
+    .in("status", ["published", "recruiting"])
+    .lt("application_deadline", nowIso)
+    .select("id");
+
+  if (closeError) {
+    return NextResponse.json(
+      { error: "campaign_close_failed" },
+      { status: 500 },
+    );
+  }
 
   const [
     { data: upcomingBookings, error: bookingError },
@@ -47,7 +62,7 @@ export async function GET(request: NextRequest) {
         )
       `)
       .neq("verification_status", "approved")
-      .gte("due_at", new Date(now).toISOString())
+      .gte("due_at", nowIso)
       .lte("due_at", dueWindowEnd),
   ]);
 
@@ -132,6 +147,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    campaignsClosed: closedCampaigns?.length ?? 0,
     generated: notifications.length,
   });
 }
