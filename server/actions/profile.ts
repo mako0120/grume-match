@@ -5,6 +5,53 @@ import { createClient } from "@/lib/supabase/server";
 
 const allowedPlatforms = new Set(["instagram", "tiktok", "youtube"]);
 
+function nonNegativeInteger(value: FormDataEntryValue | null, fallback: number) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : fallback;
+}
+
+export async function saveCreatorBasics(formData: FormData) {
+  const displayName = String(formData.get("displayName") ?? "").trim();
+  const bio = String(formData.get("bio") ?? "").trim();
+  const baseArea = String(formData.get("baseArea") ?? "").trim();
+  const minReward = nonNegativeInteger(formData.get("minReward"), 0);
+  const travelRadiusKm = nonNegativeInteger(formData.get("travelRadiusKm"), 20);
+
+  if (!displayName || !baseArea) {
+    redirect(
+      "/creator/profile?message=" +
+        encodeURIComponent("表示名と活動エリアを入力してください。"),
+    );
+  }
+
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) redirect("/login");
+
+  const { error } = await supabase
+    .from("creator_profiles")
+    .update({
+      display_name: displayName,
+      bio,
+      base_area: baseArea,
+      min_reward: minReward,
+      travel_radius_km: travelRadiusKm,
+    })
+    .eq("user_id", authData.user.id);
+
+  if (error) {
+    redirect(
+      "/creator/profile?message=" +
+        encodeURIComponent("Creator情報を保存できませんでした。"),
+    );
+  }
+
+  redirect(
+    "/creator/profile?message=" +
+      encodeURIComponent("Creator情報を保存しました。"),
+  );
+}
+
 export async function savePrimarySocialAccount(formData: FormData) {
   const platform = String(formData.get("platform") ?? "");
   const handle = String(formData.get("handle") ?? "").trim().replace(/^@/, "");
