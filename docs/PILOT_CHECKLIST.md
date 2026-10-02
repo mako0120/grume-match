@@ -129,6 +129,40 @@ Creator:
 - [ ] No-show/dispute states appear.
 - [ ] Resolved exception disappears from active queue.
 
+## J. STUDIO (UGC and usage rights)
+
+Restaurant:
+- [ ] Create a campaign with UGC写真 and no usage rights → blocked with a clear message.
+- [ ] Choose SNS/Web + ads with fee 0 → blocked.
+- [ ] Publish with UGC写真 + 90日 + fee.
+
+Creator:
+- [ ] Campaign card/detail shows the usage terms before applying.
+- [ ] After booking, Wallet/booking shows reward + usage fee.
+- [ ] Upload 2 photos from a phone (HEIC from iPhone included).
+- [ ] A PDF or an oversized file is rejected with a clear message.
+- [ ] Remove one file, deliver the rest.
+
+Restaurant:
+- [ ] Files open on the booking page while reviewing.
+- [ ] Approve all deliverables → license shows 90 days remaining.
+- [ ] /restaurant/studio shows the files with download links.
+- [ ] Creator can no longer delete approved files.
+- [ ] (SQL, test project only) set `expires_at` in the past → files show 利用期限切れ and cannot be opened.
+
+## K. SIGNAL (attribution)
+
+- [ ] Confirmed booking shows the Creator's PR link and PR code.
+- [ ] Restaurant sets reservation URL and phone on /restaurant/signal.
+- [ ] Open the PR link logged out on a phone: PR disclosure, code, buttons, privacy note.
+- [ ] Opening the link increases 閲覧 once per tab; Instagram link preview does not.
+- [ ] Tapping 予約する / 電話 increases 予約ボタン.
+- [ ] Restaurant records a reservation and a visit with spend using the spoken code ("abcd efgh" also works).
+- [ ] Wrong / other restaurant's code is rejected without revealing which.
+- [ ] Mistaken record can be voided and totals update.
+- [ ] Cost per visit and 売上 ÷ 費用 match a manual calculation.
+- [ ] Creator sees counts but not spend.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:
@@ -137,6 +171,7 @@ Pilot is ready for external users only when:
 - [ ] Lint passes.
 - [ ] Tests pass.
 - [ ] Production build passes.
+- [ ] Database tests (`npm run test:db`) pass.
 - [ ] One complete paid PR transaction succeeds.
 - [ ] Normal transaction needs no Instagram DM.
 - [ ] No cross-tenant data is visible.

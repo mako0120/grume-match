@@ -280,6 +280,11 @@ API自動取得は後続フェーズ。
 - 全国展開
 - インセンティブ付きGoogle / 食べログ口コミ
 
+Post-MVP status: UGC delivery with structured, time-limited usage rights
+(P2-03) and code-based visit attribution (P3-01) are implemented. Automatic
+payments, review-site incentives and booking-site integrations remain out
+of scope.
+
 ## 14. Success metrics
 
 Pilot:

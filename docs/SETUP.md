@@ -21,6 +21,14 @@ npm run test
 npm run build
 ```
 
+Database checks (needs a local PostgreSQL 16 superuser connection):
+
+```bash
+PGHOST=localhost PGUSER=postgres PGPASSWORD=... npm run test:db
+```
+
+`supabase/tests/run.sh` recreates a throwaway database (`pr_os_test`), applies a minimal Supabase stub (`auth.uid()`, `anon`/`authenticated` roles, Storage tables) and **every migration**, then runs the SQL scenarios in `supabase/tests/*.test.sql`. Scenarios impersonate real users, so RLS and RPC authorization are exercised, not mocked. CI runs the same job against a `postgres:16` service. Never point it at a real Supabase project.
+
 ## 2. Supabase project
 
 Create one Supabase project for the pilot.
@@ -44,6 +52,12 @@ Legacy fallback:
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
+Optional public origin for SIGNAL tracking links (falls back to the request host):
+
+```env
+NEXT_PUBLIC_SITE_URL=https://<production-domain>
+```
+
 Use the modern Supabase secret key for new deployments when available.
 Never expose either server secret to the browser or commit it to Git.
 
@@ -62,6 +76,8 @@ Development seed:
 ```bash
 npx supabase db reset
 ```
+
+Migration `202610030001_ugc_studio.sql` creates the private Storage bucket `ugc-assets` (50MB per file, image/video MIME allow-list) and its RLS policies. Do not make the bucket public: Restaurant access to UGC files ends when the usage license expires.
 
 The seed contains demonstration restaurant/campaign data only. Do not put real Creator or restaurant personal information in `seed.sql`.
 
@@ -114,9 +130,11 @@ The route requires:
 Authorization: Bearer <CRON_SECRET>
 ```
 
-It currently creates in-app reminders for:
-- PR visit roughly 24 hours before
-- required post deadline within 24 hours
+It currently:
+- creates in-app reminders for a PR visit roughly 24 hours before
+- creates in-app reminders for a required post deadline within 24 hours
+- notifies the Restaurant 7 days before a content usage license expires
+- deletes SIGNAL events older than 13 months (retention)
 
 Notifications use a dedupe key so an hourly cron does not create repeated copies of the same reminder.
 
@@ -154,6 +172,11 @@ Restaurant:
 - `/restaurant/campaigns/new`
 - `/restaurant/flash/new`
 - `/restaurant/reschedules`
+- `/restaurant/studio` — UGC library and usage-license expiry
+- `/restaurant/signal` — PR code entry and ROI by Creator
+
+Public:
+- `/r/<code>` — Creator tracking link landing page (no login)
 
 Operator:
 - `/admin`

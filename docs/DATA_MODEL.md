@@ -210,6 +210,66 @@ DB transactionで、
 - after_json nullable
 - created_at
 
+## STUDIO tables (P2-03)
+
+### campaign_usage_rights
+Campaign-level secondary-use terms. Optional; required when the campaign
+asks for `ugc_photo` / `ugc_video`.
+
+- campaign_id PK/FK
+- usage_scope: organic | organic_and_ads
+- duration_days: 30 | 90 | 365 (no perpetual option)
+- fee integer (> 0 when ads use is included)
+
+Locked after the first application (same rule as price and deliverables).
+
+### content_usage_licenses
+Per-booking snapshot of the terms.
+
+- booking_id unique
+- campaign_id / restaurant_id / creator_id
+- usage_scope / duration_days / fee
+- status: pending | active
+- starts_at / expires_at (set when every deliverable is approved)
+
+`fee` is added to `payments.amount` when the booking is confirmed.
+
+### content_assets
+UGC files in the private `ugc-assets` Storage bucket.
+
+- deliverable_id / booking_id / creator_id / restaurant_id
+- kind: photo | video
+- storage_path unique (`<creator uid>/<deliverable id>/<file>`)
+- mime_type / byte_size (copied from Storage metadata, not the client)
+
+Restaurants can open files while reviewing and while the license is active.
+
+A deliverable counts as submitted when `deliverables.submitted_at` is set
+(URL deliverables also carry `submitted_url`).
+
+## SIGNAL tables (P3-01)
+
+### restaurants (added columns)
+- phone nullable
+- reservation_url nullable (https only)
+
+### tracking_links
+- code unique (8 chars, alphabet without I/O/0/1)
+- booking_id unique / campaign_id / restaurant_id / creator_id
+- disabled_at nullable (set when the booking is cancelled)
+
+### signal_events
+- tracking_link_id
+- kind: landing_view | reserve_click | call_click | reservation | visit
+- occurred_at
+- party_size nullable (reservation/visit only)
+- revenue_yen nullable (visit only)
+- recorded_by nullable (Restaurant user for reservation/visit)
+- voided_at nullable
+
+No visitor identifiers (cookie, IP, user agent, guest name/contact) are
+stored. Raw events are deleted after 13 months.
+
 ## Status constraints
 
 ステータス遷移はAPI層で明示的に制限する。
@@ -230,10 +290,6 @@ UIから任意のstatus文字列を直接更新させない。
 
 - offers
 - creator_rate_cards
-- content_assets
-- content_usage_rights
-- tracking_links
-- conversions
 - disputes
 - creator_metrics_daily
 - restaurant_subscriptions
