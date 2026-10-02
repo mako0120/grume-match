@@ -27,7 +27,7 @@ export function UgcAssetGrid({
               <video controls playsInline preload="metadata" src={asset.viewUrl} />
             )
           ) : (
-            <div className="ugc-locked">閲覧期間外</div>
+            <div className="ugc-locked">利用期限切れ</div>
           )}
 
           <div className="ugc-tile-meta">

@@ -2059,3 +2059,352 @@ button {
   color: var(--muted);
   font-size: 12px;
 }
+
+/* SIGNAL: attribution */
+
+.signal-landing {
+  padding-bottom: 40px;
+}
+
+.signal-disclosure {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.signal-code-card {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 18px;
+  text-align: center;
+  background: var(--surface);
+  border: 1.5px dashed var(--text);
+  border-radius: var(--radius-lg);
+}
+
+.signal-code-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.signal-code-card strong {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: clamp(30px, 10vw, 40px);
+  letter-spacing: 0.12em;
+}
+
+.signal-code-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.signal-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.signal-actions > a {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+}
+
+.signal-links {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.signal-links a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+}
+
+.signal-privacy {
+  margin-top: 22px;
+  padding: 14px 16px;
+  background: var(--surface-soft);
+  border-radius: var(--radius-md);
+}
+
+.signal-privacy strong {
+  font-size: 13px;
+}
+
+.signal-privacy p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.period-tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.period-tabs a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.period-tabs a.is-active {
+  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.signal-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.signal-metrics > div {
+  padding: 13px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+
+.signal-metrics span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.signal-metrics strong {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.signal-metrics small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media (min-width: 640px) {
+  .signal-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.signal-record-form {
+  margin-top: 10px;
+  padding-bottom: 0;
+}
+
+.signal-record-form input[name="code"] {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  background: var(--surface-soft);
+  border-radius: 14px;
+}
+
+.campaign-form .segmented label {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.campaign-form .segmented input {
+  width: 18px;
+  min-height: 18px;
+  padding: 0;
+}
+
+.signal-creator-list {
+  display: grid;
+  gap: 10px;
+}
+
+.signal-creator-card,
+.signal-link-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.signal-link-card {
+  margin-top: 14px;
+}
+
+.signal-link-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.signal-creator-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.signal-creator-head p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.signal-creator-head .meta-pill {
+  flex-shrink: 0;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+.signal-row-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.signal-row-metrics div {
+  min-width: 0;
+  padding: 8px;
+  background: var(--surface-soft);
+  border-radius: 10px;
+}
+
+.signal-row-metrics dt {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.signal-row-metrics dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.signal-conversion-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.signal-conversion-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.signal-conversion-list p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.signal-conversion-list form {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.signal-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signal-link-row code {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--surface-soft);
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.copy-button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.back-link + .eyebrow {
+  display: block;
+}
+
+.signal-metrics + .field-help {
+  margin: 8px 2px 18px;
+}
+
+.dashboard-section + .form-section,
+.form-section + .signal-privacy {
+  margin-top: 26px;
+}
+
+.signal-landing .booking-hero {
+  margin-top: 14px;
+}
+
+.booking-actions a.secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deliverable-card form > .secondary-button {
+  width: 100%;
+}
+
+.deliverable-card .secondary-button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}

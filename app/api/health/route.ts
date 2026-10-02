@@ -43,6 +43,8 @@ export async function GET() {
       supabase.from("campaign_usage_rights").select("campaign_id", { head: true }).limit(1),
       supabase.from("content_usage_licenses").select("id", { head: true }).limit(1),
       supabase.from("content_assets").select("id", { head: true }).limit(1),
+      supabase.from("tracking_links").select("id", { head: true }).limit(1),
+      supabase.from("signal_events").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {

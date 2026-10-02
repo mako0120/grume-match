@@ -197,9 +197,22 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // SIGNAL retention: raw events are kept for 13 months.
+  const { data: purgedSignalEvents, error: purgeError } = await supabase.rpc(
+    "purge_expired_signal_events",
+  );
+
+  if (purgeError) {
+    return NextResponse.json(
+      { error: "signal_purge_failed", detail: purgeError.message },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({
     ok: true,
     campaignsClosed: closedCampaigns?.length ?? 0,
     generated: notifications.length,
+    signalEventsPurged: purgedSignalEvents ?? 0,
   });
 }

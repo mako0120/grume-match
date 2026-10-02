@@ -54,6 +54,9 @@ export default async function RestaurantBookingDetailPage({
         <div className="summary-item">
           <span>報酬</span>
           <strong>¥{booking.cashReward.toLocaleString()}</strong>
+          {booking.license && booking.license.fee > 0 ? (
+            <small>うち二次利用料 ¥{booking.license.fee.toLocaleString()}</small>
+          ) : null}
         </div>
         <div className="summary-item">
           <span>支払い状態</span>
@@ -88,8 +91,10 @@ export default async function RestaurantBookingDetailPage({
             <div className="deliverable-head">
               <strong>{platformLabels[deliverable.platform] ?? deliverable.platform}</strong>
               <span className={`status-chip status-${deliverable.verification_status}`}>
-                {verificationStatusLabels[deliverable.verification_status] ??
-                  deliverable.verification_status}
+                {deliverable.submitted_at || deliverable.verification_status === "approved"
+                  ? verificationStatusLabels[deliverable.verification_status] ??
+                    deliverable.verification_status
+                  : "未提出"}
               </span>
             </div>
 

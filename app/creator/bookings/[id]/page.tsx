@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CopyButton } from "@/components/copy-button";
 import { UgcAssetGrid } from "@/components/ugc-asset-grid";
 import { UgcUploader } from "@/components/ugc-uploader";
 import { UsageLicenseSummary } from "@/components/usage-license-summary";
 import { ugcKindForPlatform } from "@/lib/content-rights";
+import { formatSignalCode } from "@/lib/signal-metrics";
+import { getSiteOrigin } from "@/lib/site-origin";
 import {
   paymentStatusLabels,
   platformLabels,
@@ -12,6 +15,7 @@ import {
 import { submitDeliverable } from "@/server/actions/deliverables";
 import { removeUgcAsset, submitUgcDeliverable } from "@/server/actions/studio";
 import { getCreatorBooking } from "@/server/queries/bookings";
+import { getCreatorSignal } from "@/server/queries/signal";
 
 export default async function CreatorBookingDetailPage({
   params,
@@ -22,9 +26,15 @@ export default async function CreatorBookingDetailPage({
 }) {
   const { id } = await params;
   const { message, status } = await searchParams;
-  const booking = await getCreatorBooking(id);
+  const [booking, signal, origin] = await Promise.all([
+    getCreatorBooking(id),
+    getCreatorSignal(id),
+    getSiteOrigin(),
+  ]);
 
   if (!booking) notFound();
+
+  const signalUrl = signal ? `${origin}/r/${signal.code}` : null;
 
   return (
     <main className="creator-shell">
@@ -86,6 +96,40 @@ export default async function CreatorBookingDetailPage({
       ) : null}
 
       {booking.license ? <UsageLicenseSummary license={booking.license} /> : null}
+
+      {signal && signalUrl ? (
+        <section className="signal-link-card">
+          <div className="deliverable-head">
+            <strong>あなた専用のPRリンク</strong>
+            <span className="status-chip">PRコード {formatSignalCode(signal.code)}</span>
+          </div>
+          <p>
+            投稿のキャプションやプロフィールに貼ると、閲覧・予約・来店があなたの成果として記録されます。
+          </p>
+          <div className="signal-link-row">
+            <code>{signalUrl}</code>
+            <CopyButton value={signalUrl} />
+          </div>
+          <dl className="signal-row-metrics">
+            <div>
+              <dt>閲覧</dt>
+              <dd>{signal.landing_views}</dd>
+            </div>
+            <div>
+              <dt>予約ボタン</dt>
+              <dd>{signal.reserve_clicks + signal.call_clicks}</dd>
+            </div>
+            <div>
+              <dt>予約</dt>
+              <dd>{signal.reservations}</dd>
+            </div>
+            <div>
+              <dt>来店</dt>
+              <dd>{signal.visits}</dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
 
       <section className="deliverable-section">
         <h2>投稿物を提出</h2>
