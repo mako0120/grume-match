@@ -39,6 +39,13 @@ export type DemoCampaign = {
   creatorSlots: number;
   visibility?: "public" | "direct";
   platforms: Platform[];
+  usageRights?: CampaignUsageRights | null;
   visitPeriod: string;
   slots: CampaignSlot[];
+};
+
+export type CampaignUsageRights = {
+  usageScope: "organic" | "organic_and_ads";
+  durationDays: number;
+  fee: number;
 };

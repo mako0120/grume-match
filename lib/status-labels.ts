@@ -31,6 +31,7 @@ export const notificationTypeLabels: Record<string, string> = {
   deliverable_due_24h: "投稿期限",
   flash_for_standby: "FLASH",
   direct_offer_received: "指名",
+  usage_license_expiring: "素材利用",
 };
 
 
@@ -44,4 +45,14 @@ export const campaignStatusLabels: Record<string, string> = {
   completed: "完了",
   cancelled: "キャンセル",
   suspended: "停止中",
+};
+
+export const platformLabels: Record<string, string> = {
+  instagram_feed: "Instagram Feed",
+  instagram_reel: "Instagram Reel",
+  instagram_story: "Instagram Story",
+  tiktok: "TikTok",
+  youtube_shorts: "YouTube Shorts",
+  ugc_photo: "UGC写真",
+  ugc_video: "UGC動画",
 };

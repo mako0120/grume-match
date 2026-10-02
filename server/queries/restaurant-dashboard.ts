@@ -1,3 +1,4 @@
+import { platformLabels } from "@/lib/status-labels";
 import { createClient } from "@/lib/supabase/server";
 
 export type RestaurantTask = {
@@ -59,9 +60,9 @@ export async function getRestaurantDashboard() {
 
     supabase
       .from("deliverables")
-      .select("id,booking_id,platform,verification_status,submitted_url,bookings!inner(id,creator_profiles(display_name),campaigns!inner(restaurant_id,title))")
+      .select("id,booking_id,platform,verification_status,submitted_at,bookings!inner(id,creator_profiles(display_name),campaigns!inner(restaurant_id,title))")
       .eq("bookings.campaigns.restaurant_id", restaurantId)
-      .not("submitted_url", "is", null)
+      .not("submitted_at", "is", null)
       .eq("verification_status", "pending")
       .limit(20),
 
@@ -145,7 +146,7 @@ export async function getRestaurantDashboard() {
       detail:
         (creator?.display_name ?? "Creator") +
         "・" +
-        String(item.platform),
+        (platformLabels[item.platform] ?? String(item.platform)),
       href: "/restaurant/bookings/" + item.booking_id,
     });
   }

@@ -104,6 +104,14 @@ export default async function RestaurantDashboardPage({
         </Link>
       </section>
 
+      <nav className="dashboard-links" aria-label="素材">
+        <Link href="/restaurant/studio">
+          <span className="eyebrow">STUDIO</span>
+          <strong>素材ライブラリ</strong>
+          <small>UGC写真・動画と利用期限</small>
+        </Link>
+      </nav>
+
       <section className="dashboard-section">
         <div className="section-heading">
           <h2>案件</h2>

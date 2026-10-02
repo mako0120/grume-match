@@ -3,6 +3,11 @@ import type { DemoCampaign, CampaignSlot, Platform } from "@/lib/domain/types";
 
 type RawRestaurant = { name: string };
 type RawPlatform = { platform: Platform };
+type RawUsageRights = {
+  usage_scope: "organic" | "organic_and_ads";
+  duration_days: number;
+  fee: number;
+};
 type RawSlot = {
   id: string;
   starts_at: string;
@@ -28,6 +33,7 @@ type RawCampaign = {
   restaurants: RawRestaurant | RawRestaurant[] | null;
   campaign_platforms: RawPlatform[] | null;
   campaign_slots: RawSlot[] | null;
+  campaign_usage_rights: RawUsageRights | RawUsageRights[] | null;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -72,6 +78,10 @@ function presentSlot(slot: RawSlot): CampaignSlot {
 }
 
 function presentCampaign(row: RawCampaign): DemoCampaign {
+  const usageRights = Array.isArray(row.campaign_usage_rights)
+    ? row.campaign_usage_rights[0] ?? null
+    : row.campaign_usage_rights;
+
   return {
     id: row.id,
     restaurantName: restaurantName(row.restaurants),
@@ -84,6 +94,13 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
     creatorSlots: row.creator_slots,
     visibility: row.visibility,
     platforms: (row.campaign_platforms ?? []).map((item) => item.platform),
+    usageRights: usageRights
+      ? {
+          usageScope: usageRights.usage_scope,
+          durationDays: usageRights.duration_days,
+          fee: usageRights.fee,
+        }
+      : null,
     visitPeriod: visitPeriod(row.visit_period_start, row.visit_period_end),
     slots: (row.campaign_slots ?? [])
       .map(presentSlot)
@@ -106,7 +123,8 @@ const campaignSelect = `
   visit_period_end,
   restaurants(name),
   campaign_platforms(platform),
-  campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status)
+  campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status),
+  campaign_usage_rights(usage_scope,duration_days,fee)
 `;
 
 export async function listCreatorCampaigns(

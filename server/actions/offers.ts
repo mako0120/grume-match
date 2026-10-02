@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { buildDirectOfferSchedule } from "@/lib/direct-offer-schedule";
 import { createClient } from "@/lib/supabase/server";
+import { readUsageRightsForm } from "@/server/actions/usage-rights-form";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
@@ -65,6 +66,11 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
+  const usage = readUsageRightsForm(formData, platforms);
+  if (!usage.ok) {
+    redirect("/restaurant/offers/new?message=" + encodeURIComponent(usage.message));
+  }
+
   let schedule;
   try {
     schedule = buildDirectOfferSchedule(candidateLocalDateTimes, durationMinutes);
@@ -95,6 +101,7 @@ export async function createDirectOffer(formData: FormData) {
     p_application_deadline: schedule.deadlineIso,
     p_platforms: platforms,
     p_slots: schedule.slots,
+    p_usage_rights: usage.usageRights,
   });
 
   if (error || !data) {

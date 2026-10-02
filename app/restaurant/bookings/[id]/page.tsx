@@ -1,18 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { paymentStatusLabels, verificationStatusLabels } from "@/lib/status-labels";
+import { UgcAssetGrid } from "@/components/ugc-asset-grid";
+import { UsageLicenseSummary } from "@/components/usage-license-summary";
+import { ugcKindForPlatform } from "@/lib/content-rights";
+import {
+  paymentStatusLabels,
+  platformLabels,
+  verificationStatusLabels,
+} from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
-
-const platformLabels: Record<string, string> = {
-  instagram_feed: "Instagram Feed",
-  instagram_reel: "Instagram Reel",
-  instagram_story: "Instagram Story",
-  tiktok: "TikTok",
-  youtube_shorts: "YouTube Shorts",
-  ugc_photo: "UGC写真",
-  ugc_video: "UGC動画",
-};
 
 export default async function RestaurantBookingDetailPage({
   params,
@@ -75,10 +72,12 @@ export default async function RestaurantBookingDetailPage({
         </div>
       ) : null}
 
+      {booking.license ? <UsageLicenseSummary license={booking.license} /> : null}
+
       <section className="deliverable-section">
         <h2>投稿確認</h2>
         <p className="schedule-hint">
-          Creatorが提出したURLを確認し、承認または修正依頼を行います。
+          Creatorが提出したURL・素材を確認し、承認または修正依頼を行います。
         </p>
 
         {booking.deliverables.map((deliverable) => (
@@ -94,7 +93,13 @@ export default async function RestaurantBookingDetailPage({
               </span>
             </div>
 
-            {deliverable.submitted_url ? (
+            {ugcKindForPlatform(deliverable.platform) ? (
+              deliverable.submitted_at ? (
+                <UgcAssetGrid assets={deliverable.assets} showDownload />
+              ) : (
+                <div className="pending-box">まだ素材が納品されていません。</div>
+              )
+            ) : deliverable.submitted_url ? (
               <a
                 className="submitted-link"
                 href={deliverable.submitted_url}
@@ -107,7 +112,7 @@ export default async function RestaurantBookingDetailPage({
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
 
-            {deliverable.submitted_url &&
+            {deliverable.submitted_at &&
             deliverable.verification_status !== "approved" ? (
               <>
                 <label>

@@ -1,17 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TapSchedule } from "@/components/tap-schedule";
+import { describeUsageRights } from "@/lib/content-rights";
+import { platformLabels } from "@/lib/status-labels";
 import { getCreatorCampaign } from "@/server/queries/campaigns";
-
-const platformLabels: Record<string, string> = {
-  instagram_feed: "Instagram Feed",
-  instagram_reel: "Instagram Reel",
-  instagram_story: "Instagram Story",
-  tiktok: "TikTok",
-  youtube_shorts: "YouTube Shorts",
-  ugc_photo: "UGC写真",
-  ugc_video: "UGC動画",
-};
 
 export default async function CreatorCampaignDetailPage({
   params,
@@ -62,6 +54,14 @@ export default async function CreatorCampaignDetailPage({
           <span>必須投稿</span>
           <strong>
             {campaign.platforms.map((platform) => platformLabels[platform] ?? platform).join(" / ")}
+          </strong>
+        </div>
+        <div className="summary-item">
+          <span>素材の二次利用</span>
+          <strong>
+            {campaign.usageRights
+              ? describeUsageRights(campaign.usageRights)
+              : "なし（投稿のみ）"}
           </strong>
         </div>
         <div className="summary-item">

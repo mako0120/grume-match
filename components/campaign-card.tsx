@@ -26,6 +26,15 @@ export function CampaignCard({ campaign }: { campaign: DemoCampaign }) {
         <small>現金報酬</small>
       </div>
 
+      {campaign.usageRights ? (
+        <span className="meta-pill usage-pill">
+          二次利用 {campaign.usageRights.durationDays}日
+          {campaign.usageRights.fee > 0
+            ? ` ＋¥${campaign.usageRights.fee.toLocaleString()}`
+            : ""}
+        </span>
+      ) : null}
+
       <div className="campaign-meta">
         <span className="meta-pill">{campaign.foodOffer}</span>
         <span className="meta-pill">{campaign.visitPeriod}</span>

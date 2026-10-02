@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createDirectOffer } from "@/server/actions/offers";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
 
@@ -113,6 +114,14 @@ export default async function NewDirectOfferPage({
               <input name="platforms" type="checkbox" value="instagram_story" />
               Story
             </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_photo" />
+              UGC写真（納品）
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_video" />
+              UGC縦動画（納品）
+            </label>
           </div>
 
           <label>
@@ -124,6 +133,8 @@ export default async function NewDirectOfferPage({
             />
           </label>
         </section>
+
+        <UsageRightsFields />
 
         <section className="form-section">
           <span className="eyebrow">03 DATE</span>

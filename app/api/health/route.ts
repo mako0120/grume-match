@@ -40,6 +40,9 @@ export async function GET() {
       supabase.from("creator_standby").select("creator_id", { head: true }).limit(1),
       supabase.from("booking_reschedule_requests").select("id", { head: true }).limit(1),
       supabase.from("notifications").select("id", { head: true }).limit(1),
+      supabase.from("campaign_usage_rights").select("campaign_id", { head: true }).limit(1),
+      supabase.from("content_usage_licenses").select("id", { head: true }).limit(1),
+      supabase.from("content_assets").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {

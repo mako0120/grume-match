@@ -1,4 +1,5 @@
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createCampaign } from "@/server/actions/campaigns";
 
 const weekdays = [
@@ -116,8 +117,18 @@ export default async function NewCampaignPage({
               <input name="platforms" type="checkbox" value="tiktok" />
               TikTok
             </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_photo" />
+              UGC写真（納品）
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_video" />
+              UGC縦動画（納品）
+            </label>
           </div>
         </section>
+
+        <UsageRightsFields />
 
         <section className="form-section">
           <span className="eyebrow">03 DATE</span>

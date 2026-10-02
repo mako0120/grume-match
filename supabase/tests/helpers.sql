@@ -10,6 +10,7 @@ as $$
 declare
   v_id uuid := gen_random_uuid();
 begin
+  perform tests.act_as_superuser();
   insert into auth.users (id, email) values (v_id, p_email);
   return v_id;
 end;
@@ -87,11 +88,17 @@ returns table (
 language plpgsql
 as $$
 declare
-  v_admin uuid := tests.create_user('admin@example.test');
-  v_restaurant_user uuid := tests.create_user('shop@example.test');
-  v_creator_user uuid := tests.create_user('creator@example.test');
-  v_other_user uuid := tests.create_user('other@example.test');
+  v_admin uuid;
+  v_restaurant_user uuid;
+  v_creator_user uuid;
+  v_other_user uuid;
 begin
+  perform tests.act_as_superuser();
+  v_admin := tests.create_user('admin-' || gen_random_uuid() || '@example.test');
+  v_restaurant_user := tests.create_user('shop-' || gen_random_uuid() || '@example.test');
+  v_creator_user := tests.create_user('creator-' || gen_random_uuid() || '@example.test');
+  v_other_user := tests.create_user('other-' || gen_random_uuid() || '@example.test');
+
   update public.users
   set role = 'admin', onboarding_completed_at = now()
   where id = v_admin;
