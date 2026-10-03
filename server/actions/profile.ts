@@ -126,3 +126,32 @@ export async function savePrimarySocialAccount(formData: FormData) {
 
   redirect("/creator/campaigns");
 }
+
+const requestPageErrors: Array<[string, string]> = [
+  ["invalid_request_slug", "URLは英小文字・数字・_ - で3〜30文字にしてください。"],
+  ["request_slug_reserved", "このURLは使えません。別の文字にしてください。"],
+  ["request_slug_taken", "このURLはすでに使われています。"],
+];
+
+/** Public PR request page that Creators send in reply to DM requests. */
+export async function saveRequestPage(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const enabled = formData.get("enabled") === "on";
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_creator_request_page", {
+    p_slug: slug,
+    p_enabled: enabled,
+  });
+
+  if (error) {
+    const reason = error.message ?? "";
+    const known = requestPageErrors.find(([key]) => reason.includes(key));
+    redirect("/creator/profile?message=" + encodeURIComponent(known?.[1] ?? "保存できませんでした。"));
+  }
+
+  redirect(
+    "/creator/profile?message=" +
+      encodeURIComponent(enabled ? "依頼受付ページを公開しました。" : "依頼受付ページを非公開にしました。"),
+  );
+}

@@ -7,7 +7,13 @@ import {
   prefectureOf,
   type ServicePrefecture,
 } from "@/lib/areas";
+import { safeNextPath } from "@/lib/next-path";
 import { createClient } from "@/lib/supabase/server";
+
+function onboardingPath(formData: FormData) {
+  const next = safeNextPath(formData.get("next"));
+  return next ? `/onboarding?next=${encodeURIComponent(next)}&` : "/onboarding?";
+}
 
 function toNonNegativeInteger(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
@@ -26,7 +32,7 @@ export async function completeCreatorOnboarding(formData: FormData) {
 
   // The service currently runs in Osaka.
   if (!(CREATOR_BASE_AREAS as readonly string[]).includes(baseArea)) {
-    redirect(`/onboarding?message=${encodeURIComponent("活動エリアを選択してください（現在は大阪で提供中）。")}`);
+    redirect(onboardingPath(formData) + `message=${encodeURIComponent("活動エリアを選択してください（現在は大阪で提供中）。")}`);
   }
   const minReward = toNonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = toNonNegativeInteger(formData.get("travelRadiusKm"), 20);
@@ -40,10 +46,10 @@ export async function completeCreatorOnboarding(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/onboarding?message=${encodeURIComponent("Creator登録に失敗しました。入力内容をご確認ください。")}`);
+    redirect(onboardingPath(formData) + `message=${encodeURIComponent("Creator登録に失敗しました。入力内容をご確認ください。")}`);
   }
 
-  redirect("/creator/profile");
+  redirect(safeNextPath(formData.get("next")) ?? "/creator/profile");
 }
 
 export async function completeRestaurantOnboarding(formData: FormData) {
@@ -61,11 +67,11 @@ export async function completeRestaurantOnboarding(formData: FormData) {
   // the prefecture with the place so matching always knows where it is
   // ("大阪・梅田").
   if (!OPEN_PREFECTURES.includes(prefecture) || !place) {
-    redirect(`/onboarding?message=${encodeURIComponent("現在は大阪の店舗のみ登録できます。エリアを入力してください。")}`);
+    redirect(onboardingPath(formData) + `message=${encodeURIComponent("現在は大阪の店舗のみ登録できます。エリアを入力してください。")}`);
   }
   const placePrefecture = prefectureOf(place);
   if (placePrefecture && placePrefecture !== prefecture) {
-    redirect(`/onboarding?message=${encodeURIComponent(`「${place}」は${placePrefecture}のエリアです。現在は大阪府内の店舗のみ登録できます。`)}`);
+    redirect(onboardingPath(formData) + `message=${encodeURIComponent(`「${place}」は${placePrefecture}のエリアです。現在は大阪府内の店舗のみ登録できます。`)}`);
   }
   const area = place.startsWith(prefecture) ? place : `${prefecture}・${place}`;
 
@@ -76,8 +82,8 @@ export async function completeRestaurantOnboarding(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/onboarding?message=${encodeURIComponent("店舗登録に失敗しました。入力内容をご確認ください。")}`);
+    redirect(onboardingPath(formData) + `message=${encodeURIComponent("店舗登録に失敗しました。入力内容をご確認ください。")}`);
   }
 
-  redirect("/restaurant/campaigns/new");
+  redirect(safeNextPath(formData.get("next")) ?? "/restaurant/campaigns/new");
 }

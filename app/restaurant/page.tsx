@@ -116,6 +116,11 @@ export default async function RestaurantDashboardPage({
           <strong>素材ライブラリ</strong>
           <small>UGC写真・動画と利用期限</small>
         </Link>
+        <Link href="/restaurant/offers/invites">
+          <span className="eyebrow">INVITE</span>
+          <strong>Instagramで招待</strong>
+          <small>DMで依頼している人もアプリで</small>
+        </Link>
         <Link href="/restaurant/billing">
           <span className="eyebrow">BILLING</span>
           <strong>ご請求</strong>

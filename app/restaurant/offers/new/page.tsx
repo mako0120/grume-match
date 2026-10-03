@@ -84,6 +84,22 @@ export default async function NewDirectOfferPage({
           <span className="eyebrow">01 CREATOR</span>
           <h2>依頼する人</h2>
 
+          <label className="creator-option invite-option">
+            <input name="creatorId" type="radio" value="invite" />
+            <div>
+              <strong>まだ登録していない人を招待</strong>
+              <span>InstagramのDMで依頼している人など</span>
+              <p>アカウント名を入れると招待リンクができます。DMで送ると、登録してそのまま応募できます。</p>
+              <input
+                autoCapitalize="none"
+                autoComplete="off"
+                maxLength={31}
+                name="instagramHandle"
+                placeholder="@instagramのアカウント名"
+              />
+            </div>
+          </label>
+
           {creators.length ? (
             <div className="creator-picker">
               {creators.map((creator) => (

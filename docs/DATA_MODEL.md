@@ -366,3 +366,21 @@ Meal-only invitations: `campaigns.cash_reward = 0` is allowed (the paid
 campaign guard was removed in `202610030009_meal_invitations.sql`). Their ¥0
 payment settles as `paid` when the PR completes, without payment
 notifications, and the fee is the ¥2,000 minimum.
+
+## DM onboarding
+
+### creator_profiles (added)
+- request_slug unique (`^[a-z0-9][a-z0-9_-]{2,29}$`) / request_page_enabled
+
+`get_creator_request_page(slug)` (anon) returns the enabled page: name, area,
+bio, minimum reward, completed PRs, revealed rating and verified posts of
+the last 60 days. No contact details.
+
+### offer_invites
+- token (20 chars) / campaign_id unique / restaurant_id / instagram_handle
+- claimed_by_creator_id / claimed_at
+
+`create_offer_invite` creates a 1-person direct campaign with no target.
+`get_offer_invite(token)` is the anon preview (no address).
+`claim_offer_invite(token)` adds the signed-in Creator as the target, which
+sends the usual direct offer notification. One Creator per invite.

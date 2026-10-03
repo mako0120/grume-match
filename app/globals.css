@@ -3079,3 +3079,73 @@ button {
 .fee-note {
   margin-top: -4px;
 }
+
+.onboarding-grid.is-restaurant-first > form:last-child {
+  order: -1;
+}
+
+/* DM → app */
+
+.dm-template {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--surface-soft);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.invite-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  margin-top: 11px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.invite-card.is-new {
+  border-color: var(--positive-line);
+}
+
+.invite-option input[name="instagramHandle"] {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.request-page-section {
+  display: grid;
+  gap: 12px;
+}
+
+.slug-field {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.slug-field input {
+  min-width: 0;
+  flex: 1;
+}
+
+.inline-check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.request-cta {
+  display: grid;
+  gap: 10px;
+}

@@ -205,6 +205,14 @@ Restaurant:
 - [ ] A meal-only invitation (現金報酬 0円) can be published; cards show 「食事招待」; Creators with a minimum reward are not invited.
 - [ ] Completing a meal-only PR settles the ¥0 payment without a 「¥0 の報酬」 notification and records a ¥2,000 fee.
 
+## P. DM → app
+
+- [ ] Creator publishes 「PR依頼の受付ページ」 on /creator/profile and copies the DM reply.
+- [ ] /c/<slug> signed out: verified posts only, no contact details; 依頼する → signup → onboarding as 店舗 → Direct OFFER with the Creator preselected.
+- [ ] Restaurant chooses 「まだ登録していない人を招待」 with an Instagram handle → /restaurant/offers/invites shows the DM text and link.
+- [ ] /i/<token> signed out shows the offer without the address; 登録して受ける → onboarding as Creator → back to the invite → この依頼を受ける → campaign detail.
+- [ ] The invite then shows 「…さんが登録済み」; a second Creator cannot take it.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:
