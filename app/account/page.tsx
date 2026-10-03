@@ -71,7 +71,7 @@ export default async function AccountPage() {
               Creatorプロフィールを編集
             </Link>
             <Link className="secondary-button" href="/creator/performance">
-              過去30日の実績・メディアキット
+              過去30日の実績
             </Link>
           </>
         ) : null}

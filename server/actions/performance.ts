@@ -147,69 +147,6 @@ export async function reviewEvidence(formData: FormData) {
   );
 }
 
-/** Logs a sales email the Creator is about to send from Gmail. */
-export async function logOutreach(input: {
-  companyName: string;
-  contactName: string;
-  email: string;
-}): Promise<{ ok: boolean }> {
-  const companyName = input.companyName.trim().slice(0, 80);
-  if (!companyName) return { ok: false };
-
-  const supabase = await createClient();
-  const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) return { ok: false };
-
-  const { data: profile } = await supabase
-    .from("creator_profiles")
-    .select("id")
-    .eq("user_id", authData.user.id)
-    .maybeSingle();
-  if (!profile) return { ok: false };
-
-  const { error } = await supabase.from("creator_outreach").insert({
-    creator_id: profile.id,
-    company_name: companyName,
-    contact_name: input.contactName.trim().slice(0, 40) || null,
-    email: input.email.trim() || null,
-  });
-
-  revalidatePath(PAGE);
-  return { ok: !error };
-}
-
-/** One switch: publish the media kit together with the flat-rate plan. */
-export async function savePrDesk(formData: FormData) {
-  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
-  const price = Number(formData.get("price") ?? 8000);
-  const enabled = formData.get("enabled") === "on";
-
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("set_pr_desk", {
-    p_enabled: enabled,
-    p_price: Number.isInteger(price) ? price : 8000,
-    p_slug: slug,
-  });
-
-  if (error) {
-    const reason = error.message ?? "";
-    back(
-      PAGE,
-      reason.includes("media_kit_slug_taken")
-        ? "そのURLはすでに使われています。"
-        : reason.includes("invalid_media_kit_slug")
-          ? "URLは半角英小文字・数字・ハイフンで3〜30文字にしてください。"
-          : reason.includes("invalid_flat_plan_price")
-            ? "料金は1,000円以上にしてください。"
-            : "保存できませんでした。",
-      "error",
-    );
-  }
-
-  revalidatePath(PAGE);
-  back(PAGE, enabled ? "PR窓口を公開しました。" : "PR窓口を停止しました。", "ok");
-}
-
 /** Operator / Claude: register rows read from a screenshot (verified). */
 export async function importFromEvidence(formData: FormData) {
   const evidenceId = String(formData.get("evidenceId") ?? "");

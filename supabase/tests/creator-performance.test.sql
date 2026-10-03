@@ -1,5 +1,5 @@
 -- Creator performance (実績): self-reported metrics, Operator verification
--- via screenshot, visibility to Restaurants, and the opt-in public media kit.
+-- via screenshot and visibility to Restaurants.
 do $$
 declare
   p record;
@@ -8,7 +8,6 @@ declare
   v_count integer;
   v_path text;
   v_evidence uuid;
-  v_kit jsonb;
 begin
   select * into p from tests.seed_parties();
 
@@ -135,29 +134,5 @@ begin
     raise exception 'untouched rows should stay verified';
   end if;
 
-  -- Media kit: private by default, opt-in public by slug.
-  perform tests.act_as(p.creator_user_id);
-  perform tests.assert_raises('select public.set_media_kit(true, ''A'')', 'invalid_media_kit_slug');
-  perform public.set_media_kit(false, 'gourmet-diary');
-
-  perform tests.act_as_anon();
-  if public.get_public_media_kit('gourmet-diary') is not null then
-    raise exception 'private media kit is readable';
-  end if;
-
-  perform tests.act_as(p.creator_user_id);
-  perform public.set_media_kit(true, 'Gourmet-Diary');
-
-  perform tests.act_as(p.other_creator_user_id);
-  perform tests.assert_raises('select public.set_media_kit(true, ''gourmet-diary'')', 'media_kit_slug_taken');
-
-  perform tests.act_as_anon();
-  v_kit := public.get_public_media_kit('gourmet-diary');
-  if v_kit ->> 'display_name' <> 'グルメ日誌'
-     or jsonb_array_length(v_kit -> 'posts') <> 3
-     or (v_kit -> 'posts' -> 0 ->> 'views')::integer <> 30000
-     or v_kit ? 'email' then
-    raise exception 'unexpected public media kit: %', v_kit;
-  end if;
 end;
 $$;

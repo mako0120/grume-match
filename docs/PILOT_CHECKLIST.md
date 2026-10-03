@@ -166,28 +166,15 @@ Restaurant:
 ## L. PROOF (Creator performance)
 
 Creator (グルメ日誌):
-- [ ] Paste the 30-day insights (docs/CREATOR_PERFORMANCE.md) → preview shows 8投稿・約12.4万閲覧.
-- [ ] A broken line shows the line number and reason; save stays disabled.
-- [ ] Save, then send the insights screenshot.
-- [ ] Publish the media kit and open `/k/<slug>` logged out (also the LINE/Instagram link preview).
+- [ ] Send only the insights screenshot → 読み取り待ち.
 
-Operator:
-- [ ] Screenshot appears in Inbox → /admin/performance; approve → 運営確認済み.
+Operator / Claude:
+- [ ] Screenshot appears in Inbox; Claude (`read-insights`) or /admin/performance registers 8投稿・約12.4万閲覧 → 運営確認済み, Creator notified.
 
 Restaurant:
 - [ ] Applicant card shows 30-day reach and links to the media kit.
 - [ ] Direct OFFER picker lists Creators by reach; "この人に指名オファー" preselects the Creator.
 - [ ] Another Creator cannot see グルメ日誌's numbers; the screenshot is never visible to Restaurants.
-
-## M. PR desk (グルメ日誌 一律¥8,000)
-
-- [ ] Creator sends only the insights screenshot → 読み取り待ち.
-- [ ] Claude (`read-insights`) or /admin/performance registers it → 登録済み・運営確認済み, Creator notified.
-- [ ] Creator turns on PR窓口 (¥8,000) → /order/<slug> shows the plan and results.
-- [ ] Gmail opens with subject, body and the order link; the store appears in 送った店舗.
-- [ ] Logged-out Restaurant: sign up from /order/<slug> → after email confirmation and onboarding it returns to the order page.
-- [ ] Restaurant orders with 1–3 dates → campaign is ¥8,000・Reel 1本・食事1名分; Creator gets 指名PR notification.
-- [ ] Turning PR窓口 off stops new orders.
 
 ## Exit criteria
 

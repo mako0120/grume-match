@@ -46,8 +46,8 @@ export default async function CreatorProfilePage({
       <Link className="proof-link-card" href="/creator/performance">
         <div>
           <span className="eyebrow">PROOF</span>
-          <strong>過去30日の実績・メディアキット</strong>
-          <p>インサイトを貼り付けるだけ。応募・指名・店舗への営業に使えます。</p>
+          <strong>過去30日の実績</strong>
+          <p>スクショを送るだけ。応募や指名で店舗に選ばれやすくなります。</p>
         </div>
         <span>→</span>
       </Link>

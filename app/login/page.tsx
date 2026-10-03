@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { safeReturnTo } from "@/lib/return-to";
 import { signIn } from "@/server/actions/auth";
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; next?: string }>;
+  searchParams: Promise<{ message?: string }>;
 }) {
-  const { message, next: nextParam } = await searchParams;
-  const next = safeReturnTo(nextParam);
+  const { message } = await searchParams;
 
   return (
     <main className="auth-shell">
@@ -20,7 +18,6 @@ export default async function LoginPage({
         {message ? <div className="form-message">{message}</div> : null}
 
         <form action={signIn} className="form-stack">
-          {next ? <input name="next" type="hidden" value={next} /> : null}
           <label>
             メールアドレス
             <input autoComplete="email" name="email" required type="email" />
@@ -33,7 +30,7 @@ export default async function LoginPage({
         </form>
 
         <p className="auth-switch">
-          初めてですか？ <Link href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}>アカウントを作成</Link>
+          初めてですか？ <Link href="/signup">アカウントを作成</Link>
         </p>
       </section>
     </main>

@@ -179,12 +179,10 @@ Restaurant:
 - `/restaurant/creators/<id>` — Creator media kit (30-day performance)
 
 Creator:
-- `/creator/performance` — 実績とPR窓口: screenshot, flat-rate PR desk, Gmail outreach
+- `/creator/performance` — 過去30日の実績 (send an insights screenshot)
 
 Public:
 - `/r/<code>` — Creator tracking link landing page (no login)
-- `/k/<slug>` — opt-in Creator media kit (no login)
-- `/order/<slug>` — Creator's flat-rate PR order page (Restaurants order with candidate dates)
 
 Operator:
 - `/admin`

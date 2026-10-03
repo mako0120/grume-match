@@ -291,16 +291,6 @@ Visible to the Creator and the Operator only.
 
 - status: pending | verified | rejected
 
-### creator_profiles (added columns)
-- media_kit_slug unique (`/k/<slug>`)
-- media_kit_public (default false)
-
-- flat_plan_enabled / flat_plan_price (PR desk; default ¥8,000)
-
-### creator_outreach
-Sales emails the Creator opened in Gmail (company, contact, email, date).
-Private to the Creator.
-
 See `docs/CREATOR_PERFORMANCE.md`.
 
 ## Status constraints

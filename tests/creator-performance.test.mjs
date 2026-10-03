@@ -172,19 +172,18 @@ test("docs carry the same paste-ready data the summary is tested with", async ()
   }
 });
 
-test("public media kit exposes no screenshots or contact details", async () => {
+test("screenshots stay private and reading needs no external AI API", async () => {
   const { readFile } = await import("node:fs/promises");
-  const migration = await readFile(
-    "supabase/migrations/202610030003_creator_performance.sql",
-    "utf8",
-  );
-  const kit = migration.slice(
-    migration.indexOf("create or replace function public.get_public_media_kit"),
-    migration.indexOf("revoke all on function public.get_public_media_kit"),
-  );
+  const [performance, screenshot, script, skill, pkg] = await Promise.all([
+    readFile("supabase/migrations/202610030003_creator_performance.sql", "utf8"),
+    readFile("supabase/migrations/202610030004_screenshot_import.sql", "utf8"),
+    readFile("scripts/insights-queue.mjs", "utf8"),
+    readFile(".claude/skills/read-insights/SKILL.md", "utf8"),
+    readFile("package.json", "utf8"),
+  ]);
 
-  assert.match(kit, /cp\.media_kit_public/);
-  assert.doesNotMatch(kit, /email|storage_path|evidence|phone/);
-  assert.match(migration, /'creator-evidence',\s*'creator-evidence',\s*false/);
-  assert.match(migration, /media_kit_public boolean not null default false/);
+  assert.match(performance, /'creator-evidence',\s*'creator-evidence',\s*false/);
+  assert.match(screenshot, /public\.is_operator_or_service\(\)/);
+  assert.doesNotMatch(script + pkg, /anthropic|openai|vision|tesseract/i);
+  assert.match(skill, /Never guess a number/);
 });
