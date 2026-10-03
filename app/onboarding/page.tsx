@@ -48,8 +48,7 @@ export default async function OnboardingPage({
             活動エリア
             <select defaultValue="大阪" name="baseArea" required>
               <option value="大阪">大阪</option>
-              <option value="兵庫">兵庫</option>
-              <option value="大阪・兵庫">大阪・兵庫</option>
+              <option value="大阪・兵庫">大阪・兵庫（兵庫からも通える）</option>
             </select>
           </label>
           <label>
@@ -84,20 +83,12 @@ export default async function OnboardingPage({
             店舗名
             <input name="name" required />
           </label>
-          <div className="field-row">
-            <label>
-              府県
-              <select defaultValue="大阪" name="prefecture" required>
-                <option value="大阪">大阪</option>
-                <option value="兵庫">兵庫</option>
-              </select>
-            </label>
-            <label>
-              エリア
-              <input placeholder="梅田 / 三宮 / 淡路" name="area" required />
-            </label>
-          </div>
-          <p className="field-help">現在は大阪・兵庫の店舗のみご利用いただけます。</p>
+          <input name="prefecture" type="hidden" value="大阪" />
+          <label>
+            エリア（大阪府内）
+            <input placeholder="梅田 / 難波 / 天王寺" name="area" required />
+          </label>
+          <p className="field-help">現在は大阪府内の店舗のみご利用いただけます。</p>
           <label>
             住所
             <input name="address" required />

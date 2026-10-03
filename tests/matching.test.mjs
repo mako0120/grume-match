@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isServiceArea, prefectureOf } from "../lib/areas.ts";
+import { CREATOR_BASE_AREAS, OPEN_PREFECTURES, isServiceArea, prefectureOf } from "../lib/areas.ts";
 import { parseInsightLines, summarizePerformance } from "../lib/creator-performance.ts";
 import { autoInviteCandidates, matchCreatorToCampaign, rankCreators } from "../lib/matching.ts";
 
@@ -53,6 +53,11 @@ const pricey = {
   completedPrs: 8,
   noShows: 0,
 };
+
+test("launch is Osaka only; 兵庫 is still recognised for track records", () => {
+  assert.deepEqual([...OPEN_PREFECTURES], ["大阪"]);
+  assert.deepEqual([...CREATOR_BASE_AREAS], ["大阪", "大阪・兵庫"]);
+});
 
 test("places resolve to the service prefectures 大阪・兵庫", () => {
   assert.equal(prefectureOf("大阪市北区梅田1-2-3"), "大阪");

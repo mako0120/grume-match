@@ -16,7 +16,7 @@ const differences = [
   {
     topic: "Creatorの選び方",
     usual: "フォロワー数・条件の絞り込み",
-    ours: "直近30日の閲覧・大阪/兵庫での投稿実績・PR完了数で相性を点数化。理由も表示",
+    ours: "直近30日の閲覧・大阪での投稿実績・PR完了数で相性を点数化。理由も表示",
   },
   {
     topic: "実績の信頼性",
@@ -53,7 +53,7 @@ export default function HomePage() {
           <Link className="secondary-button" href="/login">
             ログイン
           </Link>
-          <span className="status-pill">大阪・兵庫で提供中</span>
+          <span className="status-pill">大阪で提供中</span>
         </div>
       </section>
 

@@ -1,7 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { SERVICE_PREFECTURES, prefectureOf, type ServicePrefecture } from "@/lib/areas";
+import {
+  CREATOR_BASE_AREAS,
+  OPEN_PREFECTURES,
+  prefectureOf,
+  type ServicePrefecture,
+} from "@/lib/areas";
 import { createClient } from "@/lib/supabase/server";
 
 function toNonNegativeInteger(value: FormDataEntryValue | null, fallback: number) {
@@ -19,9 +24,9 @@ export async function completeCreatorOnboarding(formData: FormData) {
   const bio = String(formData.get("bio") ?? "").trim();
   const baseArea = String(formData.get("baseArea") ?? "").trim();
 
-  // Service area: 大阪・兵庫.
-  if (!["大阪", "兵庫", "大阪・兵庫"].includes(baseArea)) {
-    redirect(`/onboarding?message=${encodeURIComponent("活動エリアは大阪・兵庫から選択してください。")}`);
+  // The service currently runs in Osaka.
+  if (!(CREATOR_BASE_AREAS as readonly string[]).includes(baseArea)) {
+    redirect(`/onboarding?message=${encodeURIComponent("活動エリアを選択してください（現在は大阪で提供中）。")}`);
   }
   const minReward = toNonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = toNonNegativeInteger(formData.get("travelRadiusKm"), 20);
@@ -52,14 +57,15 @@ export async function completeRestaurantOnboarding(formData: FormData) {
   const prefecture = String(formData.get("prefecture") ?? "") as ServicePrefecture;
   const place = String(formData.get("area") ?? "").trim();
 
-  // Service area: 大阪・兵庫. Store the prefecture with the place so that
-  // matching can always tell where the restaurant is ("大阪・梅田").
-  if (!SERVICE_PREFECTURES.includes(prefecture) || !place) {
-    redirect(`/onboarding?message=${encodeURIComponent("府県（大阪・兵庫）とエリアを入力してください。")}`);
+  // Restaurants can join only in open prefectures (Osaka at launch). Store
+  // the prefecture with the place so matching always knows where it is
+  // ("大阪・梅田").
+  if (!OPEN_PREFECTURES.includes(prefecture) || !place) {
+    redirect(`/onboarding?message=${encodeURIComponent("現在は大阪の店舗のみ登録できます。エリアを入力してください。")}`);
   }
   const placePrefecture = prefectureOf(place);
   if (placePrefecture && placePrefecture !== prefecture) {
-    redirect(`/onboarding?message=${encodeURIComponent(`「${place}」は${placePrefecture}のエリアです。府県を確認してください。`)}`);
+    redirect(`/onboarding?message=${encodeURIComponent(`「${place}」は${placePrefecture}のエリアです。現在は大阪府内の店舗のみ登録できます。`)}`);
   }
   const area = place.startsWith(prefecture) ? place : `${prefecture}・${place}`;
 

@@ -70,7 +70,7 @@ export default async function CreatorProfilePage({
               活動エリア
               <select
                 defaultValue={
-                  ["大阪", "兵庫", "大阪・兵庫"].includes(profile?.base_area ?? "")
+                  ["大阪", "大阪・兵庫"].includes(profile?.base_area ?? "")
                     ? profile?.base_area
                     : "大阪"
                 }
@@ -78,8 +78,7 @@ export default async function CreatorProfilePage({
                 required
               >
                 <option value="大阪">大阪</option>
-                <option value="兵庫">兵庫</option>
-                <option value="大阪・兵庫">大阪・兵庫</option>
+                <option value="大阪・兵庫">大阪・兵庫（兵庫からも通える）</option>
               </select>
             </label>
           </div>

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { CREATOR_BASE_AREAS } from "@/lib/areas";
 import { createClient } from "@/lib/supabase/server";
 
 const allowedPlatforms = new Set(["instagram", "tiktok", "youtube"]);
@@ -17,10 +18,10 @@ export async function saveCreatorBasics(formData: FormData) {
   const minReward = nonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = nonNegativeInteger(formData.get("travelRadiusKm"), 20);
 
-  if (!displayName || !["大阪", "兵庫", "大阪・兵庫"].includes(baseArea)) {
+  if (!displayName || !(CREATOR_BASE_AREAS as readonly string[]).includes(baseArea)) {
     redirect(
       "/creator/profile?message=" +
-        encodeURIComponent("表示名と活動エリア（大阪・兵庫）を入力してください。"),
+        encodeURIComponent("表示名と活動エリアを入力してください（現在は大阪で提供中）。"),
     );
   }
 

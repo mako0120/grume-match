@@ -5,6 +5,17 @@
 export const SERVICE_PREFECTURES = ["大阪", "兵庫"] as const;
 export type ServicePrefecture = (typeof SERVICE_PREFECTURES)[number];
 
+/**
+ * Where restaurants can sign up today. The launch is Osaka only so that
+ * every campaign has enough nearby Creators; 兵庫 stays recognised so that
+ * Creators' posts there still count as track record. Open the next
+ * prefecture by adding it here.
+ */
+export const OPEN_PREFECTURES: readonly ServicePrefecture[] = ["大阪"];
+
+/** Creator 活動エリア choices while the service is Osaka only. */
+export const CREATOR_BASE_AREAS = ["大阪", "大阪・兵庫"] as const;
+
 const places: Record<ServicePrefecture, string[]> = {
   大阪: [
     "大阪", "梅田", "北新地", "中之島", "福島", "天満", "南森町", "中崎町", "曽根崎", "茶屋町", "扇町",
