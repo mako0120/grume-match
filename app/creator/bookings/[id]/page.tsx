@@ -104,7 +104,7 @@ export default async function CreatorBookingDetailPage({
             <span className="status-chip">PRコード {formatSignalCode(signal.code)}</span>
           </div>
           <p>
-            投稿のキャプションやプロフィールに貼ると、閲覧・予約・来店があなたの成果として記録されます。
+            投稿のキャプションやプロフィールに貼ると、閲覧と来店があなたの成果として記録されます。お店では「PRコード」を伝えてもらうと来店が記録されます。
           </p>
           <div className="signal-link-row">
             <code>{signalUrl}</code>
@@ -114,14 +114,6 @@ export default async function CreatorBookingDetailPage({
             <div>
               <dt>閲覧</dt>
               <dd>{signal.landing_views}</dd>
-            </div>
-            <div>
-              <dt>予約ボタン</dt>
-              <dd>{signal.reserve_clicks + signal.call_clicks}</dd>
-            </div>
-            <div>
-              <dt>予約</dt>
-              <dd>{signal.reservations}</dd>
             </div>
             <div>
               <dt>来店</dt>

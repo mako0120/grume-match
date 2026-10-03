@@ -249,10 +249,6 @@ A deliverable counts as submitted when `deliverables.submitted_at` is set
 
 ## SIGNAL tables (P3-01)
 
-### restaurants (added columns)
-- phone nullable
-- reservation_url nullable (https only)
-
 ### tracking_links
 - code unique (8 chars, alphabet without I/O/0/1)
 - booking_id unique / campaign_id / restaurant_id / creator_id
@@ -260,15 +256,16 @@ A deliverable counts as submitted when `deliverables.submitted_at` is set
 
 ### signal_events
 - tracking_link_id
-- kind: landing_view | reserve_click | call_click | reservation | visit
+- kind: landing_view | visit
 - occurred_at
-- party_size nullable (reservation/visit only)
+- party_size nullable (visit only)
 - revenue_yen nullable (visit only)
-- recorded_by nullable (Restaurant user for reservation/visit)
+- recorded_by nullable (Restaurant user for visits)
 - voided_at nullable
 
 No visitor identifiers (cookie, IP, user agent, guest name/contact) are
-stored. Raw events are deleted after 13 months.
+stored. Raw events are deleted after 13 months. Reservations are out of scope: the
+product does not track reservation buttons or reservation records.
 
 ## PROOF tables (Creator performance)
 

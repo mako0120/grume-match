@@ -1,5 +1,5 @@
--- P3-01 SIGNAL: tracking link → anonymous touches → Restaurant-recorded
--- reservations/visits → ROI aggregates, with privacy and retention rules.
+-- P3-01 SIGNAL: tracking link → anonymous landing views → Restaurant-recorded
+-- visits → ROI aggregates, with privacy and retention rules.
 do $$
 declare
   p record;
@@ -11,7 +11,7 @@ declare
   v_landing record;
   v_summary record;
   v_creator_summary record;
-  v_reservation uuid;
+  v_visit uuid;
   v_count integer;
   i integer;
 begin
@@ -20,21 +20,6 @@ begin
   v_other_shop_user := tests.create_user('signal-other-shop@example.test');
   perform tests.act_as(v_other_shop_user);
   perform public.complete_restaurant_onboarding('別の店', '大阪市中央区', '難波');
-
-  perform tests.act_as(p.restaurant_user_id);
-  perform tests.assert_raises(format(
-    'select public.update_restaurant_contact(%L, %L, %L)',
-    p.restaurant_id, '06-1234-5678', 'http://insecure.example.com'), 'invalid_reservation_url');
-  perform tests.assert_raises(format(
-    'select public.update_restaurant_contact(%L, %L, %L)',
-    p.restaurant_id, 'call me', null), 'invalid_phone');
-  perform public.update_restaurant_contact(
-    p.restaurant_id, '06-1234-5678', 'https://reserve.example.com/shop');
-
-  perform tests.act_as(v_other_shop_user);
-  perform tests.assert_raises(format(
-    'select public.update_restaurant_contact(%L, %L, %L)',
-    p.restaurant_id, '06-0000-0000', null), 'not_authorized');
 
   perform tests.act_as(p.restaurant_user_id);
   v_campaign := public.create_campaign_with_slots(
@@ -64,11 +49,10 @@ begin
     raise exception 'tracking link leaked to another creator';
   end if;
 
-  -- Anonymous visitors: landing data and touches only through RPCs.
+  -- Anonymous visitors: landing data and views only through RPCs.
   perform tests.act_as_anon();
   select * into v_landing from public.get_signal_landing(lower(v_code));
   if v_landing.restaurant_name <> 'テスト食堂'
-     or v_landing.reservation_url <> 'https://reserve.example.com/shop'
      or v_landing.creator_name <> 'グルメ日誌' then
     raise exception 'unexpected landing data: %', row_to_json(v_landing);
   end if;
@@ -78,52 +62,47 @@ begin
     raise exception 'anonymous visitors can read tracking tables';
   end if;
 
-  if not public.record_signal_touch(v_code, 'landing_view') then
+  if not public.record_signal_view(v_code) then
     raise exception 'landing view not recorded';
   end if;
-  perform public.record_signal_touch(v_code, 'reserve_click');
-  perform public.record_signal_touch(v_code, 'call_click');
 
-  if public.record_signal_touch('ZZZZZZZZ', 'landing_view') then
+  if public.record_signal_view('ZZZZZZZZ') then
     raise exception 'unknown code should not record';
   end if;
+  -- Visits are recorded by the Restaurant only, never from the landing page.
   perform tests.assert_raises(
-    format('select public.record_signal_touch(%L, %L)', v_code, 'visit'),
-    'invalid_signal_kind');
-  perform tests.assert_raises(
-    format('select public.record_signal_conversion(%L, %L)', v_code, 'visit'),
+    format('select public.record_signal_visit(%L)', v_code),
     'authentication_required');
 
-  -- Throttle: at most 30 touches of one kind per link per minute.
+  -- Throttle: at most 30 views per link per minute.
   for i in 1..29 loop
-    perform public.record_signal_touch(v_code, 'landing_view');
+    perform public.record_signal_view(v_code);
   end loop;
-  if public.record_signal_touch(v_code, 'landing_view') then
+  if public.record_signal_view(v_code) then
     raise exception 'throttle did not stop the 31st view';
   end if;
 
-  -- Restaurant records conversions from the spoken code (any formatting).
+  -- Restaurant records visits from the spoken code (any formatting).
   perform tests.act_as(p.restaurant_user_id);
-  v_reservation := public.record_signal_conversion(
-    lower(substr(v_code, 1, 4)) || '-' || substr(v_code, 5), 'reservation', 2);
-  perform public.record_signal_conversion(v_code, 'reservation', 4);
-  perform public.record_signal_conversion(
-    v_code, 'visit', 2, 12000, (now() at time zone 'Asia/Tokyo')::date - 1);
+  v_visit := public.record_signal_visit(
+    lower(substr(v_code, 1, 4)) || '-' || substr(v_code, 5), 4);
+  perform public.record_signal_visit(
+    v_code, 2, 12000, (now() at time zone 'Asia/Tokyo')::date - 1);
 
   perform tests.assert_raises(
-    format('select public.record_signal_conversion(%L, %L, 2, 5000)', v_code, 'reservation'),
-    'revenue_only_for_visits');
-  perform tests.assert_raises(
-    format('select public.record_signal_conversion(%L, %L, 1, null, %L)',
-      v_code, 'visit', (now() at time zone 'Asia/Tokyo')::date + 1),
+    format('select public.record_signal_visit(%L, 1, null, %L)',
+      v_code, (now() at time zone 'Asia/Tokyo')::date + 1),
     'invalid_signal_date');
   perform tests.assert_raises(
-    format('select public.record_signal_conversion(%L, %L, 0)', v_code, 'visit'),
+    format('select public.record_signal_visit(%L, 0)', v_code),
     'invalid_party_size');
+  perform tests.assert_raises(
+    format('select public.record_signal_visit(%L, 2, -1)', v_code),
+    'invalid_revenue');
 
   -- Mistakes can be voided; voided events drop out of the aggregates.
-  perform public.void_signal_conversion(v_reservation);
-  perform public.void_signal_conversion(v_reservation);
+  perform public.void_signal_visit(v_visit);
+  perform public.void_signal_visit(v_visit);
 
   select * into v_summary
   from public.restaurant_signal_summary()
@@ -131,9 +110,6 @@ begin
 
   if v_summary.cost_yen <> 6000
      or v_summary.landing_views <> 30
-     or v_summary.reserve_clicks <> 1
-     or v_summary.call_clicks <> 1
-     or v_summary.reservations <> 1
      or v_summary.visits <> 1
      or v_summary.visit_guests <> 2
      or v_summary.revenue_yen <> 12000 then
@@ -143,10 +119,10 @@ begin
   -- Another Restaurant can neither record against nor read this link.
   perform tests.act_as(v_other_shop_user);
   perform tests.assert_raises(
-    format('select public.record_signal_conversion(%L, %L)', v_code, 'visit'),
+    format('select public.record_signal_visit(%L)', v_code),
     'signal_code_not_found');
   perform tests.assert_raises(
-    format('select public.void_signal_conversion(%L)', v_reservation),
+    format('select public.void_signal_visit(%L)', v_visit),
     'signal_event_not_found');
   select count(*) into v_count from public.restaurant_signal_summary();
   if v_count <> 0 then
@@ -161,7 +137,6 @@ begin
   perform tests.act_as(p.creator_user_id);
   select * into v_creator_summary from public.creator_signal_summary(v_booking);
   if v_creator_summary.landing_views <> 30
-     or v_creator_summary.reservations <> 1
      or v_creator_summary.visits <> 1 then
     raise exception 'unexpected creator summary: %', row_to_json(v_creator_summary);
   end if;
@@ -196,8 +171,8 @@ begin
   if v_count <> 0 then
     raise exception 'cancelled booking still has a landing page';
   end if;
-  if public.record_signal_touch(v_code, 'reserve_click') then
-    raise exception 'cancelled booking still records touches';
+  if public.record_signal_view(v_code) then
+    raise exception 'cancelled booking still records views';
   end if;
 end;
 $$;

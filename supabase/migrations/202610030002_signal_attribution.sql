@@ -1,69 +1,14 @@
--- P3-01: SIGNAL attribution — from a Creator's post to reservations and visits.
+-- P3-01: SIGNAL attribution — from a Creator's post to visits.
 --
 -- * Every booking gets a tracking link /r/<code>. The code doubles as a
---   short "PR code" that guests can mention when they reserve or visit.
--- * The public landing page records only counts: page views and taps on the
---   reservation / call buttons. No cookies, IP addresses, user agents or
---   other visitor identifiers are stored.
--- * Reservations and visits are recorded by the Restaurant when a guest
---   gives the PR code (phone, reservation note or at the table). Optional
---   party size and spend make ROI measurable without collecting guest data.
+--   short "PR code" that guests can mention when they visit.
+-- * The public landing page records only page views. No cookies, IP
+--   addresses, user agents or other visitor identifiers are stored.
+-- * Visits are recorded by the Restaurant when a guest gives the PR code at
+--   the table. Optional party size and spend make ROI measurable without
+--   collecting guest data. Reservations are out of scope: the product does
+--   not handle restaurant bookings.
 -- * Raw events are kept for 13 months (purge_expired_signal_events).
-
--- ---------------------------------------------------------------------------
--- Restaurant reservation contact shown on the landing page
--- ---------------------------------------------------------------------------
-
-alter table public.restaurants
-  add column if not exists phone text
-    check (phone is null or phone ~ '^\+?[0-9][0-9-]{6,18}[0-9]$'),
-  add column if not exists reservation_url text
-    check (
-      reservation_url is null
-      or (reservation_url ~ '^https://[^[:space:]]+\.[^[:space:]]+$' and char_length(reservation_url) <= 500)
-    );
-
-create or replace function public.update_restaurant_contact(
-  p_restaurant_id uuid,
-  p_phone text,
-  p_reservation_url text
-)
-returns void
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  v_phone text := nullif(regexp_replace(coalesce(p_phone, ''), '[[:space:]]', '', 'g'), '');
-  v_url text := nullif(trim(coalesce(p_reservation_url, '')), '');
-begin
-  if auth.uid() is null then
-    raise exception 'authentication_required' using errcode = '28000';
-  end if;
-
-  if not (public.is_restaurant_member(p_restaurant_id) or public.is_admin()) then
-    raise exception 'not_authorized' using errcode = '42501';
-  end if;
-
-  if v_phone is not null and v_phone !~ '^\+?[0-9][0-9-]{6,18}[0-9]$' then
-    raise exception 'invalid_phone' using errcode = 'P0001';
-  end if;
-
-  if v_url is not null and (
-    v_url !~ '^https://[^[:space:]]+\.[^[:space:]]+$' or char_length(v_url) > 500
-  ) then
-    raise exception 'invalid_reservation_url' using errcode = 'P0001';
-  end if;
-
-  update public.restaurants
-  set phone = v_phone,
-      reservation_url = v_url
-  where id = p_restaurant_id;
-end;
-$$;
-
-revoke all on function public.update_restaurant_contact(uuid, text, text) from public;
-grant execute on function public.update_restaurant_contact(uuid, text, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Tracking links
@@ -206,9 +151,7 @@ where not exists (
 create table public.signal_events (
   id uuid primary key default gen_random_uuid(),
   tracking_link_id uuid not null references public.tracking_links(id) on delete cascade,
-  kind text not null check (
-    kind in ('landing_view', 'reserve_click', 'call_click', 'reservation', 'visit')
-  ),
+  kind text not null check (kind in ('landing_view', 'visit')),
   occurred_at timestamptz not null default now(),
   party_size integer check (party_size is null or party_size between 1 and 50),
   revenue_yen integer check (revenue_yen is null or revenue_yen between 0 and 10000000),
@@ -216,10 +159,9 @@ create table public.signal_events (
   voided_at timestamptz,
   created_at timestamptz not null default now(),
   check (
-    kind in ('reservation', 'visit')
+    kind = 'visit'
     or (party_size is null and revenue_yen is null and recorded_by is null)
-  ),
-  check (kind = 'visit' or revenue_yen is null)
+  )
 );
 
 create index signal_events_link_kind_idx
@@ -259,8 +201,6 @@ returns table (
   restaurant_name text,
   area text,
   address text,
-  phone text,
-  reservation_url text,
   category text,
   creator_name text,
   post_url text
@@ -275,8 +215,6 @@ as $$
     r.name,
     r.area,
     r.address,
-    r.phone,
-    r.reservation_url,
     c.category,
     cp.display_name,
     (
@@ -300,9 +238,9 @@ $$;
 revoke all on function public.get_signal_landing(text) from public;
 grant execute on function public.get_signal_landing(text) to anon, authenticated;
 
--- Anonymous touch events from the landing page. Throttled per link so that a
+-- Anonymous page views from the landing page. Throttled per link so that a
 -- runaway client or bot cannot flood the table.
-create or replace function public.record_signal_touch(p_code text, p_kind text)
+create or replace function public.record_signal_view(p_code text)
 returns boolean
 language plpgsql
 security definer
@@ -312,10 +250,6 @@ declare
   v_link_id uuid;
   v_recent integer;
 begin
-  if p_kind not in ('landing_view', 'reserve_click', 'call_click') then
-    raise exception 'invalid_signal_kind' using errcode = 'P0001';
-  end if;
-
   select tl.id
     into v_link_id
   from public.tracking_links tl
@@ -332,7 +266,7 @@ begin
     into v_recent
   from public.signal_events e
   where e.tracking_link_id = v_link_id
-    and e.kind = p_kind
+    and e.kind = 'landing_view'
     and e.occurred_at > now() - interval '1 minute';
 
   if v_recent >= 30 then
@@ -340,19 +274,18 @@ begin
   end if;
 
   insert into public.signal_events (tracking_link_id, kind)
-  values (v_link_id, p_kind);
+  values (v_link_id, 'landing_view');
 
   return true;
 end;
 $$;
 
-revoke all on function public.record_signal_touch(text, text) from public;
-grant execute on function public.record_signal_touch(text, text) to anon, authenticated;
+revoke all on function public.record_signal_view(text) from public;
+grant execute on function public.record_signal_view(text) to anon, authenticated;
 
--- Restaurant records a reservation or visit for a guest who gave a PR code.
-create or replace function public.record_signal_conversion(
+-- Restaurant records a visit for a guest who gave a PR code.
+create or replace function public.record_signal_visit(
   p_code text,
-  p_kind text,
   p_party_size integer default null,
   p_revenue_yen integer default null,
   p_occurred_on date default null
@@ -369,10 +302,6 @@ declare
 begin
   if auth.uid() is null then
     raise exception 'authentication_required' using errcode = '28000';
-  end if;
-
-  if p_kind not in ('reservation', 'visit') then
-    raise exception 'invalid_signal_kind' using errcode = 'P0001';
   end if;
 
   select *
@@ -392,10 +321,6 @@ begin
 
   if p_revenue_yen is not null and (p_revenue_yen < 0 or p_revenue_yen > 10000000) then
     raise exception 'invalid_revenue' using errcode = 'P0001';
-  end if;
-
-  if p_kind = 'reservation' and p_revenue_yen is not null then
-    raise exception 'revenue_only_for_visits' using errcode = 'P0001';
   end if;
 
   if p_occurred_on is null then
@@ -419,7 +344,7 @@ begin
   )
   values (
     v_link.id,
-    p_kind,
+    'visit',
     v_occurred_at,
     p_party_size,
     p_revenue_yen,
@@ -438,7 +363,7 @@ begin
   values (
     auth.uid(),
     case when public.is_admin() then 'admin'::public.user_role else 'restaurant'::public.user_role end,
-    'signal.' || p_kind || '_recorded',
+    'signal.visit_recorded',
     'signal_event',
     v_event_id,
     jsonb_build_object(
@@ -452,10 +377,10 @@ begin
 end;
 $$;
 
-revoke all on function public.record_signal_conversion(text, text, integer, integer, date) from public;
-grant execute on function public.record_signal_conversion(text, text, integer, integer, date) to authenticated;
+revoke all on function public.record_signal_visit(text, integer, integer, date) from public;
+grant execute on function public.record_signal_visit(text, integer, integer, date) to authenticated;
 
-create or replace function public.void_signal_conversion(p_event_id uuid)
+create or replace function public.void_signal_visit(p_event_id uuid)
 returns void
 language plpgsql
 security definer
@@ -483,7 +408,7 @@ begin
   end if;
 
   if not found
-     or v_event.kind not in ('reservation', 'visit')
+     or v_event.kind <> 'visit'
      or not (public.is_restaurant_member(v_restaurant_id) or public.is_admin()) then
     raise exception 'signal_event_not_found' using errcode = 'P0002';
   end if;
@@ -506,15 +431,15 @@ begin
   values (
     auth.uid(),
     case when public.is_admin() then 'admin'::public.user_role else 'restaurant'::public.user_role end,
-    'signal.conversion_voided',
+    'signal.visit_voided',
     'signal_event',
     p_event_id
   );
 end;
 $$;
 
-revoke all on function public.void_signal_conversion(uuid) from public;
-grant execute on function public.void_signal_conversion(uuid) to authenticated;
+revoke all on function public.void_signal_visit(uuid) from public;
+grant execute on function public.void_signal_visit(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Aggregates
@@ -536,9 +461,6 @@ returns table (
   disabled boolean,
   cost_yen integer,
   landing_views integer,
-  reserve_clicks integer,
-  call_clicks integer,
-  reservations integer,
   visits integer,
   visit_guests integer,
   revenue_yen bigint
@@ -564,9 +486,6 @@ as $$
       0
     ),
     count(e.id) filter (where e.kind = 'landing_view')::integer,
-    count(e.id) filter (where e.kind = 'reserve_click')::integer,
-    count(e.id) filter (where e.kind = 'call_click')::integer,
-    count(e.id) filter (where e.kind = 'reservation')::integer,
     count(e.id) filter (where e.kind = 'visit')::integer,
     coalesce(sum(coalesce(e.party_size, 1)) filter (where e.kind = 'visit'), 0)::integer,
     coalesce(sum(e.revenue_yen) filter (where e.kind = 'visit'), 0)::bigint
@@ -593,9 +512,6 @@ create or replace function public.creator_signal_summary(p_booking_id uuid)
 returns table (
   code text,
   landing_views integer,
-  reserve_clicks integer,
-  call_clicks integer,
-  reservations integer,
   visits integer
 )
 language sql
@@ -606,9 +522,6 @@ as $$
   select
     tl.code,
     count(e.id) filter (where e.kind = 'landing_view')::integer,
-    count(e.id) filter (where e.kind = 'reserve_click')::integer,
-    count(e.id) filter (where e.kind = 'call_click')::integer,
-    count(e.id) filter (where e.kind = 'reservation')::integer,
     count(e.id) filter (where e.kind = 'visit')::integer
   from public.tracking_links tl
   join public.creator_profiles cp on cp.id = tl.creator_id

@@ -31,9 +31,6 @@ export type SignalSummaryRow = {
   disabled: boolean;
   cost_yen: number;
   landing_views: number;
-  reserve_clicks: number;
-  call_clicks: number;
-  reservations: number;
   visits: number;
   visit_guests: number;
   revenue_yen: number | string;
@@ -42,20 +39,17 @@ export type SignalSummaryRow = {
 export type SignalTotals = {
   costYen: number;
   landingViews: number;
-  ctaClicks: number;
-  reservations: number;
   visits: number;
   visitGuests: number;
   revenueYen: number;
 };
 
 export type SignalMetrics = SignalTotals & {
-  costPerReservation: number | null;
   costPerVisit: number | null;
   /** Revenue ÷ cost. 1.0 means the PR paid for itself. */
   roas: number | null;
-  /** Share of landing views that tapped reserve or call. */
-  ctaRate: number | null;
+  /** Share of landing views that turned into a recorded visit. */
+  visitRate: number | null;
 };
 
 function ratio(numerator: number, denominator: number) {
@@ -65,11 +59,9 @@ function ratio(numerator: number, denominator: number) {
 export function deriveSignalMetrics(totals: SignalTotals): SignalMetrics {
   return {
     ...totals,
-    costPerReservation:
-      totals.reservations > 0 ? Math.round(totals.costYen / totals.reservations) : null,
     costPerVisit: totals.visits > 0 ? Math.round(totals.costYen / totals.visits) : null,
     roas: ratio(totals.revenueYen, totals.costYen),
-    ctaRate: ratio(totals.ctaClicks, totals.landingViews),
+    visitRate: ratio(totals.visits, totals.landingViews),
   };
 }
 
@@ -78,8 +70,6 @@ function totalsOf(rows: SignalSummaryRow[]): SignalTotals {
     (sum, row) => ({
       costYen: sum.costYen + row.cost_yen,
       landingViews: sum.landingViews + row.landing_views,
-      ctaClicks: sum.ctaClicks + row.reserve_clicks + row.call_clicks,
-      reservations: sum.reservations + row.reservations,
       visits: sum.visits + row.visits,
       visitGuests: sum.visitGuests + row.visit_guests,
       // bigint aggregates arrive as strings from PostgREST.
@@ -88,8 +78,6 @@ function totalsOf(rows: SignalSummaryRow[]): SignalTotals {
     {
       costYen: 0,
       landingViews: 0,
-      ctaClicks: 0,
-      reservations: 0,
       visits: 0,
       visitGuests: 0,
       revenueYen: 0,
@@ -122,7 +110,6 @@ export function summarizeSignal(rows: SignalSummaryRow[]) {
     .sort(
       (a, b) =>
         b.visits - a.visits ||
-        b.reservations - a.reservations ||
         b.landingViews - a.landingViews ||
         b.visitStartsAt.localeCompare(a.visitStartsAt),
     );

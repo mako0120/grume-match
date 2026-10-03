@@ -2,12 +2,9 @@
 
 import { useEffect } from "react";
 
-type TouchKind = "landing_view" | "reserve_click" | "call_click";
+function sendView(code: string) {
+  const payload = JSON.stringify({ code });
 
-function sendTouch(code: string, kind: TouchKind) {
-  const payload = JSON.stringify({ code, kind });
-
-  // sendBeacon survives the navigation to the reservation site / dialer.
   if (typeof navigator !== "undefined" && navigator.sendBeacon) {
     const sent = navigator.sendBeacon(
       "/api/signal",
@@ -36,45 +33,8 @@ export function SignalLandingView({ code }: { code: string }) {
     } catch {
       // Storage may be unavailable (private mode); count the view anyway.
     }
-    sendTouch(code, "landing_view");
+    sendView(code);
   }, [code]);
 
   return null;
-}
-
-export function SignalLandingActions({
-  code,
-  phone,
-  reservationUrl,
-}: {
-  code: string;
-  phone: string | null;
-  reservationUrl: string | null;
-}) {
-  if (!phone && !reservationUrl) return null;
-
-  return (
-    <div className="signal-actions">
-      {reservationUrl ? (
-        <a
-          className="primary-button"
-          href={reservationUrl}
-          onClick={() => sendTouch(code, "reserve_click")}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          予約する
-        </a>
-      ) : null}
-      {phone ? (
-        <a
-          className="secondary-button"
-          href={`tel:${phone}`}
-          onClick={() => sendTouch(code, "call_click")}
-        >
-          電話で予約する
-        </a>
-      ) : null}
-    </div>
-  );
 }

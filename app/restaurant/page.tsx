@@ -108,7 +108,7 @@ export default async function RestaurantDashboardPage({
         <Link href="/restaurant/signal">
           <span className="eyebrow">SIGNAL</span>
           <strong>PR効果</strong>
-          <small>閲覧・予約・来店と費用対効果</small>
+          <small>閲覧・来店と費用対効果</small>
         </Link>
         <Link href="/restaurant/studio">
           <span className="eyebrow">STUDIO</span>

@@ -4,9 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-const allowedKinds = new Set(["landing_view", "reserve_click", "call_click"]);
-
-// Anonymous landing-page touches. Stores only the event kind and time for the
+// Anonymous landing-page views. Stores only the time of the view for the
 // tracking link: no cookies, IP address or user agent are persisted.
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -16,21 +14,15 @@ export async function POST(request: NextRequest) {
     return new NextResponse(null, { status: 400 });
   }
 
-  const { code, kind } = (body ?? {}) as { code?: unknown; kind?: unknown };
+  const { code } = (body ?? {}) as { code?: unknown };
 
-  if (
-    typeof code !== "string" ||
-    typeof kind !== "string" ||
-    !allowedKinds.has(kind) ||
-    !isSignalCode(code)
-  ) {
+  if (typeof code !== "string" || !isSignalCode(code)) {
     return new NextResponse(null, { status: 400 });
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("record_signal_touch", {
+  const { error } = await supabase.rpc("record_signal_view", {
     p_code: normalizeSignalCode(code),
-    p_kind: kind,
   });
 
   return new NextResponse(null, {

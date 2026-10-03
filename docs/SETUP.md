@@ -175,7 +175,7 @@ Restaurant:
 - `/restaurant/flash/new`
 - `/restaurant/reschedules`
 - `/restaurant/studio` — UGC library and usage-license expiry
-- `/restaurant/signal` — PR code entry and ROI by Creator
+- `/restaurant/signal` — visit entry by PR code and ROI by Creator
 - `/restaurant/creators/<id>` — Creator media kit (30-day performance)
 
 Creator:

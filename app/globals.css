@@ -2103,20 +2103,6 @@ button {
   line-height: 1.6;
 }
 
-.signal-actions {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.signal-actions > a {
-  display: flex;
-  width: 100%;
-  min-height: 52px;
-  align-items: center;
-  justify-content: center;
-}
-
 .signal-links {
   display: grid;
   gap: 4px;

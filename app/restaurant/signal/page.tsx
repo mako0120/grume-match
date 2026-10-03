@@ -7,11 +7,7 @@ import {
   formatYen,
   SIGNAL_RETENTION_MONTHS,
 } from "@/lib/signal-metrics";
-import {
-  recordSignalConversion,
-  updateRestaurantContact,
-  voidSignalConversion,
-} from "@/server/actions/signal";
+import { recordSignalVisit, voidSignalVisit } from "@/server/actions/signal";
 import {
   getRestaurantSignal,
   parseSignalPeriod,
@@ -74,7 +70,7 @@ export default async function RestaurantSignalPage({
       <span className="eyebrow">SIGNAL</span>
       <h1 className="page-title">PR効果</h1>
       <p className="page-subtitle">
-        Creatorごとのリンク閲覧・予約・来店と、1件あたりの費用を確認できます。
+        Creatorごとのリンク閲覧・来店と、来店1件あたりの費用を確認できます。
       </p>
 
       {message ? (
@@ -109,10 +105,6 @@ export default async function RestaurantSignalPage({
           <strong>{totals.landingViews.toLocaleString()}</strong>
         </div>
         <div>
-          <span>予約</span>
-          <strong>{totals.reservations.toLocaleString()}</strong>
-        </div>
-        <div>
           <span>来店</span>
           <strong>
             {totals.visits.toLocaleString()}
@@ -120,8 +112,8 @@ export default async function RestaurantSignalPage({
           </strong>
         </div>
         <div>
-          <span>予約単価</span>
-          <strong>{formatYen(totals.costPerReservation)}</strong>
+          <span>閲覧→来店</span>
+          <strong>{formatPercent(totals.visitRate)}</strong>
         </div>
         <div>
           <span>来店単価</span>
@@ -142,12 +134,12 @@ export default async function RestaurantSignalPage({
 
       <section className="form-section">
         <span className="eyebrow">RECORD</span>
-        <h2>PRコードを記録</h2>
+        <h2>来店を記録</h2>
         <p className="field-help">
-          予約や来店のときにお客様から伝えられた8文字のPRコードを入力します。お客様の個人情報は入力しません。
+          来店したお客様から伝えられた8文字のPRコードを入力します。お客様の個人情報は入力しません。
         </p>
 
-        <form action={recordSignalConversion} className="campaign-form signal-record-form">
+        <form action={recordSignalVisit} className="campaign-form signal-record-form">
           <label>
             PRコード
             <input
@@ -160,17 +152,6 @@ export default async function RestaurantSignalPage({
               required
             />
           </label>
-
-          <div className="segmented" role="radiogroup" aria-label="記録の種類">
-            <label>
-              <input defaultChecked name="kind" type="radio" value="visit" />
-              来店
-            </label>
-            <label>
-              <input name="kind" type="radio" value="reservation" />
-              予約
-            </label>
-          </div>
 
           <div className="field-row">
             <label>
@@ -217,14 +198,6 @@ export default async function RestaurantSignalPage({
                     <dd>{row.landingViews}</dd>
                   </div>
                   <div>
-                    <dt>予約ボタン</dt>
-                    <dd>{row.ctaClicks}</dd>
-                  </div>
-                  <div>
-                    <dt>予約</dt>
-                    <dd>{row.reservations}</dd>
-                  </div>
-                  <div>
                     <dt>来店</dt>
                     <dd>{row.visits}</dd>
                   </div>
@@ -237,8 +210,8 @@ export default async function RestaurantSignalPage({
                     <dd>{formatYen(row.costPerVisit)}</dd>
                   </div>
                   <div>
-                    <dt>ボタン率</dt>
-                    <dd>{formatPercent(row.ctaRate)}</dd>
+                    <dt>閲覧→来店</dt>
+                    <dd>{formatPercent(row.visitRate)}</dd>
                   </div>
                   <div>
                     <dt>売上÷費用</dt>
@@ -267,7 +240,7 @@ export default async function RestaurantSignalPage({
               <li key={item.id}>
                 <div>
                   <strong>
-                    {item.kind === "visit" ? "来店" : "予約"}
+                    来店
                     {item.partySize ? `・${item.partySize}名` : ""}
                     {item.revenueYen !== null ? `・${formatYen(item.revenueYen)}` : ""}
                   </strong>
@@ -276,7 +249,7 @@ export default async function RestaurantSignalPage({
                     {formatSignalCode(item.code)}
                   </p>
                 </div>
-                <form action={voidSignalConversion}>
+                <form action={voidSignalVisit}>
                   <input name="eventId" type="hidden" value={item.id} />
                   <button className="text-button" type="submit">
                     取り消す
@@ -287,47 +260,15 @@ export default async function RestaurantSignalPage({
           </ul>
         ) : (
           <section className="section-card">
-            <p>予約・来店の記録はまだありません。</p>
+            <p>来店の記録はまだありません。</p>
           </section>
         )}
-      </section>
-
-      <section className="form-section">
-        <span className="eyebrow">LANDING PAGE</span>
-        <h2>予約導線</h2>
-        <p className="field-help">
-          PRリンクのページに表示する予約ボタンです。どちらも空欄の場合、ボタンは表示されません。
-        </p>
-
-        <form action={updateRestaurantContact} className="campaign-form signal-record-form">
-          <input name="restaurantId" type="hidden" value={signal.restaurantId} />
-          <label>
-            予約ページURL（任意）
-            <input
-              defaultValue={signal.restaurant?.reservation_url ?? ""}
-              name="reservationUrl"
-              placeholder="https://"
-              type="url"
-            />
-          </label>
-          <label>
-            電話番号（任意）
-            <input
-              defaultValue={signal.restaurant?.phone ?? ""}
-              inputMode="tel"
-              name="phone"
-              placeholder="06-1234-5678"
-              type="tel"
-            />
-          </label>
-          <PendingSubmitButton idleLabel="保存する" pendingLabel="保存中..." />
-        </form>
       </section>
 
       <section className="signal-privacy">
         <strong>計測範囲と保持期間</strong>
         <p>
-          PRリンクのページでは表示回数とボタン操作の回数だけを記録し、Cookie・IPアドレス・端末情報は保存しません。予約・来店はPRコードと任意の人数・売上だけを記録します。記録は{SIGNAL_RETENTION_MONTHS}か月後に自動で削除されます。
+          PRリンクのページでは表示回数だけを記録し、Cookie・IPアドレス・端末情報は保存しません。来店はPRコードと任意の人数・売上だけを記録します。記録は{SIGNAL_RETENTION_MONTHS}か月後に自動で削除されます。
         </p>
       </section>
     </main>

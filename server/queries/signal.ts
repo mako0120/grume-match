@@ -21,7 +21,6 @@ function single<T>(value: Relation<T>): T | null {
 
 type RawConversion = {
   id: string;
-  kind: "reservation" | "visit";
   occurred_at: string;
   party_size: number | null;
   revenue_yen: number | null;
@@ -39,7 +38,7 @@ export async function getRestaurantSignal(period: SignalPeriod) {
 
   const { data: membership } = await supabase
     .from("restaurant_memberships")
-    .select("restaurant_id,restaurants(name,phone,reservation_url)")
+    .select("restaurant_id")
     .eq("user_id", authData.user.id)
     .limit(1)
     .maybeSingle();
@@ -57,10 +56,10 @@ export async function getRestaurantSignal(period: SignalPeriod) {
     supabase
       .from("signal_events")
       .select(
-        "id,kind,occurred_at,party_size,revenue_yen,tracking_links!inner(code,restaurant_id,creator_profiles(display_name))",
+        "id,occurred_at,party_size,revenue_yen,tracking_links!inner(code,restaurant_id,creator_profiles(display_name))",
       )
       .eq("tracking_links.restaurant_id", restaurantId)
-      .in("kind", ["reservation", "visit"])
+      .eq("kind", "visit")
       .is("voided_at", null)
       .order("occurred_at", { ascending: false })
       .limit(15),
@@ -78,27 +77,17 @@ export async function getRestaurantSignal(period: SignalPeriod) {
       // produced any signal in it, so that its cost is not silently dropped.
       (!since ||
         row.visit_starts_at >= since ||
-        row.landing_views + row.reserve_clicks + row.call_clicks + row.reservations + row.visits > 0),
-  );
-
-  const restaurant = single(
-    membership.restaurants as Relation<{
-      name: string;
-      phone: string | null;
-      reservation_url: string | null;
-    }>,
+        row.landing_views + row.visits > 0),
   );
 
   return {
     restaurantId,
-    restaurant,
     ...summarizeSignal(rows),
     conversions: ((conversionsResult.data ?? []) as unknown as RawConversion[]).map(
       (row) => {
         const link = single(row.tracking_links);
         return {
           id: row.id,
-          kind: row.kind,
           occurredAt: row.occurred_at,
           partySize: row.party_size,
           revenueYen: row.revenue_yen,
@@ -121,9 +110,6 @@ export async function getCreatorSignal(bookingId: string) {
   return data as {
     code: string;
     landing_views: number;
-    reserve_clicks: number;
-    call_clicks: number;
-    reservations: number;
     visits: number;
   };
 }

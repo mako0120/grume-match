@@ -79,9 +79,8 @@ Exit:
 
 - creator tracking link ✅ (P3-01)
 - restaurant landing page ✅ (P3-01)
-- reservation attribution ✅ (P3-01: PR code recorded by the Restaurant)
-- conversion model — PR-code based, last-touch per code; revisit when booking-site integrations exist
-- cost per reservation ✅ (P3-01)
+- visit attribution ✅ (P3-01: PR code recorded by the Restaurant)
+- conversion model — PR-code based, one code per PR (reservations are out of scope)
 - cost per visit ✅ (P3-01)
 - Restaurant ROI dashboard ✅ (P3-01: /restaurant/signal)
 

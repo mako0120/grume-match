@@ -26,7 +26,7 @@ const differences = [
   {
     topic: "効果測定",
     usual: "いいね・再生数まで",
-    ours: "PRコードで予約・来店を記録し、来店1件あたりの費用まで",
+    ours: "PRリンクの閲覧数と、PRコードで記録した来店から来店1件あたりの費用まで",
   },
   {
     topic: "写真・動画の二次利用",
@@ -43,7 +43,7 @@ export default function HomePage() {
         <h1>有償PRを、合う人に。DMなしで、来店まで。</h1>
         <p>
           飲食店とグルメCreatorを、現金報酬が明示されたPR案件でつなぎます。
-          相性の良いCreatorを理由つきで提案し、日程はタップで確定。投稿の確認から報酬の管理、予約・来店の計測まで1つのアプリで進みます。
+          相性の良いCreatorを理由つきで提案し、日程はタップで確定。投稿の確認から報酬の管理、来店の計測まで1つのアプリで進みます。
         </p>
 
         <div className="hero-actions">
@@ -70,7 +70,7 @@ export default function HomePage() {
 
         <article className="feature-card">
           <strong>来店まで計測</strong>
-          <p>Creatorごとのリンクと口頭で伝えられるPRコードで、予約・来店1件あたりの費用が分かります。</p>
+          <p>Creatorごとのリンクと口頭で伝えられるPRコードで、何人に見られ、何組が来店したか、来店1件あたりの費用が分かります。</p>
         </article>
       </section>
 

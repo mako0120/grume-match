@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  SignalLandingActions,
-  SignalLandingView,
-} from "@/components/signal-landing-actions";
+import { SignalLandingView } from "@/components/signal-landing-actions";
 import {
   formatSignalCode,
   isSignalCode,
@@ -25,8 +22,6 @@ type Landing = {
   restaurant_name: string;
   area: string;
   address: string;
-  phone: string | null;
-  reservation_url: string | null;
   category: string;
   creator_name: string;
   post_url: string | null;
@@ -68,18 +63,12 @@ export default async function SignalLandingPage({
       </section>
 
       <section className="signal-code-card">
-        <span>予約・来店時にお伝えください</span>
+        <span>ご来店時にお伝えください</span>
         <strong>{formatSignalCode(landing.code)}</strong>
         <p>
           スタッフがPRの効果測定に使います。お名前や連絡先が記録されることはありません。
         </p>
       </section>
-
-      <SignalLandingActions
-        code={landing.code}
-        phone={landing.phone}
-        reservationUrl={landing.reservation_url}
-      />
 
       <section className="signal-links">
         <a href={mapUrl} rel="noopener noreferrer" target="_blank">
@@ -95,7 +84,7 @@ export default async function SignalLandingPage({
       <section className="signal-privacy">
         <strong>計測について</strong>
         <p>
-          このページでは、表示回数と「予約する」「電話で予約する」が押された回数だけを記録します。Cookie・IPアドレス・端末情報など、あなたを識別できる情報は保存しません。記録は{SIGNAL_RETENTION_MONTHS}か月後に削除されます。
+          このページでは、表示された回数だけを記録します。Cookie・IPアドレス・端末情報など、あなたを識別できる情報は保存しません。記録は{SIGNAL_RETENTION_MONTHS}か月後に削除されます。
         </p>
       </section>
     </main>

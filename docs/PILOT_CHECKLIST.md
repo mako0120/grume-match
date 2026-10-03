@@ -153,14 +153,12 @@ Restaurant:
 ## K. SIGNAL (attribution)
 
 - [ ] Confirmed booking shows the Creator's PR link and PR code.
-- [ ] Restaurant sets reservation URL and phone on /restaurant/signal.
-- [ ] Open the PR link logged out on a phone: PR disclosure, code, buttons, privacy note.
+- [ ] Open the PR link logged out on a phone: PR disclosure, code, map / post links, privacy note (no reservation buttons).
 - [ ] Opening the link increases 閲覧 once per tab; Instagram link preview does not.
-- [ ] Tapping 予約する / 電話 increases 予約ボタン.
-- [ ] Restaurant records a reservation and a visit with spend using the spoken code ("abcd efgh" also works).
+- [ ] Restaurant records a visit with party size and spend using the spoken code ("abcd efgh" also works).
 - [ ] Wrong / other restaurant's code is rejected without revealing which.
 - [ ] Mistaken record can be voided and totals update.
-- [ ] Cost per visit and 売上 ÷ 費用 match a manual calculation.
+- [ ] Cost per visit, 閲覧→来店 and 売上 ÷ 費用 match a manual calculation.
 - [ ] Creator sees counts but not spend.
 
 ## L. PROOF (Creator performance)

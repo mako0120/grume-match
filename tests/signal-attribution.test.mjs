@@ -23,9 +23,6 @@ function row(overrides) {
     disabled: false,
     cost_yen: 0,
     landing_views: 0,
-    reserve_clicks: 0,
-    call_clicks: 0,
-    reservations: 0,
     visits: 0,
     visit_guests: 0,
     revenue_yen: 0,
@@ -43,37 +40,32 @@ test("PR codes are normalized from spoken or typed input", () => {
   assert.equal(isSignalCode("ABCDEFG"), false);
 });
 
-test("cost per reservation / visit and ROAS", () => {
+test("cost per visit, view-to-visit rate and ROAS", () => {
   const metrics = deriveSignalMetrics({
     costYen: 11000,
     landingViews: 400,
-    ctaClicks: 30,
-    reservations: 4,
     visits: 3,
     visitGuests: 7,
     revenueYen: 42000,
   });
 
-  assert.equal(metrics.costPerReservation, 2750);
   assert.equal(metrics.costPerVisit, 3667);
   assert.equal(metrics.roas.toFixed(2), "3.82");
-  assert.equal(metrics.ctaRate, 0.075);
+  assert.equal(metrics.visitRate, 0.0075);
+  assert.equal("costPerReservation" in metrics, false);
 });
 
 test("metrics stay undefined instead of dividing by zero", () => {
   const metrics = deriveSignalMetrics({
     costYen: 6000,
     landingViews: 0,
-    ctaClicks: 0,
-    reservations: 0,
     visits: 0,
     visitGuests: 0,
     revenueYen: 0,
   });
 
-  assert.equal(metrics.costPerReservation, null);
   assert.equal(metrics.costPerVisit, null);
-  assert.equal(metrics.ctaRate, null);
+  assert.equal(metrics.visitRate, null);
   assert.equal(metrics.roas, 0);
   assert.equal(formatYen(null), "—");
   assert.equal(formatRoas(null), "—");
@@ -87,16 +79,12 @@ test("summary totals across Creators and ranks by visits", () => {
       creator_name: "A",
       cost_yen: 6000,
       landing_views: 100,
-      reserve_clicks: 5,
-      reservations: 1,
     }),
     row({
       tracking_link_id: "b",
       creator_name: "B",
       cost_yen: 11000,
       landing_views: 50,
-      call_clicks: 3,
-      reservations: 2,
       visits: 2,
       visit_guests: 5,
       // bigint aggregates arrive as strings.
@@ -109,8 +97,7 @@ test("summary totals across Creators and ranks by visits", () => {
     ["B", "A"],
   );
   assert.equal(totals.costYen, 17000);
-  assert.equal(totals.ctaClicks, 8);
-  assert.equal(totals.reservations, 3);
+  assert.equal(totals.landingViews, 150);
   assert.equal(totals.visits, 2);
   assert.equal(totals.revenueYen, 33000);
   assert.equal(totals.costPerVisit, 8500);
@@ -118,7 +105,7 @@ test("summary totals across Creators and ranks by visits", () => {
   assert.equal(creators[1].costPerVisit, null);
 });
 
-test("landing touches store no visitor identifiers", async () => {
+test("landing views store no visitor identifiers", async () => {
   const [route, migration, landing] = await Promise.all([
     readFile("app/api/signal/route.ts", "utf8"),
     readFile("supabase/migrations/202610030002_signal_attribution.sql", "utf8"),
@@ -135,7 +122,8 @@ test("landing touches store no visitor identifiers", async () => {
   assert.doesNotMatch(table, /\bip\b|user_agent|cookie|email|phone|name/i);
 
   assert.match(migration, /interval '13 months'/);
-  assert.match(migration, /grant execute on function public\.record_signal_touch\(text, text\) to anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.record_signal_view\(text\) to anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.record_signal_visit\(text, integer, integer, date\) to authenticated;/);
   assert.match(migration, /v_recent >= 30/);
 });
 
@@ -150,4 +138,22 @@ test("Creators get counts without the Restaurant's spend", async () => {
   );
 
   assert.doesNotMatch(creatorSummary, /revenue|cost|amount/);
+});
+
+test("there is no reservation tracking", async () => {
+  const files = await Promise.all(
+    [
+      "supabase/migrations/202610030002_signal_attribution.sql",
+      "app/api/signal/route.ts",
+      "components/signal-landing-actions.tsx",
+      "app/r/[code]/page.tsx",
+      "app/restaurant/signal/page.tsx",
+      "lib/signal-metrics.ts",
+    ].map((path) => readFile(path, "utf8")),
+  );
+
+  for (const source of files) {
+    // Case-sensitive so the migration may still explain why "Reservations" are out of scope.
+    assert.doesNotMatch(source, /reserv|call_click|予約/);
+  }
 });
