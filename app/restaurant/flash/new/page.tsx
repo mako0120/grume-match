@@ -72,10 +72,10 @@ export default async function NewFlashPage({
               <input name="category" placeholder="焼肉" required />
             </label>
             <label>
-              現金報酬（税込）
+              現金報酬（税込・0円なら食事招待のみ）
               <input
                 defaultValue="7000"
-                min="1"
+                min="0"
                 name="cashReward"
                 required
                 type="number"

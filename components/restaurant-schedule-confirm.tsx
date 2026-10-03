@@ -1,5 +1,6 @@
 "use client";
 
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { type ReactNode, useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
@@ -141,7 +142,7 @@ export function RestaurantScheduleConfirm({
           {performance}
         </div>
         <div className="applicant-reward">
-          ¥{cashReward.toLocaleString()}
+          {formatReward(cashReward)}
           <small>報酬</small>
         </div>
       </div>

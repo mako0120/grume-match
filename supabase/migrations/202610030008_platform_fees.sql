@@ -3,7 +3,8 @@
 -- * No setup or monthly fee. A fee is due only when a PR is completed: when
 --   the Creator's payment becomes approved (every deliverable approved).
 -- * Fee = 20% of what the Restaurant pays the Creator (reward + usage
---   fee), at least ¥2,000. The Creator always receives the full amount.
+--   fee), at least ¥2,000 — so a meal-only invitation is ¥2,000. The
+--   Creator always receives the full amount.
 -- * Each Restaurant's first completed PR is free (waived).
 -- * Fees are invoiced to the Restaurant monthly by the Operator, outside
 --   the app. The app records the status only.
@@ -14,10 +15,8 @@ language sql
 immutable
 set search_path = ''
 as $$
-  select case
-    when coalesce(p_amount, 0) <= 0 then 0
-    else greatest(round(p_amount * 0.2)::integer, 2000)
-  end;
+  -- Meal-only invitations (no cash reward) pay the minimum.
+  select greatest(round(greatest(coalesce(p_amount, 0), 0) * 0.2)::integer, 2000);
 $$;
 
 grant execute on function public.platform_fee_for(integer) to anon, authenticated, service_role;
@@ -56,7 +55,11 @@ declare
   v_restaurant_id uuid;
   v_first boolean;
 begin
-  if new.status <> 'approved' or old.status is not distinct from new.status then
+  -- Completed = the payment left 'pending' (meal-only payments of ¥0 go
+  -- straight to 'paid').
+  if new.status not in ('approved', 'scheduled', 'paid')
+     or old.status is not distinct from new.status
+     or old.status <> 'pending' then
     return new;
   end if;
 

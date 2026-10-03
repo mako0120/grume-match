@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { MatchReasons } from "@/components/match-reasons";
 import type { DemoCampaign } from "@/lib/domain/types";
@@ -34,8 +35,8 @@ export function CampaignCard({
       </div>
 
       <div className="reward">
-        ¥{campaign.cashReward.toLocaleString()}
-        <small>現金報酬</small>
+        {formatReward(campaign.cashReward)}
+        <small>{campaign.cashReward > 0 ? "現金報酬＋食事" : "現金報酬なし"}</small>
       </div>
 
       {campaign.usageRights ? (

@@ -128,8 +128,8 @@ export default async function NewDirectOfferPage({
 
           <div className="field-row">
             <label>
-              現金報酬（税込）
-              <input defaultValue="6000" min="1" name="cashReward" required type="number" />
+              現金報酬（税込・0円なら食事招待のみ）
+              <input defaultValue="6000" min="0" name="cashReward" required type="number" />
             </label>
             <label>
               来店人数

@@ -38,7 +38,7 @@ export default async function CreatorCampaignListPage() {
 
       <h1 className="page-title">PR案件を探す</h1>
       <p className="page-subtitle">
-        あなたの実績エリア・希望報酬に合う順に並んでいます。食事提供とは別に、現金報酬が明示された案件だけです。
+        あなたの実績エリア・希望報酬に合う順に並んでいます。食事招待（現金報酬なし）と現金報酬つきの案件があります。
       </p>
 
       <Link className="quick-status-link" href="/creator/applications">

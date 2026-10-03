@@ -60,10 +60,10 @@ export default async function NewCampaignPage({
 
           <div className="field-row">
             <label>
-              現金報酬（税込）
+              現金報酬（税込・0円なら食事招待のみ）
               <input
                 defaultValue="6000"
-                min="1"
+                min="0"
                 name="cashReward"
                 required
                 type="number"

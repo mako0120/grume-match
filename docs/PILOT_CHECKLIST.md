@@ -202,6 +202,8 @@ Restaurant:
 - [ ] /restaurant/billing groups fees by month; /restaurant/signal PR費用 includes the fee.
 - [ ] `npm run ops -- fees` lists them; `fee-status invoiced` then `paid` updates the Restaurant's page.
 - [ ] The Creator's payment amount never changes.
+- [ ] A meal-only invitation (現金報酬 0円) can be published; cards show 「食事招待」; Creators with a minimum reward are not invited.
+- [ ] Completing a meal-only PR settles the ¥0 payment without a 「¥0 の報酬」 notification and records a ¥2,000 fee.
 
 ## Exit criteria
 

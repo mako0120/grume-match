@@ -6,8 +6,8 @@ import { PLATFORM_FEE_MINIMUM, PLATFORM_FEE_RATE, platformFee } from "@/lib/pric
 const differences = [
   {
     topic: "Creatorへの対価",
-    usual: "食事の無償提供が中心",
-    ours: "現金報酬が必須。0円の案件は公開できません",
+    usual: "DMで個別に交渉。条件があいまい",
+    ours: "「食事招待のみ」か「食事＋現金報酬」を案件ごとに選択。対価とPR表記を案件に明記",
   },
   {
     topic: "日程調整",
@@ -53,7 +53,7 @@ export default function HomePage() {
         <span className="eyebrow">GOURMET DIARY</span>
         <h1>有償PRを、合う人に。DMなしで、来店まで。</h1>
         <p>
-          飲食店とグルメCreatorを、現金報酬が明示されたPR案件でつなぎます。
+          飲食店とグルメCreatorを、食事招待または現金報酬つきのPR案件でつなぎます。
           相性の良いCreatorを理由つきで提案し、日程はタップで確定。投稿の確認から報酬の管理、来店の計測まで1つのアプリで進みます。
         </p>
 
@@ -70,8 +70,8 @@ export default function HomePage() {
 
       <section className="feature-grid" aria-label="主要機能">
         <article className="feature-card">
-          <strong>現金報酬つきの有償PR</strong>
-          <p>食事提供とは別に、Creatorへの報酬を必ず明示。PR表記が前提の、ステマ規制に沿った運用です。</p>
+          <strong>広告費をかけずにPR投稿</strong>
+          <p>料理の提供だけで、CreatorにPR投稿を作ってもらえます（食事招待）。現金報酬を上乗せすれば、実績のあるCreatorも集まりやすくなります。どちらもPR表記が前提の、ステマ規制に沿った運用です。</p>
         </article>
 
         <article className="feature-card">
@@ -138,7 +138,7 @@ export default function HomePage() {
         <article className="feature-card">
           <strong>Creatorの方へ</strong>
           <p>
-            食事だけではなく現金報酬が出る案件だけ。実績のスクショを送るだけで、あなたのエリアと実績に合う案件の招待が届きます。
+            無料で食事ができる招待と、現金報酬つきの案件。実績のスクショを送るだけで、あなたのエリアと実績に合う案件の招待が届きます。
           </p>
         </article>
       </section>

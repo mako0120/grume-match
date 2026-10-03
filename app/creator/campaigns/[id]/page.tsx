@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TapSchedule } from "@/components/tap-schedule";
@@ -36,8 +37,10 @@ export default async function CreatorCampaignDetailPage({
         <span>{campaign.area}・{campaign.category}</span>
         <h1>{campaign.title}</h1>
         <div className="reward">
-          ¥{campaign.cashReward.toLocaleString()}
-          <small style={{ color: "rgba(255,255,255,.75)" }}>現金報酬</small>
+          {formatReward(campaign.cashReward)}
+          <small style={{ color: "rgba(255,255,255,.75)" }}>
+            {campaign.cashReward > 0 ? "現金報酬＋食事" : "現金報酬なし"}
+          </small>
         </div>
       </section>
 

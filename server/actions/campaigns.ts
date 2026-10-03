@@ -56,7 +56,7 @@ export async function createCampaign(formData: FormData) {
     .map(String)
     .filter(Boolean);
 
-  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+  if (!category || !Number.isInteger(cashReward) || cashReward < 0 || creatorSlots <= 0 || !platforms.length) {
     redirect(
       "/restaurant/campaigns/new?message=" +
         encodeURIComponent("ジャンル・報酬・募集人数・投稿先を確認してください。"),

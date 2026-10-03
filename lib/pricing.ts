@@ -6,10 +6,17 @@
 export const PLATFORM_FEE_RATE = 0.2;
 export const PLATFORM_FEE_MINIMUM = 2000;
 
-/** Fee for one completed PR, from what the Restaurant pays the Creator. */
+/**
+ * Fee for one completed PR, from what the Restaurant pays the Creator.
+ * A meal-only invitation (¥0) pays the minimum.
+ */
 export function platformFee(creatorPayment: number) {
-  if (creatorPayment <= 0) return 0;
-  return Math.max(Math.round(creatorPayment * PLATFORM_FEE_RATE), PLATFORM_FEE_MINIMUM);
+  return Math.max(Math.round(Math.max(creatorPayment, 0) * PLATFORM_FEE_RATE), PLATFORM_FEE_MINIMUM);
+}
+
+/** "¥8,000" or, for a meal-only invitation, "食事招待". */
+export function formatReward(cashReward: number) {
+  return cashReward > 0 ? `¥${cashReward.toLocaleString("ja-JP")}` : "食事招待";
 }
 
 /** What one completed PR costs the Restaurant in total (meal cost aside). */
@@ -18,7 +25,7 @@ export function restaurantTotal(creatorPayment: number, waived = false) {
 }
 
 export function formatFeeRule() {
-  return `PRが完了した時だけ、報酬の${PLATFORM_FEE_RATE * 100}%（最低¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}）`;
+  return `PRが完了した時だけ、報酬の${PLATFORM_FEE_RATE * 100}%（最低¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}。食事招待のみは¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}）`;
 }
 
 export const platformFeeStatusLabels: Record<string, string> = {

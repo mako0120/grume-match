@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
@@ -66,7 +67,7 @@ export default async function CreatorBookingDetailPage({
         </div>
         <div className="summary-item">
           <span>報酬</span>
-          <strong>¥{booking.payment?.amount.toLocaleString() ?? "—"}</strong>
+          <strong>{booking.payment ? formatReward(booking.payment.amount) : "—"}</strong>
           {booking.license && booking.license.fee > 0 ? (
             <small>うち二次利用料 ¥{booking.license.fee.toLocaleString()}</small>
           ) : null}

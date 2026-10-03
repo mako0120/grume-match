@@ -52,10 +52,10 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
-  if (cashReward <= 0) {
+  if (!Number.isInteger(cashReward) || cashReward < 0) {
     redirect(
       "/restaurant/offers/new?message=" +
-        encodeURIComponent("現金報酬を入力してください。"),
+        encodeURIComponent("現金報酬を確認してください（食事招待のみは0円）。"),
     );
   }
 

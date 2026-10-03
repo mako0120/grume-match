@@ -95,7 +95,7 @@ export default async function CreatorProfilePage({
 
           <div className="field-row">
             <label>
-              最低報酬
+              最低報酬（0円なら食事招待も届きます）
               <input
                 defaultValue={profile?.min_reward ?? 0}
                 min="0"

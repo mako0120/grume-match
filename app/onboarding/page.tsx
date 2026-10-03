@@ -38,7 +38,7 @@ export default async function OnboardingPage({
         <form action={completeCreatorOnboarding} className="onboarding-card">
           <span className="eyebrow">CREATOR</span>
           <h2>PR案件に応募する</h2>
-          <p>現金報酬付き案件を探し、来店候補日時をタップして応募します。</p>
+          <p>食事招待・現金報酬つきの案件を探し、来店候補日時をタップして応募します。</p>
 
           <label>
             表示名
@@ -61,7 +61,7 @@ export default async function OnboardingPage({
           </label>
           <div className="field-row">
             <label>
-              最低報酬
+              最低報酬（0円なら食事招待も届きます）
               <input min="0" name="minReward" placeholder="例：6000" type="number" />
             </label>
             <label>
@@ -77,7 +77,7 @@ export default async function OnboardingPage({
         <form action={completeRestaurantOnboarding} className="onboarding-card">
           <span className="eyebrow">RESTAURANT</span>
           <h2>PR案件を募集する</h2>
-          <p>店舗情報を登録し、現金報酬と来店可能枠を設定して募集します。</p>
+          <p>店舗情報を登録し、食事招待か現金報酬と、来店可能枠を設定して募集します。</p>
 
           <label>
             店舗名

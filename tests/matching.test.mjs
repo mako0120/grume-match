@@ -169,3 +169,9 @@ test("Restaurants' ratings count from 2 reviews and can lower a Creator", () => 
   assert.ok(poor.score < base || base < 10);
   assert.ok(poor.cautions.includes("店舗評価が低め（★2.5）"));
 });
+
+test("meal-only invitations go to Creators without a minimum reward", () => {
+  const campaign = { area: "大阪・梅田", category: "焼肉", cashReward: 0 };
+  assert.equal(matchCreatorToCampaign(campaign, newcomer).blocked, false);
+  assert.equal(matchCreatorToCampaign(campaign, gourmetDiary).blocked, true);
+});

@@ -361,3 +361,8 @@ Recorded by a trigger when the payment becomes approved (= the PR is
 complete). fee = `platform_fee_for(base_amount)` = 20%, at least ¥2,000.
 The Restaurant's first completed PR is `waived`. Visible to the Restaurant
 and the Operator; only the Operator / service role changes the status.
+
+Meal-only invitations: `campaigns.cash_reward = 0` is allowed (the paid
+campaign guard was removed in `202610030009_meal_invitations.sql`). Their ¥0
+payment settles as `paid` when the PR completes, without payment
+notifications, and the fee is the ¥2,000 minimum.

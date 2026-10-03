@@ -11,7 +11,7 @@ import {
   verificationStatusLabels,
 } from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
-import { platformFeeStatusLabels } from "@/lib/pricing";
+import { formatReward, platformFeeStatusLabels } from "@/lib/pricing";
 import { getBookingFee } from "@/server/queries/billing";
 import { getBookingPostReports, getBookingReviews } from "@/server/queries/pr-feedback";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
@@ -70,7 +70,7 @@ export default async function RestaurantBookingDetailPage({
         </div>
         <div className="summary-item">
           <span>報酬</span>
-          <strong>¥{booking.cashReward.toLocaleString()}</strong>
+          <strong>{formatReward(booking.cashReward)}</strong>
           {booking.license && booking.license.fee > 0 ? (
             <small>うち二次利用料 ¥{booking.license.fee.toLocaleString()}</small>
           ) : null}

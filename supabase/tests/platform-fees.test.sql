@@ -1,5 +1,6 @@
 -- Platform fee: only on completed PRs, 20% (min ¥2,000), first PR free,
--- status managed by the Operator only.
+-- status managed by the Operator only. Meal-only invitations (¥0 reward)
+-- can be published, settle without a transfer and pay the ¥2,000 minimum.
 do $$
 declare
   p record;
@@ -16,7 +17,7 @@ begin
   select * into p from tests.seed_parties();
 
   if public.platform_fee_for(8000) <> 2000 or public.platform_fee_for(15000) <> 3000
-     or public.platform_fee_for(0) <> 0 then
+     or public.platform_fee_for(0) <> 2000 then
     raise exception 'unexpected fee formula';
   end if;
 
@@ -70,6 +71,40 @@ begin
   if v_count <> 1 then
     raise exception 'fee recorded twice';
   end if;
+
+  -- Meal-only invitation: ¥0 reward is allowed and completes like any PR.
+  perform tests.act_as(p.restaurant_user_id);
+  v_campaign := public.create_campaign_with_slots(
+    p.restaurant_id, 'テスト食堂 食事招待', '', '焼肉', '梅田', 0, 'tax_included',
+    '1名分提供', 0, 1, v_today, v_today + 10, now() + interval '9 days',
+    array['instagram_reel'], tests.future_slot(7));
+  select id into v_slot from public.campaign_slots where campaign_id = v_campaign;
+  perform tests.act_as(p.creator_user_id);
+  perform public.apply_to_campaign(v_campaign, 1, array[v_slot], '[]'::jsonb);
+  perform tests.act_as(p.restaurant_user_id);
+  v_booking := public.confirm_booking(
+    (select id from public.applications where campaign_id = v_campaign), v_slot);
+  perform tests.act_as(p.creator_user_id);
+  select id into v_deliverable from public.deliverables where booking_id = v_booking;
+  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/meal/');
+  perform tests.act_as(p.restaurant_user_id);
+  perform public.review_deliverable(v_deliverable, true, null);
+
+  perform tests.act_as_superuser();
+  if (select status from public.payments where booking_id = v_booking) <> 'paid' then
+    raise exception 'meal-only payment should settle as paid';
+  end if;
+  if exists (
+    select 1 from public.notifications
+    where user_id = p.creator_user_id and type like 'payment_%' and body like '¥0 %'
+  ) then
+    raise exception 'creator notified about a ¥0 payment';
+  end if;
+  select * into v_fee from public.platform_fees where booking_id = v_booking;
+  if v_fee.fee <> 2000 or v_fee.status <> 'pending' then
+    raise exception 'meal-only fee wrong: %', row_to_json(v_fee);
+  end if;
+  select * into v_fee from public.platform_fees where booking_id = v_bookings[2];
 
   -- Restaurants and Creators cannot change status; others cannot see fees.
   perform tests.act_as(p.restaurant_user_id);

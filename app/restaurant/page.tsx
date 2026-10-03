@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { campaignStatusLabels } from "@/lib/status-labels";
 import { closeCampaignRecruitment } from "@/server/actions/campaigns";
@@ -144,7 +145,7 @@ export default async function RestaurantDashboardPage({
                     <p>募集 {campaign.creator_slots}名</p>
                   </div>
                   <div className="booking-money">
-                    ¥{Number(campaign.cash_reward).toLocaleString()}
+                    {formatReward(Number(campaign.cash_reward))}
                     <small>Creator報酬</small>
                   </div>
                 </Link>
