@@ -11,7 +11,8 @@
     "typecheck": "tsc6 --noEmit",
     "test": "node --test tests/**/*.test.mjs",
     "check": "npm run typecheck && npm run lint && npm run test",
-    "test:db": "bash supabase/tests/run.sh"
+    "test:db": "bash supabase/tests/run.sh",
+    "insights": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/insights-queue.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

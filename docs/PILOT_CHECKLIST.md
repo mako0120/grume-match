@@ -179,6 +179,16 @@ Restaurant:
 - [ ] Direct OFFER picker lists Creators by reach; "この人に指名オファー" preselects the Creator.
 - [ ] Another Creator cannot see グルメ日誌's numbers; the screenshot is never visible to Restaurants.
 
+## M. PR desk (グルメ日誌 一律¥8,000)
+
+- [ ] Creator sends only the insights screenshot → 読み取り待ち.
+- [ ] Claude (`read-insights`) or /admin/performance registers it → 登録済み・運営確認済み, Creator notified.
+- [ ] Creator turns on PR窓口 (¥8,000) → /order/<slug> shows the plan and results.
+- [ ] Gmail opens with subject, body and the order link; the store appears in 送った店舗.
+- [ ] Logged-out Restaurant: sign up from /order/<slug> → after email confirmation and onboarding it returns to the order page.
+- [ ] Restaurant orders with 1–3 dates → campaign is ¥8,000・Reel 1本・食事1名分; Creator gets 指名PR notification.
+- [ ] Turning PR窓口 off stops new orders.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

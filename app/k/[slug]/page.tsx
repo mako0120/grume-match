@@ -56,12 +56,25 @@ export default async function PublicMediaKitPage({
         actions={
           <section className="media-kit-contact">
             <strong>{kit.displayName}にPRを依頼する</strong>
-            <p>
-              GOURMET DIARYに店舗登録（無料）すると、報酬・提供内容・候補日時を決めて指名オファーを送れます。日程調整や投稿確認、報酬管理までDMなしで進みます。
-            </p>
-            <Link className="primary-button" href="/signup">
-              店舗として登録して依頼する
-            </Link>
+            {kit.flatPlan ? (
+              <>
+                <p>
+                  一律¥{kit.flatPlan.price.toLocaleString("ja-JP")}（税込）でInstagramリール1本。お食事は1名分のみご提供ください。候補日時を選ぶだけで依頼できます。
+                </p>
+                <Link className="primary-button" href={`/order/${kit.slug}`}>
+                  ¥{kit.flatPlan.price.toLocaleString("ja-JP")}で依頼する
+                </Link>
+              </>
+            ) : (
+              <>
+                <p>
+                  GOURMET DIARYに店舗登録（無料）すると、報酬・提供内容・候補日時を決めて指名オファーを送れます。日程調整や投稿確認、報酬管理までDMなしで進みます。
+                </p>
+                <Link className="primary-button" href="/signup">
+                  店舗として登録して依頼する
+                </Link>
+              </>
+            )}
           </section>
         }
         baseArea={kit.baseArea}

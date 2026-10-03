@@ -7,10 +7,13 @@ import { getRestaurantCampaignApplications } from "@/server/queries/restaurant-a
 
 export default async function RestaurantApplicationsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ message?: string }>;
 }) {
   const { id } = await params;
+  const { message } = await searchParams;
   const campaign = await getRestaurantCampaignApplications(id);
 
   if (!campaign) notFound();
@@ -34,6 +37,12 @@ export default async function RestaurantApplicationsPage({
       <p className="page-subtitle">
         採用と来店日時の確定を同じ操作で完了させます。
       </p>
+
+      {message ? (
+        <div className="form-message inline-success" aria-live="polite">
+          {message}
+        </div>
+      ) : null}
 
       <section className="section-card restaurant-campaign-summary">
         <span className="eyebrow">CAMPAIGN</span>

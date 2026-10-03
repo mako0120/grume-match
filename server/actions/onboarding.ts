@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { RETURN_TO_COOKIE, safeReturnTo } from "@/lib/return-to";
 import { createClient } from "@/lib/supabase/server";
 
 function toNonNegativeInteger(value: FormDataEntryValue | null, fallback: number) {
@@ -53,6 +55,14 @@ export async function completeRestaurantOnboarding(formData: FormData) {
 
   if (error) {
     redirect(`/onboarding?message=${encodeURIComponent("店舗登録に失敗しました。入力内容をご確認ください。")}`);
+  }
+
+  // Came from a Creator's order page: go back there to finish the order.
+  const cookieStore = await cookies();
+  const next = safeReturnTo(cookieStore.get(RETURN_TO_COOKIE)?.value);
+  if (next) {
+    cookieStore.delete(RETURN_TO_COOKIE);
+    redirect(next);
   }
 
   redirect("/restaurant/campaigns/new");

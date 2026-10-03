@@ -179,16 +179,21 @@ Restaurant:
 - `/restaurant/creators/<id>` — Creator media kit (30-day performance)
 
 Creator:
-- `/creator/performance` — paste insights, verification screenshot, media kit
+- `/creator/performance` — 実績とPR窓口: screenshot, flat-rate PR desk, Gmail outreach
 
 Public:
 - `/r/<code>` — Creator tracking link landing page (no login)
 - `/k/<slug>` — opt-in Creator media kit (no login)
+- `/order/<slug>` — Creator's flat-rate PR order page (Restaurants order with candidate dates)
 
 Operator:
 - `/admin`
 - `/admin/payments`
-- `/admin/performance` — verify Creator insights screenshots
+- `/admin/performance` — read Creator insights screenshots and register the numbers
+
+Reading screenshots without an AI API: ask Claude to "実績スクショを読み取って"
+(`.claude/skills/read-insights/SKILL.md`, `npm run insights -- list`). It needs
+`NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY` in that environment.
 
 Shared:
 - `/login`

@@ -38,13 +38,13 @@ export async function getOwnPerformance() {
 
   const { data: profile } = await supabase
     .from("creator_profiles")
-    .select("id,display_name,media_kit_slug,media_kit_public")
+    .select("id,display_name,media_kit_slug,media_kit_public,flat_plan_enabled,flat_plan_price,creator_social_accounts(platform,handle)")
     .eq("user_id", authData.user.id)
     .maybeSingle();
 
   if (!profile) return null;
 
-  const [metricsResult, evidenceResult] = await Promise.all([
+  const [metricsResult, evidenceResult, outreachResult] = await Promise.all([
     supabase
       .from("creator_post_metrics")
       .select(metricColumns)
@@ -58,6 +58,12 @@ export async function getOwnPerformance() {
       .eq("creator_id", profile.id)
       .order("created_at", { ascending: false })
       .limit(10),
+    supabase
+      .from("creator_outreach")
+      .select("id,company_name,contact_name,email,created_at")
+      .eq("creator_id", profile.id)
+      .order("created_at", { ascending: false })
+      .limit(20),
   ]);
 
   if (metricsResult.error) throw new Error(metricsResult.error.message);
@@ -72,6 +78,9 @@ export async function getOwnPerformance() {
       display_name: string;
       media_kit_slug: string | null;
       media_kit_public: boolean;
+      flat_plan_enabled: boolean;
+      flat_plan_price: number;
+      creator_social_accounts: { platform: string; handle: string }[] | null;
     },
     rows: rows.map((row) => ({ id: row.id, ...rowToPostMetric(row) })),
     summary: summarizePerformance(posts, { today: todayInTokyo() }),
@@ -81,6 +90,13 @@ export async function getOwnPerformance() {
       measured_on: string;
       status: "pending" | "verified" | "rejected";
       review_note: string | null;
+      created_at: string;
+    }[],
+    outreach: (outreachResult.data ?? []) as {
+      id: string;
+      company_name: string;
+      contact_name: string | null;
+      email: string | null;
       created_at: string;
     }[],
   };
@@ -127,7 +143,7 @@ export async function getCreatorMediaKit(creatorId: string) {
   const { data: profile, error } = await supabase
     .from("creator_profiles")
     .select(
-      "id,display_name,bio,base_area,min_reward,reliability_score,creator_social_accounts(platform,handle,profile_url,followers)",
+      "id,display_name,bio,base_area,min_reward,reliability_score,media_kit_slug,media_kit_public,flat_plan_enabled,flat_plan_price,creator_social_accounts(platform,handle,profile_url,followers)",
     )
     .eq("id", creatorId)
     .maybeSingle();
@@ -142,8 +158,14 @@ export async function getCreatorMediaKit(creatorId: string) {
     followers: number;
   }[];
 
+  const flatPlanOpen =
+    Boolean(profile.flat_plan_enabled) && Boolean(profile.media_kit_public) && Boolean(profile.media_kit_slug);
+
   return {
     id: profile.id as string,
+    flatPlan: flatPlanOpen
+      ? { price: profile.flat_plan_price as number, slug: profile.media_kit_slug as string }
+      : null,
     displayName: profile.display_name as string,
     bio: (profile.bio as string) ?? "",
     baseArea: profile.base_area as string,
@@ -161,6 +183,9 @@ export async function getCreatorMediaKit(creatorId: string) {
 }
 
 type PublicKit = {
+  slug: string;
+  flat_plan_enabled: boolean;
+  flat_plan_price: number;
   display_name: string;
   bio: string;
   base_area: string;
@@ -182,6 +207,8 @@ export async function getPublicMediaKit(slug: string) {
   const posts = (kit.posts ?? []).map(rowToPostMetric);
 
   return {
+    slug: kit.slug,
+    flatPlan: kit.flat_plan_enabled ? { price: kit.flat_plan_price } : null,
     displayName: kit.display_name,
     bio: kit.bio ?? "",
     baseArea: kit.base_area,

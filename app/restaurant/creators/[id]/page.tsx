@@ -27,12 +27,19 @@ export default async function RestaurantCreatorPage({
       <MediaKitView
         accounts={kit.accounts}
         actions={
-          <Link
-            className="primary-button media-kit-cta"
-            href={`/restaurant/offers/new?creator=${kit.id}`}
-          >
-            この人に指名オファーを送る
-          </Link>
+          <>
+            {kit.flatPlan ? (
+              <Link className="primary-button media-kit-cta" href={`/order/${kit.flatPlan.slug}`}>
+                一律¥{kit.flatPlan.price.toLocaleString("ja-JP")}で依頼する
+              </Link>
+            ) : null}
+            <Link
+              className={kit.flatPlan ? "secondary-button media-kit-cta" : "primary-button media-kit-cta"}
+              href={`/restaurant/offers/new?creator=${kit.id}`}
+            >
+              条件を決めて指名オファーを送る
+            </Link>
+          </>
         }
         baseArea={kit.baseArea}
         bio={kit.bio}

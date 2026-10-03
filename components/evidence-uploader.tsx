@@ -58,7 +58,7 @@ export function EvidenceUploader({
       const result = await registerEvidence({ platform, measuredOn, storagePath: path });
       setMessage(
         result.ok
-          ? { text: "送信しました。運営が確認すると「運営確認済み」が付きます。", ok: true }
+          ? { text: "送信しました。数字を読み取って登録したら通知でお知らせします。", ok: true }
           : { text: result.message, ok: false },
       );
     } finally {
@@ -79,7 +79,7 @@ export function EvidenceUploader({
           type="file"
         />
         <strong>{busy ? "送信中..." : "インサイトのスクショを送る"}</strong>
-        <span>店舗には表示されません。運営の確認だけに使います。</span>
+        <span>送るだけでOK。数字は読み取って登録します。画像は店舗には表示されません。</span>
       </label>
       {message ? (
         <div

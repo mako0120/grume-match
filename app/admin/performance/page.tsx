@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PerformanceSummaryCard } from "@/components/performance-summary";
-import { reviewEvidence } from "@/server/actions/performance";
+import { importFromEvidence, reviewEvidence } from "@/server/actions/performance";
 import { listPendingEvidence } from "@/server/queries/performance";
 
 export default async function AdminPerformancePage({
@@ -23,7 +23,7 @@ export default async function AdminPerformancePage({
 
       <h1 className="page-title">実績の確認</h1>
       <p className="page-subtitle">
-        Creatorが送ったインサイトのスクリーンショットと、入力された数字を照合します。
+        Creatorが送ったインサイトのスクリーンショットを読み取って登録します。Claudeに「実績スクショを読み取って」と頼むと、同じ処理を代わりに行います（docs/CREATOR_PERFORMANCE.md）。
       </p>
 
       {message ? (
@@ -58,11 +58,35 @@ export default async function AdminPerformancePage({
                 <div className="pending-box">画像を開けませんでした。</div>
               )}
 
-              {item.summary ? (
-                <PerformanceSummaryCard postLimit={20} summary={item.summary} />
-              ) : (
-                <div className="pending-box">照合する実績がまだ入力されていません。</div>
-              )}
+              <form action={importFromEvidence} className="campaign-form">
+                <input name="evidenceId" type="hidden" value={item.id} />
+                <label>
+                  計測日（スクショの日）
+                  <input defaultValue={item.measuredOn} name="measuredOn" required type="date" />
+                </label>
+                <label>
+                  読み取った数字（1投稿1行）
+                  <textarea
+                    name="insights"
+                    placeholder="淡路市 / 刺身好きなら一度は行きたい / 2.7万 / 1,106 / 27 / 12 / 5 / 3週間"
+                    rows={8}
+                    spellCheck={false}
+                  />
+                </label>
+                <p className="field-help">
+                  エリア / 見出し / 閲覧数 / いいね / コメント / リポスト / シェア / 投稿時期。登録すると「運営確認済み」になり、Creatorに通知されます。
+                </p>
+                <button className="primary-button" type="submit">
+                  この内容で登録
+                </button>
+              </form>
+
+              {item.summary && item.summary.measuredOn === item.measuredOn ? (
+                <details>
+                  <summary className="field-help">Creatorが入力済みの数字と照合する</summary>
+                  <PerformanceSummaryCard postLimit={20} summary={item.summary} />
+                </details>
+              ) : null}
 
               <form action={reviewEvidence} className="campaign-form">
                 <input name="evidenceId" type="hidden" value={item.id} />
@@ -72,11 +96,13 @@ export default async function AdminPerformancePage({
                 </label>
                 <div className="review-actions">
                   <button className="secondary-button" name="decision" type="submit" value="reject">
-                    差し戻す
+                    読めないので差し戻す
                   </button>
-                  <button className="primary-button review-approve" name="decision" type="submit" value="approve">
-                    一致を確認
-                  </button>
+                  {item.summary && item.summary.measuredOn === item.measuredOn ? (
+                    <button className="secondary-button" name="decision" type="submit" value="approve">
+                      入力済みの数字と一致
+                    </button>
+                  ) : null}
                 </div>
               </form>
             </article>
