@@ -40,6 +40,14 @@ export async function GET() {
       supabase.from("creator_standby").select("creator_id", { head: true }).limit(1),
       supabase.from("booking_reschedule_requests").select("id", { head: true }).limit(1),
       supabase.from("notifications").select("id", { head: true }).limit(1),
+      supabase.from("campaign_usage_rights").select("campaign_id", { head: true }).limit(1),
+      supabase.from("content_usage_licenses").select("id", { head: true }).limit(1),
+      supabase.from("content_assets").select("id", { head: true }).limit(1),
+      supabase.from("tracking_links").select("id", { head: true }).limit(1),
+      supabase.from("signal_events").select("id", { head: true }).limit(1),
+      supabase.from("creator_post_metrics").select("id", { head: true }).limit(1),
+      supabase.from("creator_performance_evidence").select("id", { head: true }).limit(1),
+      supabase.from("campaign_invitations").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {

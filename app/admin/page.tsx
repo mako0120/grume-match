@@ -8,6 +8,10 @@ const labels = {
   payment_failed: "支払",
   dispute: "紛争",
   no_show: "来店",
+  performance_review: "実績",
+  post_report_review: "閲覧数",
+  post_report_missing: "閲覧数",
+  review_low: "評価",
 } as const;
 
 export default async function AdminPage() {
@@ -19,6 +23,7 @@ export default async function AdminPage() {
         <strong>GOURMET DIARY</strong>
         <nav className="mini-nav">
           <Link href="/admin/payments">報酬支払い</Link>
+          <Link href="/admin/performance">実績確認</Link>
           <Link href="/notifications">通知</Link>
         </nav>
       </header>

@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 import { createClient } from "@/lib/supabase/server";
+import { autoInviteMatches } from "@/server/actions/matching";
+import { readUsageRightsForm } from "@/server/actions/usage-rights-form";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
   const parsed = Number(value);
@@ -54,11 +56,16 @@ export async function createCampaign(formData: FormData) {
     .map(String)
     .filter(Boolean);
 
-  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+  if (!category || !Number.isInteger(cashReward) || cashReward < 0 || creatorSlots <= 0 || !platforms.length) {
     redirect(
       "/restaurant/campaigns/new?message=" +
         encodeURIComponent("ジャンル・報酬・募集人数・投稿先を確認してください。"),
     );
+  }
+
+  const usage = readUsageRightsForm(formData, platforms);
+  if (!usage.ok) {
+    redirect("/restaurant/campaigns/new?message=" + encodeURIComponent(usage.message));
   }
 
   let slots;
@@ -117,16 +124,37 @@ export async function createCampaign(formData: FormData) {
     p_application_deadline: deadlineIso,
     p_platforms: platforms,
     p_slots: slots,
+    p_usage_rights: usage.usageRights,
   });
 
   if (error || !data) {
-    redirect(
-      "/restaurant/campaigns/new?message=" +
-        encodeURIComponent("案件を公開できませんでした。入力内容をご確認ください。"),
-    );
+    const reason = error?.message ?? "";
+    const message = reason.includes("usage_rights_required_for_ugc")
+      ? "UGC写真・動画を依頼する場合は、二次利用の範囲と期間を設定してください。"
+      : reason.includes("ads_usage_requires_fee")
+        ? "広告で利用する場合は二次利用料を設定してください。"
+        : "案件を公開できませんでした。入力内容をご確認ください。";
+
+    redirect("/restaurant/campaigns/new?message=" + encodeURIComponent(message));
   }
 
-  redirect("/restaurant/campaigns/" + data + "/applications");
+  const invited = await autoInviteMatches(String(data), {
+    area,
+    category,
+    cashReward,
+    kind: "market",
+  });
+
+  redirect(
+    "/restaurant/campaigns/" +
+      data +
+      "/applications?message=" +
+      encodeURIComponent(
+        invited > 0
+          ? `公開しました。条件に合うCreator${invited}人に自動でお知らせしました。`
+          : "公開しました。応募が届くと通知します。",
+      ),
+  );
 }
 
 

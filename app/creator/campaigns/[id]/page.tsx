@@ -1,17 +1,12 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TapSchedule } from "@/components/tap-schedule";
+import { describeUsageRights } from "@/lib/content-rights";
+import { platformLabels } from "@/lib/status-labels";
+import { MatchReasons } from "@/components/match-reasons";
 import { getCreatorCampaign } from "@/server/queries/campaigns";
-
-const platformLabels: Record<string, string> = {
-  instagram_feed: "Instagram Feed",
-  instagram_reel: "Instagram Reel",
-  instagram_story: "Instagram Story",
-  tiktok: "TikTok",
-  youtube_shorts: "YouTube Shorts",
-  ugc_photo: "UGC写真",
-  ugc_video: "UGC動画",
-};
+import { getMyCampaignMatches } from "@/server/queries/matching";
 
 export default async function CreatorCampaignDetailPage({
   params,
@@ -22,6 +17,8 @@ export default async function CreatorCampaignDetailPage({
   const campaign = await getCreatorCampaign(id);
 
   if (!campaign) notFound();
+
+  const match = (await getMyCampaignMatches([campaign])).get(campaign.id);
 
   return (
     <main className="creator-shell">
@@ -40,15 +37,25 @@ export default async function CreatorCampaignDetailPage({
         <span>{campaign.area}・{campaign.category}</span>
         <h1>{campaign.title}</h1>
         <div className="reward">
-          ¥{campaign.cashReward.toLocaleString()}
-          <small style={{ color: "rgba(255,255,255,.75)" }}>現金報酬</small>
+          {formatReward(campaign.cashReward)}
+          <small style={{ color: "rgba(255,255,255,.75)" }}>
+            {campaign.cashReward > 0 ? "現金報酬＋食事" : "現金報酬なし"}
+          </small>
         </div>
       </section>
+
+      {match && (match.reasons.length || match.cautions.length) ? (
+        <section className="match-panel">
+          <strong>{match.invited ? "店舗から招待されています" : "あなたとの相性"}</strong>
+          <MatchReasons match={match} />
+        </section>
+      ) : null}
 
       <section className="summary-grid">
         <div className="summary-item">
           <span>店舗</span>
           <strong>{campaign.restaurantName}</strong>
+          <small>Creator評価 {campaign.restaurantRating ?? "まだありません"}</small>
         </div>
         <div className="summary-item">
           <span>提供</span>
@@ -62,6 +69,14 @@ export default async function CreatorCampaignDetailPage({
           <span>必須投稿</span>
           <strong>
             {campaign.platforms.map((platform) => platformLabels[platform] ?? platform).join(" / ")}
+          </strong>
+        </div>
+        <div className="summary-item">
+          <span>素材の二次利用</span>
+          <strong>
+            {campaign.usageRights
+              ? describeUsageRights(campaign.usageRights)
+              : "なし（投稿のみ）"}
           </strong>
         </div>
         <div className="summary-item">

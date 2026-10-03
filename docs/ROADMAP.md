@@ -59,9 +59,9 @@ Exit:
 - structured counter-offer
 - Creator standby availability
 - FLASH campaign
-- UGC photo/video deliverables
-- content usage rights
-- content library
+- UGC photo/video deliverables ✅ (P2-03)
+- content usage rights ✅ (P2-03: 30/90/365 days, organic / ads, fee)
+- content library ✅ (P2-03: /restaurant/studio)
 - Creator portfolio
 - Restaurant favorites / rehire
 
@@ -77,13 +77,12 @@ Exit:
 
 ## Phase 4 — SIGNAL
 
-- creator tracking link
-- restaurant landing page
-- reservation attribution
-- conversion model
-- cost per reservation
-- cost per visit
-- Restaurant ROI dashboard
+- creator tracking link ✅ (P3-01)
+- restaurant landing page ✅ (P3-01)
+- visit attribution ✅ (P3-01: PR code recorded by the Restaurant)
+- conversion model — PR-code based, one code per PR (reservations are out of scope)
+- cost per visit ✅ (P3-01)
+- Restaurant ROI dashboard ✅ (P3-01: /restaurant/signal)
 
 ## Phase 5 — AUTOPILOT
 

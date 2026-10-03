@@ -1,4 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  presentLicense,
+  signContentAssets,
+  type RawContentAsset,
+  type RawUsageLicense,
+} from "@/server/queries/ugc-assets";
 
 type Relation<T> = T | T[] | null;
 
@@ -26,7 +32,9 @@ type RawBooking = {
     submitted_at: string | null;
     verification_status: string;
     verification_note: string | null;
+    content_assets?: RawContentAsset[] | null;
   }[] | null;
+  content_usage_licenses?: RawUsageLicense | RawUsageLicense[] | null;
   payments: Relation<{
     amount: number;
     currency: string;
@@ -38,6 +46,13 @@ type RawBooking = {
 
 function single<T>(value: Relation<T>): T | null {
   return Array.isArray(value) ? value[0] ?? null : value;
+}
+
+// Stable order so cards do not jump around after each submission.
+function sortDeliverables<T extends { platform: string; id: string }>(items: T[]) {
+  return items
+    .slice()
+    .sort((a, b) => a.platform.localeCompare(b.platform) || a.id.localeCompare(b.id));
 }
 
 const visitFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -76,8 +91,10 @@ export async function getCreatorBooking(bookingId: string) {
         submitted_url,
         submitted_at,
         verification_status,
-        verification_note
+        verification_note,
+        content_assets(id,kind,storage_path,mime_type,byte_size,created_at)
       ),
+      content_usage_licenses(usage_scope,duration_days,fee,status,starts_at,expires_at),
       payments(amount,currency,status,due_at,paid_at)
     `)
     .eq("id", bookingId)
@@ -90,9 +107,17 @@ export async function getCreatorBooking(bookingId: string) {
   const restaurant = single(campaign?.restaurants ?? null);
   const slot = single(row.campaign_slots);
   const payment = single(row.payments);
+  const { data: authData } = await supabase.auth.getUser();
+  const deliverables = await Promise.all(
+    (row.deliverables ?? []).map(async ({ content_assets, ...deliverable }) => ({
+      ...deliverable,
+      assets: await signContentAssets(supabase, content_assets ?? []),
+    })),
+  );
 
   return {
     id: row.id,
+    viewerUserId: authData.user?.id ?? "",
     partySize: row.party_size,
     status: row.status,
     campaignId: campaign?.id ?? "",
@@ -105,7 +130,8 @@ export async function getCreatorBooking(bookingId: string) {
       row.status === "confirmed" &&
       Boolean(slot) &&
       new Date(slot!.starts_at).getTime() > Date.now(),
-    deliverables: row.deliverables ?? [],
+    deliverables: sortDeliverables(deliverables),
+    license: presentLicense(row.content_usage_licenses ?? null),
     payment: payment
       ? {
           amount: payment.amount,

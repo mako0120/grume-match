@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import { withdrawCampaignApplication } from "@/server/actions/applications";
 import { listCreatorApplications } from "@/server/queries/creator-applications";
 
@@ -67,7 +68,7 @@ export default async function CreatorApplicationsPage({
                 </div>
                 <div className="application-side">
                   <div className="booking-money">
-                    ¥{Number(campaign?.cash_reward ?? 0).toLocaleString()}
+                    {formatReward(Number(campaign?.cash_reward ?? 0))}
                     <small>{campaign?.area ?? ""}</small>
                   </div>
 

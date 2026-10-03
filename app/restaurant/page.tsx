@@ -1,3 +1,4 @@
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { campaignStatusLabels } from "@/lib/status-labels";
 import { closeCampaignRecruitment } from "@/server/actions/campaigns";
@@ -104,6 +105,29 @@ export default async function RestaurantDashboardPage({
         </Link>
       </section>
 
+      <nav className="dashboard-links" aria-label="効果と素材">
+        <Link href="/restaurant/signal">
+          <span className="eyebrow">SIGNAL</span>
+          <strong>PR効果</strong>
+          <small>閲覧・来店と費用対効果</small>
+        </Link>
+        <Link href="/restaurant/studio">
+          <span className="eyebrow">STUDIO</span>
+          <strong>素材ライブラリ</strong>
+          <small>UGC写真・動画と利用期限</small>
+        </Link>
+        <Link href="/restaurant/offers/invites">
+          <span className="eyebrow">INVITE</span>
+          <strong>Instagramで招待</strong>
+          <small>DMで依頼している人もアプリで</small>
+        </Link>
+        <Link href="/restaurant/billing">
+          <span className="eyebrow">BILLING</span>
+          <strong>ご請求</strong>
+          <small>完了したPRの手数料（月額0円）</small>
+        </Link>
+      </nav>
+
       <section className="dashboard-section">
         <div className="section-heading">
           <h2>案件</h2>
@@ -126,7 +150,7 @@ export default async function RestaurantDashboardPage({
                     <p>募集 {campaign.creator_slots}名</p>
                   </div>
                   <div className="booking-money">
-                    ¥{Number(campaign.cash_reward).toLocaleString()}
+                    {formatReward(Number(campaign.cash_reward))}
                     <small>Creator報酬</small>
                   </div>
                 </Link>
