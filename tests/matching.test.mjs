@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { areaRelation, prefectureOf, regionOf } from "../lib/areas.ts";
+import { isServiceArea, prefectureOf } from "../lib/areas.ts";
 import { parseInsightLines, summarizePerformance } from "../lib/creator-performance.ts";
 import { autoInviteCandidates, matchCreatorToCampaign, rankCreators } from "../lib/matching.ts";
 
@@ -54,20 +54,16 @@ const pricey = {
   noShows: 0,
 };
 
-test("areas group neighbourhoods into regions and prefectures", () => {
-  assert.equal(regionOf("大阪市北区梅田1-2-3")?.label, "キタ");
-  assert.equal(regionOf("北新地")?.label, "キタ");
-  assert.equal(regionOf("小野原")?.label, "北摂");
-  assert.equal(regionOf("淡路市")?.label, "淡路島");
-  assert.equal(regionOf("大阪"), null);
+test("places resolve to the service prefectures 大阪・兵庫", () => {
+  assert.equal(prefectureOf("大阪市北区梅田1-2-3"), "大阪");
+  assert.equal(prefectureOf("北新地"), "大阪");
+  assert.equal(prefectureOf("小野原"), "大阪");
+  assert.equal(prefectureOf("東大阪"), "大阪");
+  assert.equal(prefectureOf("淡路市"), "兵庫");
   assert.equal(prefectureOf("南淡路"), "兵庫");
-
-  assert.equal(areaRelation("難波", "なんば"), "region");
-  assert.equal(areaRelation("梅田", "大阪市北区梅田"), "same");
-  assert.equal(areaRelation("北新地", "梅田"), "region");
-  assert.equal(areaRelation("本町", "梅田"), "prefecture");
-  assert.equal(areaRelation("大阪", "梅田"), "prefecture");
-  assert.equal(areaRelation("淡路市", "梅田"), "none");
+  assert.equal(prefectureOf("三宮"), "兵庫");
+  assert.equal(prefectureOf("京都"), null);
+  assert.equal(isServiceArea("渋谷"), false);
 });
 
 test("グルメ日誌 is a strong match for a 梅田 焼肉 campaign and says why", () => {
@@ -80,20 +76,30 @@ test("グルメ日誌 is a strong match for a 梅田 焼肉 campaign and says wh
   assert.equal(match.label, "とても合う");
   assert.ok(match.score >= 70, String(match.score));
   assert.deepEqual(match.reasons, [
+    "大阪で投稿実績あり（6本）",
     "1投稿あたり中央値1.2万閲覧（確認済み）",
-    "キタ（北新地）で投稿実績あり",
     "PR完了3件",
     "焼肉の発信あり",
   ]);
   assert.deepEqual(match.cautions, []);
 });
 
-test("same-area posts outrank region, base area and prefecture", () => {
+test("area is judged per prefecture: posts there, then base area", () => {
   const campaign = (area) => ({ area, category: "", cashReward: 8000 });
 
-  assert.equal(matchCreatorToCampaign(campaign("難波"), gourmetDiary).reasons[0], "難波で投稿実績あり");
-  assert.match(matchCreatorToCampaign(campaign("心斎橋"), gourmetDiary).reasons.join(), /ミナミ（難波）/);
-  assert.match(matchCreatorToCampaign(campaign("京都"), gourmetDiary).cautions.join(), /京都周辺の実績はまだありません/);
+  assert.equal(matchCreatorToCampaign(campaign("三宮"), gourmetDiary).reasons[0], "兵庫で投稿実績あり（2本）");
+  assert.equal(matchCreatorToCampaign(campaign("梅田"), newcomer).reasons[0], "大阪で活動");
+  assert.match(
+    matchCreatorToCampaign(campaign("神戸"), newcomer).cautions.join(),
+    /兵庫での実績はまだありません/,
+  );
+  assert.equal(
+    matchCreatorToCampaign(campaign("三宮"), { ...newcomer, baseArea: "大阪・兵庫" }).reasons[0],
+    "兵庫で活動",
+  );
+  // Outside 大阪・兵庫 the area neither adds points nor warns.
+  const outside = matchCreatorToCampaign(campaign("京都"), gourmetDiary);
+  assert.equal(outside.cautions.some((caution) => caution.includes("京都")), false);
 });
 
 test("reward below the Creator's minimum blocks the match", () => {

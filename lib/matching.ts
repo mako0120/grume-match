@@ -1,8 +1,9 @@
 // Restaurant ↔ Creator matching. Rule-based and explainable: every point
 // comes with a reason the Restaurant (or Creator) can read. No AI.
+// Area is compared per prefecture (大阪・兵庫).
 
 // Relative .ts imports keep this module runnable by node --test.
-import { areaRelation, regionOf } from "./areas.ts";
+import { normalizeArea, prefectureOf } from "./areas.ts";
 import { formatCompactViews, type PerformanceSummary } from "./creator-performance.ts";
 
 export type MatchCampaign = {
@@ -36,32 +37,25 @@ export type MatchResult = {
 
 type Point = { points: number; reason?: string; caution?: string };
 
+// Area is judged per prefecture (大阪・兵庫), not per neighbourhood.
 function areaPoint(campaign: MatchCampaign, creator: MatchCreator): Point {
-  const postAreas = creator.performance?.areas.map((area) => area.area) ?? [];
+  const prefecture = prefectureOf(campaign.area);
+  if (!prefecture) return { points: 0 };
 
-  const samePost = postAreas.find((area) => areaRelation(area, campaign.area) === "same");
-  if (samePost) return { points: 30, reason: `${campaign.area}で投稿実績あり` };
-
-  if (areaRelation(creator.baseArea, campaign.area) === "same") {
-    return { points: 24, reason: `活動エリアが${campaign.area}` };
+  const postsThere =
+    creator.performance?.prefectures.find((entry) => entry.prefecture === prefecture)?.posts ?? 0;
+  if (postsThere > 0) {
+    return { points: 30, reason: `${prefecture}で投稿実績あり（${postsThere}本）` };
   }
 
-  const regionPost = postAreas.find((area) => areaRelation(area, campaign.area) === "region");
-  if (regionPost) {
-    const region = regionOf(campaign.area);
-    return { points: 22, reason: `${region?.label ?? "近いエリア"}（${regionPost}）で投稿実績あり` };
+  if (
+    prefectureOf(creator.baseArea) === prefecture ||
+    normalizeArea(creator.baseArea).includes(prefecture)
+  ) {
+    return { points: 24, reason: `${prefecture}で活動` };
   }
 
-  if (areaRelation(creator.baseArea, campaign.area) === "region") {
-    return { points: 18, reason: `活動エリアが近い（${creator.baseArea}）` };
-  }
-
-  const prefecturePost = postAreas.some((area) => areaRelation(area, campaign.area) === "prefecture");
-  if (prefecturePost || areaRelation(creator.baseArea, campaign.area) === "prefecture") {
-    return { points: 10, reason: "同じ府県で活動" };
-  }
-
-  return { points: 0, caution: `${campaign.area}周辺の実績はまだありません` };
+  return { points: 0, caution: `${prefecture}での実績はまだありません` };
 }
 
 function reachPoint(creator: MatchCreator): Point {

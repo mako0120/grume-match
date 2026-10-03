@@ -124,10 +124,10 @@ export function PerformanceSummaryCard({
         ))}
       </ul>
 
-      <div className="performance-areas" aria-label="エリア別">
-        {summary.areas.map((area) => (
-          <span className="meta-pill" key={area.area}>
-            {area.area} {formatCompactViews(area.views)}
+      <div className="performance-areas" aria-label="府県別">
+        {summary.prefectures.map((entry) => (
+          <span className="meta-pill" key={entry.prefecture}>
+            {entry.prefecture} {entry.posts}投稿・{formatCompactViews(entry.views)}閲覧
           </span>
         ))}
       </div>

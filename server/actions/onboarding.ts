@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { SERVICE_PREFECTURES, prefectureOf, type ServicePrefecture } from "@/lib/areas";
 import { createClient } from "@/lib/supabase/server";
 
 function toNonNegativeInteger(value: FormDataEntryValue | null, fallback: number) {
@@ -17,6 +18,11 @@ export async function completeCreatorOnboarding(formData: FormData) {
   const displayName = String(formData.get("displayName") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const baseArea = String(formData.get("baseArea") ?? "").trim();
+
+  // Service area: 大阪・兵庫.
+  if (!["大阪", "兵庫", "大阪・兵庫"].includes(baseArea)) {
+    redirect(`/onboarding?message=${encodeURIComponent("活動エリアは大阪・兵庫から選択してください。")}`);
+  }
   const minReward = toNonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = toNonNegativeInteger(formData.get("travelRadiusKm"), 20);
 
@@ -43,7 +49,19 @@ export async function completeRestaurantOnboarding(formData: FormData) {
 
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
-  const area = String(formData.get("area") ?? "").trim();
+  const prefecture = String(formData.get("prefecture") ?? "") as ServicePrefecture;
+  const place = String(formData.get("area") ?? "").trim();
+
+  // Service area: 大阪・兵庫. Store the prefecture with the place so that
+  // matching can always tell where the restaurant is ("大阪・梅田").
+  if (!SERVICE_PREFECTURES.includes(prefecture) || !place) {
+    redirect(`/onboarding?message=${encodeURIComponent("府県（大阪・兵庫）とエリアを入力してください。")}`);
+  }
+  const placePrefecture = prefectureOf(place);
+  if (placePrefecture && placePrefecture !== prefecture) {
+    redirect(`/onboarding?message=${encodeURIComponent(`「${place}」は${placePrefecture}のエリアです。府県を確認してください。`)}`);
+  }
+  const area = place.startsWith(prefecture) ? place : `${prefecture}・${place}`;
 
   const { error } = await supabase.rpc("complete_restaurant_onboarding", {
     p_name: name,

@@ -1,6 +1,9 @@
 // Creator performance (実績): parsing insights as Creators read them off
 // their phone, and the 30-day summary Restaurants see.
 
+// Relative .ts import keeps this module runnable by node --test.
+import { prefectureOf } from "./areas.ts";
+
 export type PerformancePlatform = "instagram" | "tiktok" | "youtube" | "threads";
 
 export const performancePlatformLabels: Record<PerformancePlatform, string> = {
@@ -223,7 +226,8 @@ export type PerformanceSummary = {
   totalShares: number;
   /** (likes + comments + reposts + shares + saves) ÷ views */
   engagementRate: number | null;
-  areas: { area: string; posts: number; views: number }[];
+  /** Per prefecture (大阪・兵庫, otherwise その他), most views first. */
+  prefectures: { prefecture: string; posts: number; views: number }[];
   verified: "all" | "partial" | "none";
   highlights: string[];
 };
@@ -293,14 +297,15 @@ export function summarizePerformance(
   const totalShares = sum((post) => post.shares);
   const totalSaves = sum((post) => post.saves ?? 0);
 
-  const areaMap = new Map<string, { area: string; posts: number; views: number }>();
+  const prefectureMap = new Map<string, { prefecture: string; posts: number; views: number }>();
   for (const post of posts) {
-    const entry = areaMap.get(post.area) ?? { area: post.area, posts: 0, views: 0 };
+    const prefecture = prefectureOf(post.area) ?? "その他";
+    const entry = prefectureMap.get(prefecture) ?? { prefecture, posts: 0, views: 0 };
     entry.posts += 1;
     entry.views += post.views;
-    areaMap.set(post.area, entry);
+    prefectureMap.set(prefecture, entry);
   }
-  const areas = [...areaMap.values()].sort((a, b) => b.views - a.views);
+  const prefectures = [...prefectureMap.values()].sort((a, b) => b.views - a.views);
 
   const verifiedCount = posts.filter((post) => post.verified).length;
   const today = options.today ?? new Date().toISOString().slice(0, 10);
@@ -327,7 +332,7 @@ export function summarizePerformance(
       totalViews > 0
         ? (totalLikes + totalComments + totalReposts + totalShares + totalSaves) / totalViews
         : null,
-    areas,
+    prefectures,
     verified:
       verifiedCount === posts.length ? "all" : verifiedCount > 0 ? "partial" : "none",
     highlights: [],
@@ -353,15 +358,18 @@ function buildHighlights(summary: PerformanceSummary) {
     highlights.push(`${summary.postCount}本中${summary.postsOver10k}本が1万閲覧超え`);
   }
 
-  const topAreas = summary.posts
-    .filter((post) => post.views === summary.maxViews)
-    .map((post) => post.area);
-  highlights.push(
-    `最高${approx}${formatCompactViews(summary.maxViews)}閲覧（${[...new Set(topAreas)].join("・")}）`,
-  );
+  highlights.push(`最高${approx}${formatCompactViews(summary.maxViews)}閲覧`);
 
-  if (summary.areas.length >= 3) {
-    highlights.push(`${summary.areas.length}エリアで実績`);
+  const known = summary.prefectures.filter((entry) => entry.prefecture !== "その他");
+  if (known.length) {
+    highlights.push(
+      known
+        .map(
+          (entry) =>
+            `${entry.prefecture}${entry.posts}投稿（${approx}${formatCompactViews(entry.views)}閲覧）`,
+        )
+        .join("・"),
+    );
   }
 
   if (summary.totalLikes > 0) {

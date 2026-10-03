@@ -121,7 +121,10 @@ test("30-day summary of グルメ日誌", () => {
   assert.equal(summary.totalReposts, 58);
   assert.equal(summary.totalShares, 64);
   assert.equal(summary.engagementRate.toFixed(4), "0.0492");
-  assert.equal(summary.areas.length, 8);
+  assert.deepEqual(summary.prefectures, [
+    { prefecture: "大阪", posts: 6, views: 87207 },
+    { prefecture: "兵庫", posts: 2, views: 37000 },
+  ]);
   assert.equal(summary.verified, "none");
   assert.equal(summary.stale, false);
 
@@ -129,8 +132,8 @@ test("30-day summary of グルメ日誌", () => {
     "直近30日の8投稿で合計約12.4万閲覧",
     "全投稿が5,000閲覧以上",
     "8本中5本が1万閲覧超え",
-    "最高約2.7万閲覧（淡路市・小野原）",
-    "8エリアで実績",
+    "最高約2.7万閲覧",
+    "大阪6投稿（約8.7万閲覧）・兵庫2投稿（約3.7万閲覧）",
     "いいね合計5,938",
   ]);
 });

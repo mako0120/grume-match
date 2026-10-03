@@ -109,7 +109,7 @@ export default async function RestaurantApplicationsPage({
             ) : null}
           </div>
           <p className="field-help recommend-help">
-            エリアの投稿実績・閲覧数・PR完了数・希望報酬から選んでいます。招待するとCreatorに通知が届き、案件一覧に「招待あり」と表示されます。
+            大阪・兵庫での投稿実績・閲覧数・PR完了数・希望報酬から選んでいます。招待するとCreatorに通知が届き、案件一覧に「招待あり」と表示されます。
           </p>
 
           {matches.recommendations.length ? (

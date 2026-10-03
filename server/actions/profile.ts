@@ -17,10 +17,10 @@ export async function saveCreatorBasics(formData: FormData) {
   const minReward = nonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = nonNegativeInteger(formData.get("travelRadiusKm"), 20);
 
-  if (!displayName || !baseArea) {
+  if (!displayName || !["大阪", "兵庫", "大阪・兵庫"].includes(baseArea)) {
     redirect(
       "/creator/profile?message=" +
-        encodeURIComponent("表示名と活動エリアを入力してください。"),
+        encodeURIComponent("表示名と活動エリア（大阪・兵庫）を入力してください。"),
     );
   }
 
