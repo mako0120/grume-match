@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
+import { PostReportCard } from "@/components/post-report-card";
+import { PostReportUploader } from "@/components/post-report-uploader";
+import { PrReviewSection } from "@/components/pr-review-section";
 import { UgcAssetGrid } from "@/components/ugc-asset-grid";
 import { UgcUploader } from "@/components/ugc-uploader";
 import { UsageLicenseSummary } from "@/components/usage-license-summary";
@@ -15,6 +18,7 @@ import {
 import { submitDeliverable } from "@/server/actions/deliverables";
 import { removeUgcAsset, submitUgcDeliverable } from "@/server/actions/studio";
 import { getCreatorBooking } from "@/server/queries/bookings";
+import { getBookingPostReports, getBookingReviews } from "@/server/queries/pr-feedback";
 import { getCreatorSignal } from "@/server/queries/signal";
 
 export default async function CreatorBookingDetailPage({
@@ -26,10 +30,12 @@ export default async function CreatorBookingDetailPage({
 }) {
   const { id } = await params;
   const { message, status } = await searchParams;
-  const [booking, signal, origin] = await Promise.all([
+  const [booking, signal, origin, reviews, reports] = await Promise.all([
     getCreatorBooking(id),
     getCreatorSignal(id),
     getSiteOrigin(),
+    getBookingReviews(id, "creator"),
+    getBookingPostReports(id),
   ]);
 
   if (!booking) notFound();
@@ -185,8 +191,11 @@ export default async function CreatorBookingDetailPage({
             );
           }
 
+          const report = reports.get(deliverable.id);
+
           return (
-            <form action={submitDeliverable} className="deliverable-card" key={deliverable.id}>
+            <article className="deliverable-card" key={deliverable.id}>
+            <form action={submitDeliverable} className="deliverable-form">
               <input name="deliverableId" type="hidden" value={deliverable.id} />
               <input name="bookingId" type="hidden" value={booking.id} />
 
@@ -222,9 +231,40 @@ export default async function CreatorBookingDetailPage({
                 <div className="pending-box">承認済みの投稿URLです。</div>
               )}
             </form>
+
+            {deliverable.submitted_url ? (
+              report?.status === "verified" ? (
+                <PostReportCard report={report} />
+              ) : (
+                <div className="post-report-request">
+                  <strong>閲覧数レポート</strong>
+                  <p>
+                    {report?.status === "pending"
+                      ? "スクショを受け取りました。読み取って登録したら通知でお知らせします。"
+                      : "投稿から1週間ほどたったら、この投稿のインサイト画面のスクショを送ってください。閲覧数が店舗に「運営確認済み」で届き、次の案件の実績になります。"}
+                  </p>
+                  {report?.status === "rejected" && report.reviewNote ? (
+                    <div className="form-message error-message">{report.reviewNote}</div>
+                  ) : null}
+                  <PostReportUploader
+                    bookingId={booking.id}
+                    deliverableId={deliverable.id}
+                    userId={booking.viewerUserId}
+                  />
+                </div>
+              )
+            ) : null}
+            </article>
           );
         })}
       </section>
+
+      <PrReviewSection
+        bookingId={booking.id}
+        counterpart={booking.restaurantName}
+        state={reviews}
+        viewer="creator"
+      />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { toReviewSummary, type ReviewSummary } from "@/lib/pr-feedback";
 import {
   matchCreatorToCampaign,
   rankCreators,
@@ -28,6 +29,24 @@ async function trackRecords(creatorIds: string[]) {
   return records;
 }
 
+export async function creatorReviewSummaries(creatorIds: string[]) {
+  const summaries = new Map<string, ReviewSummary>();
+  if (!creatorIds.length) return summaries;
+
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("creator_review_summaries", { p_creator_ids: creatorIds });
+  for (const row of (data ?? []) as {
+    creator_id: string;
+    review_count: number;
+    average_rating: number | string | null;
+    tag_counts: Record<string, number> | null;
+  }[]) {
+    const summary = toReviewSummary(row);
+    if (summary) summaries.set(row.creator_id, summary);
+  }
+  return summaries;
+}
+
 async function activeStandbyIds() {
   const supabase = await createClient();
   const { data } = await supabase.rpc("get_active_standby_creators");
@@ -37,10 +56,11 @@ async function activeStandbyIds() {
 /** Everything matching needs about these Creators, in a few queries. */
 export async function loadMatchCreators(profiles: ProfileRow[]): Promise<MatchCreator[]> {
   const ids = profiles.map((profile) => profile.id);
-  const [performance, records, standby] = await Promise.all([
+  const [performance, records, standby, reviews] = await Promise.all([
     getPerformanceSummaries(ids),
     trackRecords(ids),
     activeStandbyIds(),
+    creatorReviewSummaries(ids),
   ]);
 
   return profiles.map((profile) => ({
@@ -53,6 +73,7 @@ export async function loadMatchCreators(profiles: ProfileRow[]): Promise<MatchCr
     completedPrs: records.get(profile.id)?.completed ?? 0,
     noShows: records.get(profile.id)?.noShows ?? 0,
     standbyActive: standby.has(profile.id),
+    reviews: reviews.get(profile.id) ?? null,
   }));
 }
 

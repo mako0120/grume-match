@@ -34,6 +34,9 @@ export const notificationTypeLabels: Record<string, string> = {
   usage_license_expiring: "素材利用",
   performance_reviewed: "実績",
   campaign_invitation: "招待",
+  pr_review_received: "評価",
+  post_report_verified: "投稿レポート",
+  post_report_rejected: "投稿レポート",
 };
 
 

@@ -182,6 +182,18 @@ Restaurant:
 - [ ] A Creator whose minimum reward is above the campaign reward is never recommended or auto-invited.
 - [ ] Direct OFFER picker lists Creators by fit to the restaurant's area.
 
+## N. After the PR (reviews and post reports)
+
+- [ ] Before the post is approved there is no review form.
+- [ ] After approval both sides see 相互評価. The first reviewer sees 「…の評価を待っています」, not the other side's stars.
+- [ ] After both review, both reviews are shown; neither can be edited.
+- [ ] Creator campaign cards show 「Creator評価 ★x.x（n件）」 for that Restaurant.
+- [ ] Creator sends one insights screenshot of the PR post from the booking page → 「スクショを受け取りました」.
+- [ ] `npm run post-reports -- list` downloads it; `submit … --yes` registers it; reach > views is refused.
+- [ ] Restaurant booking page shows 投稿レポート（運営確認済み） with 1,000閲覧あたり; /restaurant/signal totals include it.
+- [ ] Both sides get a notification. The Restaurant can never open the screenshot.
+- [ ] `npm run ops` lists every queue; a ★2 review appears under reviews-low and in /admin until `followed-up`.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

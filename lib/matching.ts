@@ -5,6 +5,7 @@
 // Relative .ts imports keep this module runnable by node --test.
 import { normalizeArea, prefectureOf } from "./areas.ts";
 import { formatCompactViews, type PerformanceSummary } from "./creator-performance.ts";
+import type { ReviewSummary } from "./pr-feedback.ts";
 
 export type MatchCampaign = {
   area: string;
@@ -23,6 +24,8 @@ export type MatchCreator = {
   completedPrs: number;
   noShows: number;
   standbyActive?: boolean;
+  /** Restaurants' ratings after completed PRs (revealed reviews only). */
+  reviews?: ReviewSummary | null;
 };
 
 export type MatchResult = {
@@ -97,6 +100,20 @@ function trackRecordPoint(creator: MatchCreator): Point {
   };
 }
 
+// Restaurants' ratings count once there are at least 2, so that a single
+// review cannot make or break a Creator.
+function reviewPoint(creator: MatchCreator): Point {
+  const reviews = creator.reviews;
+  if (!reviews || reviews.averageRating === null || reviews.reviewCount < 2) return { points: 0 };
+
+  const rating = reviews.averageRating;
+  const label = `店舗評価★${rating.toFixed(1)}（${reviews.reviewCount}件）`;
+  if (rating >= 4.5) return { points: 10, reason: label };
+  if (rating >= 4) return { points: 6, reason: label };
+  if (rating < 3) return { points: -10, caution: `店舗評価が低め（★${rating.toFixed(1)}）` };
+  return { points: 0 };
+}
+
 function genrePoint(campaign: MatchCampaign, creator: MatchCreator): Point {
   const category = campaign.category.trim();
   if (!category) return { points: 0 };
@@ -117,6 +134,7 @@ export function matchCreatorToCampaign(campaign: MatchCampaign, creator: MatchCr
     reachPoint(creator),
     engagementPoint(creator),
     trackRecordPoint(creator),
+    reviewPoint(creator),
     genrePoint(campaign, creator),
   ];
 

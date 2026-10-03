@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { costPerThousandViews, totalPostReports } from "@/lib/pr-feedback";
 import {
   formatPercent,
   formatRoas,
@@ -8,6 +9,7 @@ import {
   SIGNAL_RETENTION_MONTHS,
 } from "@/lib/signal-metrics";
 import { recordSignalVisit, voidSignalVisit } from "@/server/actions/signal";
+import { getRestaurantPostReports } from "@/server/queries/pr-feedback";
 import {
   getRestaurantSignal,
   parseSignalPeriod,
@@ -56,6 +58,13 @@ export default async function RestaurantSignalPage({
   const { totals } = signal;
   const today = todayInTokyo();
 
+  // Post views come from the Creators' insights screenshots (運営確認済み).
+  const reports = await getRestaurantPostReports(signal.restaurantId);
+  const postViews = (bookingId: string) => totalPostReports(reports.get(bookingId) ?? []);
+  const reported = signal.creators.filter((row) => reports.has(row.bookingId));
+  const postTotals = totalPostReports(reported.flatMap((row) => reports.get(row.bookingId) ?? []));
+  const reportedCost = reported.reduce((sum, row) => sum + row.costYen, 0);
+
   return (
     <main className="creator-shell">
       <header className="creator-header">
@@ -70,7 +79,7 @@ export default async function RestaurantSignalPage({
       <span className="eyebrow">SIGNAL</span>
       <h1 className="page-title">PR効果</h1>
       <p className="page-subtitle">
-        Creatorごとのリンク閲覧・来店と、来店1件あたりの費用を確認できます。
+        PR投稿が何人に見られたか、PRリンクの閲覧と来店、1件あたりの費用を確認できます。
       </p>
 
       {message ? (
@@ -128,6 +137,27 @@ export default async function RestaurantSignalPage({
           <strong>{formatRoas(totals.roas)}</strong>
         </div>
       </section>
+      <section className="signal-metrics">
+        <div>
+          <span>投稿の閲覧数</span>
+          <strong>{postTotals.views.toLocaleString()}</strong>
+        </div>
+        <div>
+          <span>閲覧した人</span>
+          <strong>{postTotals.reach.toLocaleString()}</strong>
+        </div>
+        <div>
+          <span>保存</span>
+          <strong>{postTotals.saves.toLocaleString()}</strong>
+        </div>
+        <div>
+          <span>1,000閲覧あたり</span>
+          <strong>{formatYen(costPerThousandViews(reportedCost, postTotals.views))}</strong>
+        </div>
+      </section>
+      <p className="field-help">
+        投稿の閲覧数は、Creatorが送ったインサイト画面を運営が確認した数字です（{postTotals.posts}投稿分）。1,000閲覧あたりはレポートが届いたPRの費用で計算します。
+      </p>
       <p className="field-help">
         PR費用はCreator報酬と二次利用料の合計です（食事提供の原価は含みません）。期間内に来店日または計測があったPRを集計します。
       </p>
@@ -194,7 +224,15 @@ export default async function RestaurantSignalPage({
                 </div>
                 <dl className="signal-row-metrics">
                   <div>
-                    <dt>閲覧</dt>
+                    <dt>投稿の閲覧</dt>
+                    <dd>{reports.has(row.bookingId) ? postViews(row.bookingId).views.toLocaleString() : "未着"}</dd>
+                  </div>
+                  <div>
+                    <dt>1,000閲覧あたり</dt>
+                    <dd>{formatYen(costPerThousandViews(row.costYen, postViews(row.bookingId).views))}</dd>
+                  </div>
+                  <div>
+                    <dt>リンク閲覧</dt>
                     <dd>{row.landingViews}</dd>
                   </div>
                   <div>

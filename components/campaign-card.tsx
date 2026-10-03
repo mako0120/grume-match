@@ -28,6 +28,9 @@ export function CampaignCard({
       <div>
         <h2>{campaign.restaurantName}</h2>
         <p>{campaign.title}</p>
+        {campaign.restaurantRating ? (
+          <span className="rating-chip">Creator評価 {campaign.restaurantRating}</span>
+        ) : null}
       </div>
 
       <div className="reward">

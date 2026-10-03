@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PostReportCard } from "@/components/post-report-card";
+import { PrReviewSection } from "@/components/pr-review-section";
 import { UgcAssetGrid } from "@/components/ugc-asset-grid";
 import { UsageLicenseSummary } from "@/components/usage-license-summary";
 import { ugcKindForPlatform } from "@/lib/content-rights";
@@ -9,6 +11,7 @@ import {
   verificationStatusLabels,
 } from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
+import { getBookingPostReports, getBookingReviews } from "@/server/queries/pr-feedback";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
 
 export default async function RestaurantBookingDetailPage({
@@ -20,9 +23,18 @@ export default async function RestaurantBookingDetailPage({
 }) {
   const { id } = await params;
   const { message, status } = await searchParams;
-  const booking = await getRestaurantBooking(id);
+  const [booking, reviews, reports] = await Promise.all([
+    getRestaurantBooking(id),
+    getBookingReviews(id, "restaurant"),
+    getBookingPostReports(id),
+  ]);
 
   if (!booking) notFound();
+
+  // PR cost spread over the posts, for the cost per 1,000 views.
+  const costPerPost = booking.deliverables.length
+    ? Math.round(booking.cashReward / booking.deliverables.length)
+    : booking.cashReward;
 
   return (
     <main className="creator-shell">
@@ -117,6 +129,14 @@ export default async function RestaurantBookingDetailPage({
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
 
+            {reports.get(deliverable.id)?.status === "verified" ? (
+              <PostReportCard costYen={costPerPost} report={reports.get(deliverable.id)!} />
+            ) : deliverable.submitted_url && !ugcKindForPlatform(deliverable.platform) ? (
+              <div className="pending-box">
+                閲覧数のレポートは、投稿から1週間ほどでCreatorがインサイトを送り、運営が確認すると表示されます。
+              </div>
+            ) : null}
+
             {deliverable.submitted_at &&
             deliverable.verification_status !== "approved" ? (
               <>
@@ -149,6 +169,13 @@ export default async function RestaurantBookingDetailPage({
           </form>
         ))}
       </section>
+
+      <PrReviewSection
+        bookingId={booking.id}
+        counterpart={`${booking.creatorName}さん`}
+        state={reviews}
+        viewer="restaurant"
+      />
     </main>
   );
 }

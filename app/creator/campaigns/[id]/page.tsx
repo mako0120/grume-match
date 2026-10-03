@@ -52,6 +52,7 @@ export default async function CreatorCampaignDetailPage({
         <div className="summary-item">
           <span>店舗</span>
           <strong>{campaign.restaurantName}</strong>
+          <small>Creator評価 {campaign.restaurantRating ?? "まだありません"}</small>
         </div>
         <div className="summary-item">
           <span>提供</span>

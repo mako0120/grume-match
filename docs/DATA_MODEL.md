@@ -325,3 +325,26 @@ UIから任意のstatus文字列を直接更新させない。
 - restaurant_subscriptions
 - payout_accounts
 - flash_campaigns
+
+## After the PR (reviews and post reports)
+
+### pr_reviews
+- booking_id / direction (restaurant_to_creator | creator_to_restaurant), unique per pair
+- creator_id / restaurant_id / reviewer_user_id
+- rating 1–5 / tags (fixed lists, `pr_review_tags()`) / comment ≤300
+- followed_up_at (Operator closes ★2-or-lower follow-ups)
+
+Open only after the post is approved. Immutable. The other side sees a
+review only after reviewing too, or 14 days later (`booking_pr_reviews`).
+Summaries (`creator_review_summaries`, `restaurant_review_summaries`) use
+revealed reviews only and carry no comments.
+
+### pr_post_reports
+- deliverable_id unique / booking_id / creator_id / restaurant_id
+- storage_path (creator-evidence bucket; Creator and Operator only)
+- status pending | verified | rejected / review_note
+- measured_on / views / reach / likes / comments / saves / shares / follows
+
+The Creator only attaches a screenshot; the Operator or Claude registers the
+numbers (`import_pr_post_report`, service role allowed). Visible to the two
+parties. Reach can never exceed views.

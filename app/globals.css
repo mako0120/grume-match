@@ -2941,3 +2941,133 @@ button {
   align-items: center;
   justify-content: center;
 }
+
+/* After a PR: per-post report and mutual reviews */
+
+.deliverable-form {
+  display: grid;
+  gap: 13px;
+}
+
+.post-report,
+.post-report-request {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+.post-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.post-report-request p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.review-view {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  margin-top: 11px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.review-view > span:first-child {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.review-view p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.review-stars {
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.review-stars [aria-hidden="true"] {
+  color: var(--line);
+}
+
+.review-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.star-picker,
+.review-tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.star-picker legend,
+.review-tag-picker legend {
+  width: 100%;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.deliverable-card .star-picker label,
+.deliverable-card .review-tag-picker label {
+  display: inline-flex;
+  position: relative;
+}
+
+.deliverable-card .star-picker input,
+.deliverable-card .review-tag-picker input {
+  position: absolute;
+  min-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.star-picker span,
+.review-tag-picker span {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.star-picker input:checked + span,
+.review-tag-picker input:checked + span {
+  color: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.star-picker input:focus-visible + span,
+.review-tag-picker input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.rating-chip {
+  font-size: 12px;
+  font-weight: 800;
+}

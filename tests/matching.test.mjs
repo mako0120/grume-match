@@ -144,3 +144,28 @@ test("ranking and auto-invite skip blocked and weak matches", () => {
     ["gd"],
   );
 });
+
+test("Restaurants' ratings count from 2 reviews and can lower a Creator", () => {
+  const campaign = { area: "大阪・梅田", category: "焼肉", cashReward: 8000 };
+  const base = matchCreatorToCampaign(campaign, newcomer).score;
+
+  const loved = matchCreatorToCampaign(campaign, {
+    ...newcomer,
+    reviews: { reviewCount: 3, averageRating: 4.7, topTags: [] },
+  });
+  assert.equal(loved.score, base + 10);
+  assert.ok(loved.reasons.includes("店舗評価★4.7（3件）"));
+
+  const single = matchCreatorToCampaign(campaign, {
+    ...newcomer,
+    reviews: { reviewCount: 1, averageRating: 1, topTags: [] },
+  });
+  assert.equal(single.score, base);
+
+  const poor = matchCreatorToCampaign(campaign, {
+    ...newcomer,
+    reviews: { reviewCount: 4, averageRating: 2.5, topTags: [] },
+  });
+  assert.ok(poor.score < base || base < 10);
+  assert.ok(poor.cautions.includes("店舗評価が低め（★2.5）"));
+});

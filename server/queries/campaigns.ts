@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DemoCampaign, CampaignSlot, Platform } from "@/lib/domain/types";
+import { formatRating } from "@/lib/pr-feedback";
+import { getRestaurantReviewSummaries } from "@/server/queries/pr-feedback";
 
 type RawRestaurant = { name: string };
 type RawPlatform = { platform: Platform };
@@ -19,6 +21,7 @@ type RawSlot = {
 
 type RawCampaign = {
   id: string;
+  restaurant_id: string;
   title: string;
   area: string;
   category: string;
@@ -84,6 +87,7 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
 
   return {
     id: row.id,
+    restaurantId: row.restaurant_id,
     restaurantName: restaurantName(row.restaurants),
     title: row.title,
     area: row.area,
@@ -110,6 +114,7 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
 
 const campaignSelect = `
   id,
+  restaurant_id,
   title,
   area,
   category,
@@ -126,6 +131,17 @@ const campaignSelect = `
   campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status),
   campaign_usage_rights(usage_scope,duration_days,fee)
 `;
+
+/** Adds how other Creators rated each Restaurant (revealed reviews only). */
+async function withRestaurantRatings(campaigns: DemoCampaign[]) {
+  const summaries = await getRestaurantReviewSummaries(
+    campaigns.map((campaign) => campaign.restaurantId ?? "").filter(Boolean),
+  );
+  return campaigns.map((campaign) => {
+    const summary = campaign.restaurantId ? summaries.get(campaign.restaurantId) : undefined;
+    return { ...campaign, restaurantRating: summary ? formatRating(summary) : null };
+  });
+}
 
 export async function listCreatorCampaigns(
   kind: "market" | "flash" = "market",
@@ -162,10 +178,10 @@ export async function listCreatorCampaigns(
         .map((row) => row.id),
     );
 
-    return presented.filter((campaign) => visibleIds.has(campaign.id));
+    return withRestaurantRatings(presented.filter((campaign) => visibleIds.has(campaign.id)));
   }
 
-  return presented;
+  return withRestaurantRatings(presented);
 }
 
 export async function getCreatorCampaign(id: string) {
@@ -182,5 +198,7 @@ export async function getCreatorCampaign(id: string) {
   if (error || !data) return null;
 
   const campaign = presentCampaign(data as unknown as RawCampaign);
-  return campaign.slots.some((slot) => slot.isOpen) ? campaign : null;
+  if (!campaign.slots.some((slot) => slot.isOpen)) return null;
+  const [rated] = await withRestaurantRatings([campaign]);
+  return rated;
 }

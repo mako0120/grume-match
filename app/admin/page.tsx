@@ -9,6 +9,9 @@ const labels = {
   dispute: "紛争",
   no_show: "来店",
   performance_review: "実績",
+  post_report_review: "閲覧数",
+  post_report_missing: "閲覧数",
+  review_low: "評価",
 } as const;
 
 export default async function AdminPage() {
