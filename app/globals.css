@@ -2864,3 +2864,94 @@ button {
 .recommend-card .performance-chip {
   justify-self: start;
 }
+
+/* Landing: differences from the usual services */
+
+.compare-section {
+  margin-top: 28px;
+}
+
+.compare-section h2 {
+  margin: 6px 0 14px;
+  font-size: clamp(22px, 6vw, 30px);
+  letter-spacing: -0.02em;
+}
+
+.compare-list {
+  display: grid;
+  gap: 10px;
+}
+
+.compare-row {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.compare-row > strong {
+  font-size: 15px;
+}
+
+.compare-usual,
+.compare-ours {
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.compare-usual {
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.compare-ours {
+  background: var(--positive);
+  border: 1px solid var(--positive-line);
+}
+
+.compare-usual span,
+.compare-ours span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.compare-ours span {
+  color: #2f6e38;
+}
+
+.compare-usual p,
+.compare-ours p {
+  margin: 3px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.compare-ours p {
+  font-weight: 700;
+}
+
+.audience-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (min-width: 700px) {
+  .compare-row {
+    grid-template-columns: 160px 1fr 1fr;
+    align-items: center;
+  }
+
+  .audience-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hero-actions .secondary-button {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+}
