@@ -8,7 +8,8 @@ export type AdminInboxItem = {
     | "payment_overdue"
     | "payment_failed"
     | "dispute"
-    | "no_show";
+    | "no_show"
+    | "performance_review";
   title: string;
   detail: string;
   href: string | null;
@@ -30,6 +31,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     failedPaymentsResult,
     disputesResult,
     noShowsResult,
+    evidenceResult,
   ] = await Promise.all([
     supabase
       .from("deliverables")
@@ -87,6 +89,13 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .eq("status", "no_show")
       .order("confirmed_at", { ascending: false })
       .limit(20),
+
+    supabase
+      .from("creator_performance_evidence")
+      .select("id,measured_on,created_at,creator_profiles(display_name)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(20),
   ]);
 
   const inboxError = [
@@ -96,6 +105,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     failedPaymentsResult.error,
     disputesResult.error,
     noShowsResult.error,
+    evidenceResult.error,
   ].find(Boolean);
 
   if (inboxError) {
@@ -233,6 +243,19 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
         (campaign?.title ?? "PR案件"),
       href: "/restaurant/bookings/" + row.id,
       occurredAt: row.confirmed_at,
+    });
+  }
+
+  for (const row of evidenceResult.data ?? []) {
+    const creator = one(row.creator_profiles);
+
+    items.push({
+      id: "performance:" + row.id,
+      kind: "performance_review",
+      title: "実績スクショの確認",
+      detail: (creator?.display_name ?? "Creator") + "・" + row.measured_on + "計測",
+      href: "/admin/performance",
+      occurredAt: row.created_at,
     });
   }
 

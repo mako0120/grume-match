@@ -163,6 +163,22 @@ Restaurant:
 - [ ] Cost per visit and 売上 ÷ 費用 match a manual calculation.
 - [ ] Creator sees counts but not spend.
 
+## L. PROOF (Creator performance)
+
+Creator (グルメ日誌):
+- [ ] Paste the 30-day insights (docs/CREATOR_PERFORMANCE.md) → preview shows 8投稿・約12.4万閲覧.
+- [ ] A broken line shows the line number and reason; save stays disabled.
+- [ ] Save, then send the insights screenshot.
+- [ ] Publish the media kit and open `/k/<slug>` logged out (also the LINE/Instagram link preview).
+
+Operator:
+- [ ] Screenshot appears in Inbox → /admin/performance; approve → 運営確認済み.
+
+Restaurant:
+- [ ] Applicant card shows 30-day reach and links to the media kit.
+- [ ] Direct OFFER picker lists Creators by reach; "この人に指名オファー" preselects the Creator.
+- [ ] Another Creator cannot see グルメ日誌's numbers; the screenshot is never visible to Restaurants.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

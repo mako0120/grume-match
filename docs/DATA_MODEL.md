@@ -270,6 +270,33 @@ A deliverable counts as submitted when `deliverables.submitted_at` is set
 No visitor identifiers (cookie, IP, user agent, guest name/contact) are
 stored. Raw events are deleted after 13 months.
 
+## PROOF tables (Creator performance)
+
+### creator_post_metrics
+One row per post per insights snapshot (self-reported).
+
+- creator_id / platform (instagram | tiktok | youtube | threads)
+- area / headline / post_url (https, optional)
+- posted_on (+ posted_on_approx when derived from "3週間")
+- measured_on (snapshot date; replace = same platform + date)
+- views (+ views_approx when entered as "2.7万") / likes / comments / reposts / shares / saves
+- verified_at (Operator only; cleared when the Creator edits the numbers)
+
+Visible to the Creator, active Restaurants and the Operator. Summaries use
+the latest snapshot and posts from the 30 days before it.
+
+### creator_performance_evidence
+Insights screenshot in the private `creator-evidence` bucket.
+Visible to the Creator and the Operator only.
+
+- status: pending | verified | rejected
+
+### creator_profiles (added columns)
+- media_kit_slug unique (`/k/<slug>`)
+- media_kit_public (default false)
+
+See `docs/CREATOR_PERFORMANCE.md`.
+
 ## Status constraints
 
 ステータス遷移はAPI層で明示的に制限する。

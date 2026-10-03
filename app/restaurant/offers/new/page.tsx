@@ -2,15 +2,25 @@ import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createDirectOffer } from "@/server/actions/offers";
+import { PerformanceChip } from "@/components/performance-summary";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
+import { getPerformanceSummaries } from "@/server/queries/performance";
 
 export default async function NewDirectOfferPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; q?: string }>;
+  searchParams: Promise<{ message?: string; q?: string; creator?: string }>;
 }) {
-  const { message, q = "" } = await searchParams;
-  const creators = await listCreatorsForDirectOffer(q);
+  const { message, q = "", creator: preselected = "" } = await searchParams;
+  const listed = await listCreatorsForDirectOffer(q, preselected);
+  const performance = await getPerformanceSummaries(listed.map((creator) => creator.id));
+
+  // Most recent 30-day reach first; Creators without data keep name order.
+  const creators = [...listed].sort(
+    (a, b) =>
+      Number(b.id === preselected) - Number(a.id === preselected) ||
+      (performance.get(b.id)?.medianViews ?? -1) - (performance.get(a.id)?.medianViews ?? -1),
+  );
 
   return (
     <main className="creator-shell">
@@ -54,7 +64,13 @@ export default async function NewDirectOfferPage({
             <div className="creator-picker">
               {creators.map((creator) => (
                 <label className="creator-option" key={creator.id}>
-                  <input name="creatorId" required type="radio" value={creator.id} />
+                  <input
+                    defaultChecked={creator.id === preselected}
+                    name="creatorId"
+                    required
+                    type="radio"
+                    value={creator.id}
+                  />
                   <div>
                     <strong>{creator.displayName}</strong>
                     <span>{creator.baseArea}</span>
@@ -64,6 +80,10 @@ export default async function NewDirectOfferPage({
                         ? " ・ 目安 ¥" + creator.minReward.toLocaleString() + "〜"
                         : ""}
                     </p>
+                    <PerformanceChip summary={performance.get(creator.id)} />
+                    <Link className="creator-option-link" href={`/restaurant/creators/${creator.id}`}>
+                      実績を見る →
+                    </Link>
                   </div>
                 </label>
               ))}

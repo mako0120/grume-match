@@ -77,6 +77,8 @@ Development seed:
 npx supabase db reset
 ```
 
+Migration `202610030003_creator_performance.sql` creates the private bucket `creator-evidence` (insights screenshots, Creator + Operator only).
+
 Migration `202610030001_ugc_studio.sql` creates the private Storage bucket `ugc-assets` (50MB per file, image/video MIME allow-list) and its RLS policies. Do not make the bucket public: Restaurant access to UGC files ends when the usage license expires.
 
 The seed contains demonstration restaurant/campaign data only. Do not put real Creator or restaurant personal information in `seed.sql`.
@@ -174,13 +176,19 @@ Restaurant:
 - `/restaurant/reschedules`
 - `/restaurant/studio` — UGC library and usage-license expiry
 - `/restaurant/signal` — PR code entry and ROI by Creator
+- `/restaurant/creators/<id>` — Creator media kit (30-day performance)
+
+Creator:
+- `/creator/performance` — paste insights, verification screenshot, media kit
 
 Public:
 - `/r/<code>` — Creator tracking link landing page (no login)
+- `/k/<slug>` — opt-in Creator media kit (no login)
 
 Operator:
 - `/admin`
 - `/admin/payments`
+- `/admin/performance` — verify Creator insights screenshots
 
 Shared:
 - `/login`

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
   saveCreatorBasics,
@@ -41,6 +42,15 @@ export default async function CreatorProfilePage({
       </p>
 
       {message ? <div className="form-message">{message}</div> : null}
+
+      <Link className="proof-link-card" href="/creator/performance">
+        <div>
+          <span className="eyebrow">PROOF</span>
+          <strong>過去30日の実績・メディアキット</strong>
+          <p>インサイトを貼り付けるだけ。応募・指名・店舗への営業に使えます。</p>
+        </div>
+        <span>→</span>
+      </Link>
 
       <form action={saveCreatorBasics} className="campaign-form">
         <section className="form-section">

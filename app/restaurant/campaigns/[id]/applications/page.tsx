@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RestaurantScheduleConfirm } from "@/components/restaurant-schedule-confirm";
+import { PerformanceChip } from "@/components/performance-summary";
+import { getPerformanceSummaries } from "@/server/queries/performance";
 import { getRestaurantCampaignApplications } from "@/server/queries/restaurant-applications";
 
 export default async function RestaurantApplicationsPage({
@@ -12,6 +14,10 @@ export default async function RestaurantApplicationsPage({
   const campaign = await getRestaurantCampaignApplications(id);
 
   if (!campaign) notFound();
+
+  const performance = await getPerformanceSummaries(
+    campaign.applications.map((application) => application.creatorId),
+  );
 
   return (
     <main className="creator-shell">
@@ -38,6 +44,15 @@ export default async function RestaurantApplicationsPage({
       {campaign.applications.length ? (
         campaign.applications.map((application) => (
           <RestaurantScheduleConfirm
+            performance={
+              <Link
+                className="applicant-performance"
+                href={`/restaurant/creators/${application.creatorId}`}
+              >
+                <PerformanceChip summary={performance.get(application.creatorId)} />
+                <span>実績を見る →</span>
+              </Link>
+            }
             applicationId={application.applicationId}
             campaignId={campaign.campaignId}
             cashReward={campaign.cashReward}
