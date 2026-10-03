@@ -115,6 +115,11 @@ export default async function RestaurantDashboardPage({
           <strong>素材ライブラリ</strong>
           <small>UGC写真・動画と利用期限</small>
         </Link>
+        <Link href="/restaurant/billing">
+          <span className="eyebrow">BILLING</span>
+          <strong>ご請求</strong>
+          <small>完了したPRの手数料（月額0円）</small>
+        </Link>
       </nav>
 
       <section className="dashboard-section">

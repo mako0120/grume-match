@@ -1,4 +1,6 @@
+import { platformFee } from "@/lib/pricing";
 import { summarizeSignal, type SignalSummaryRow } from "@/lib/signal-metrics";
+import { getFeesByBooking } from "@/server/queries/billing";
 import { createClient } from "@/lib/supabase/server";
 
 export const signalPeriods = {
@@ -80,9 +82,17 @@ export async function getRestaurantSignal(period: SignalPeriod) {
         row.landing_views + row.visits > 0),
   );
 
+  // PR cost = Creator payment + platform fee (recorded, or estimated until
+  // the PR completes).
+  const fees = await getFeesByBooking();
+  const withFees = rows.map((row) => ({
+    ...row,
+    cost_yen: row.cost_yen + (fees.get(row.booking_id) ?? platformFee(row.cost_yen)),
+  }));
+
   return {
     restaurantId,
-    ...summarizeSignal(rows),
+    ...summarizeSignal(withFees),
     conversions: ((conversionsResult.data ?? []) as unknown as RawConversion[]).map(
       (row) => {
         const link = single(row.tracking_links);

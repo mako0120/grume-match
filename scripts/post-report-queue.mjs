@@ -13,6 +13,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { createClient } from "@supabase/supabase-js";
 import { costPerThousandViews, parseInsightCount } from "../lib/pr-feedback.ts";
+import { platformFee } from "../lib/pricing.ts";
 
 const QUEUE_DIR = ".insights-queue";
 const metrics = ["views", "reach", "likes", "comments", "saves", "shares", "follows"];
@@ -100,7 +101,7 @@ async function submit(reportId, flags) {
   const supabase = client();
   const { data: report, error } = await supabase
     .from("pr_post_reports")
-    .select("id,status,bookings(payments(amount),campaigns(cash_reward)),creator_profiles(display_name)")
+    .select("id,status,booking_id,bookings(payments(amount),campaigns(cash_reward)),creator_profiles(display_name)")
     .eq("id", reportId)
     .single();
   if (error) throw error;
@@ -111,7 +112,14 @@ async function submit(reportId, flags) {
 
   const measuredOn = flags["measured-on"] ?? todayInTokyo();
   const booking = one(report.bookings);
-  const cost = one(booking?.payments)?.amount ?? one(booking?.campaigns)?.cash_reward ?? 0;
+  const payment = one(booking?.payments)?.amount ?? one(booking?.campaigns)?.cash_reward ?? 0;
+  const { data: feeRow } = await supabase
+    .from("platform_fees")
+    .select("fee")
+    .eq("booking_id", report.booking_id)
+    .maybeSingle();
+  // PR cost as the Restaurant sees it: Creator payment + platform fee.
+  const cost = payment + (feeRow?.fee ?? platformFee(payment));
 
   console.log(`${one(report.creator_profiles)?.display_name ?? "?"} — measured on ${measuredOn}`);
   for (const name of metrics) console.log(`  ${name.padEnd(8)} ${values[name]?.toLocaleString("ja-JP") ?? "—"}`);

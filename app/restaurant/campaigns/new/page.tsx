@@ -1,3 +1,4 @@
+import { FeeNote } from "@/components/fee-note";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createCampaign } from "@/server/actions/campaigns";
@@ -80,6 +81,7 @@ export default async function NewCampaignPage({
               />
             </label>
           </div>
+          <FeeNote />
 
           <label>
             食事提供

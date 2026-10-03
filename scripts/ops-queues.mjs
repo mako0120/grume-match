@@ -6,6 +6,7 @@
 //   node scripts/ops-queues.mjs                 summary of all queues
 //   node scripts/ops-queues.mjs <queue>         items of one queue
 //   node scripts/ops-queues.mjs followed-up <reviewId>   close a low-rating follow-up
+//   node scripts/ops-queues.mjs fee-status invoiced|paid <feeId...>
 //
 // Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or
 // SUPABASE_SERVICE_ROLE_KEY). Never commit those values.
@@ -175,6 +176,20 @@ const queues = {
       `${one(row.creator_profiles)?.display_name ?? "?"} ¥${Number(row.amount).toLocaleString("ja-JP")}`,
     at: (row) => row.updated_at,
   },
+  fees: {
+    role: "経理",
+    next: "月初に店舗ごとの合計を請求書にして送る → npm run ops -- fee-status invoiced <feeId...>。入金を確認したら fee-status paid",
+    load: (db) =>
+      db
+        .from("platform_fees")
+        .select("id,fee,status,created_at,restaurant_id,restaurants(name)")
+        .in("status", ["pending", "invoiced"])
+        .order("created_at")
+        .limit(500),
+    describe: (row) =>
+      `${row.status === "invoiced" ? "請求済み・入金待ち" : "請求前"} ${one(row.restaurants)?.name ?? "?"} ¥${Number(row.fee).toLocaleString("ja-JP")} (fee ${row.id})`,
+    at: (row) => row.created_at,
+  },
 };
 
 function age(iso) {
@@ -205,20 +220,27 @@ async function show(name) {
   for (const row of data) console.log(`- ${age(queue.at(row))}  ${queue.describe(row)}`);
 }
 
+async function feeStatus(status, ids) {
+  const { data, error } = await client().rpc("set_platform_fee_status", { p_fee_ids: ids, p_status: status });
+  if (error) throw error;
+  console.log(`${data} fee(s) marked ${status}.`);
+}
+
 async function followedUp(reviewId) {
   const { error } = await client().rpc("mark_pr_review_followed_up", { p_review_id: reviewId });
   if (error) throw error;
   console.log("Marked as followed up.");
 }
 
-const [command, argument] = process.argv.slice(2);
+const [command, argument, ...more] = process.argv.slice(2);
 
 try {
   if (!command) await summary();
   else if (command === "followed-up" && argument) await followedUp(argument);
+  else if (command === "fee-status" && ["invoiced", "paid"].includes(argument) && more.length) await feeStatus(argument, more);
   else if (queues[command]) await show(command);
   else {
-    console.log(`usage: ops-queues.mjs [${Object.keys(queues).join(" | ")}] | followed-up <reviewId>`);
+    console.log(`usage: ops-queues.mjs [${Object.keys(queues).join(" | ")}] | followed-up <reviewId> | fee-status invoiced|paid <feeId...>`);
     process.exit(1);
   }
 } catch (error) {

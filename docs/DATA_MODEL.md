@@ -348,3 +348,16 @@ revealed reviews only and carry no comments.
 The Creator only attaches a screenshot; the Operator or Claude registers the
 numbers (`import_pr_post_report`, service role allowed). Visible to the two
 parties. Reach can never exceed views.
+
+## Platform fees
+
+### platform_fees
+- booking_id unique / restaurant_id
+- base_amount (the Creator payment: reward + usage fee) / fee
+- status pending | invoiced | paid | waived / note
+- invoiced_at / paid_at
+
+Recorded by a trigger when the payment becomes approved (= the PR is
+complete). fee = `platform_fee_for(base_amount)` = 20%, at least ¥2,000.
+The Restaurant's first completed PR is `waived`. Visible to the Restaurant
+and the Operator; only the Operator / service role changes the status.

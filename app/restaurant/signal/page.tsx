@@ -159,7 +159,7 @@ export default async function RestaurantSignalPage({
         投稿の閲覧数は、Creatorが送ったインサイト画面を運営が確認した数字です（{postTotals.posts}投稿分）。1,000閲覧あたりはレポートが届いたPRの費用で計算します。
       </p>
       <p className="field-help">
-        PR費用はCreator報酬と二次利用料の合計です（食事提供の原価は含みません）。期間内に来店日または計測があったPRを集計します。
+        PR費用はCreator報酬・二次利用料・手数料の合計です（食事提供の原価は含みません。完了前のPRは手数料を見込みで含めます）。期間内に来店日または計測があったPRを集計します。
       </p>
 
       <section className="form-section">

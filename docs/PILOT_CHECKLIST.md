@@ -194,6 +194,15 @@ Restaurant:
 - [ ] Both sides get a notification. The Restaurant can never open the screenshot.
 - [ ] `npm run ops` lists every queue; a ★2 review appears under reviews-low and in /admin until `followed-up`.
 
+## O. Platform fee
+
+- [ ] Campaign / OFFER / FLASH forms show the fee rule and examples under the reward.
+- [ ] Before any PR completes, the booking page shows 手数料 ¥0 「最初に完了したPRは手数料無料」.
+- [ ] The first completed PR is recorded as 無料; the second as 請求予定 ¥2,000 (reward ¥8,000).
+- [ ] /restaurant/billing groups fees by month; /restaurant/signal PR費用 includes the fee.
+- [ ] `npm run ops -- fees` lists them; `fee-status invoiced` then `paid` updates the Restaurant's page.
+- [ ] The Creator's payment amount never changes.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

@@ -3071,3 +3071,11 @@ button {
   font-size: 12px;
   font-weight: 800;
 }
+
+.pricing-grid {
+  margin-top: 14px;
+}
+
+.fee-note {
+  margin-top: -4px;
+}

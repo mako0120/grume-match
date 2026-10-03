@@ -1,3 +1,4 @@
+import { FeeNote } from "@/components/fee-note";
 import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createFlashCampaign } from "@/server/actions/flash";
@@ -81,6 +82,7 @@ export default async function NewFlashPage({
               />
             </label>
           </div>
+          <FeeNote />
 
           <label>
             食事提供

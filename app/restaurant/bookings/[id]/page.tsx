@@ -11,6 +11,8 @@ import {
   verificationStatusLabels,
 } from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
+import { platformFeeStatusLabels } from "@/lib/pricing";
+import { getBookingFee } from "@/server/queries/billing";
 import { getBookingPostReports, getBookingReviews } from "@/server/queries/pr-feedback";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
 
@@ -31,10 +33,13 @@ export default async function RestaurantBookingDetailPage({
 
   if (!booking) notFound();
 
-  // PR cost spread over the posts, for the cost per 1,000 views.
+  const fee = await getBookingFee(booking.id, booking.cashReward);
+
+  // PR cost (reward + fee) spread over the posts, for the cost per 1,000 views.
+  const prCost = booking.cashReward + fee.fee;
   const costPerPost = booking.deliverables.length
-    ? Math.round(booking.cashReward / booking.deliverables.length)
-    : booking.cashReward;
+    ? Math.round(prCost / booking.deliverables.length)
+    : prCost;
 
   return (
     <main className="creator-shell">
@@ -69,6 +74,15 @@ export default async function RestaurantBookingDetailPage({
           {booking.license && booking.license.fee > 0 ? (
             <small>うち二次利用料 ¥{booking.license.fee.toLocaleString()}</small>
           ) : null}
+        </div>
+        <div className="summary-item">
+          <span>手数料</span>
+          <strong>¥{fee.fee.toLocaleString()}</strong>
+          <small>
+            {fee.estimate
+              ? fee.note ?? "PR完了時（投稿承認時）に確定"
+              : fee.note ?? platformFeeStatusLabels[fee.status] ?? fee.status}
+          </small>
         </div>
         <div className="summary-item">
           <span>支払い状態</span>

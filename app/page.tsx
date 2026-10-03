@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PLATFORM_FEE_MINIMUM, PLATFORM_FEE_RATE, platformFee } from "@/lib/pricing";
 
 // What makes this product different from the usual free-invitation /
 // flat-rate services. See docs/COMPETITIVE_ANALYSIS.md for the research.
@@ -102,6 +103,28 @@ export default function HomePage() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="compare-section" aria-labelledby="pricing-heading">
+        <span className="eyebrow">PRICING</span>
+        <h2 id="pricing-heading">料金</h2>
+        <div className="feature-grid pricing-grid">
+          <article className="feature-card">
+            <strong>初期費用・月額 0円</strong>
+            <p>使わない月は費用がかかりません。依頼し放題の月額契約はありません。</p>
+          </article>
+          <article className="feature-card">
+            <strong>手数料はPRが完了した時だけ</strong>
+            <p>
+              投稿を承認した時に、Creator報酬の{PLATFORM_FEE_RATE * 100}%（最低¥{PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}）。
+              報酬¥8,000なら手数料¥{platformFee(8000).toLocaleString("ja-JP")}。Creatorには報酬を全額お支払いします。
+            </p>
+          </article>
+          <article className="feature-card">
+            <strong>最初の1件は手数料無料</strong>
+            <p>まずは1件、相性の良いCreatorで試してください。来店単価・1,000閲覧あたりの費用まで確認できます。</p>
+          </article>
         </div>
       </section>
 

@@ -1,3 +1,4 @@
+import { FeeNote } from "@/components/fee-note";
 import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { UsageRightsFields } from "@/components/usage-rights-fields";
@@ -139,6 +140,7 @@ export default async function NewDirectOfferPage({
               </select>
             </label>
           </div>
+          <FeeNote />
 
           <label>
             食事提供
