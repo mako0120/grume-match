@@ -1,10 +1,19 @@
 import Link from "next/link";
+import { MatchReasons } from "@/components/match-reasons";
 import type { DemoCampaign } from "@/lib/domain/types";
+import type { MatchResult } from "@/lib/matching";
 
-export function CampaignCard({ campaign }: { campaign: DemoCampaign }) {
+export function CampaignCard({
+  campaign,
+  match,
+}: {
+  campaign: DemoCampaign;
+  match?: MatchResult & { invited: boolean };
+}) {
   return (
     <Link className="campaign-card" href={`/creator/campaigns/${campaign.id}`}>
       <div className="campaign-topline">
+        {match?.invited ? <span className="meta-pill invited-pill">招待あり</span> : null}
         <span className="meta-pill">{campaign.area}</span>
         <span className="meta-pill">{campaign.category}</span>
         {campaign.visibility === "direct" ? (
@@ -34,6 +43,8 @@ export function CampaignCard({ campaign }: { campaign: DemoCampaign }) {
             : ""}
         </span>
       ) : null}
+
+      {match ? <MatchReasons compact match={match} /> : null}
 
       <div className="campaign-meta">
         <span className="meta-pill">{campaign.foodOffer}</span>

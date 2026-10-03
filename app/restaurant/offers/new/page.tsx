@@ -2,9 +2,12 @@ import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createDirectOffer } from "@/server/actions/offers";
+import { MatchReasons } from "@/components/match-reasons";
 import { PerformanceChip } from "@/components/performance-summary";
+import { rankCreators } from "@/lib/matching";
+import { createClient } from "@/lib/supabase/server";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
-import { getPerformanceSummaries } from "@/server/queries/performance";
+import { loadMatchCreators } from "@/server/queries/matching";
 
 export default async function NewDirectOfferPage({
   searchParams,
@@ -12,15 +15,35 @@ export default async function NewDirectOfferPage({
   searchParams: Promise<{ message?: string; q?: string; creator?: string }>;
 }) {
   const { message, q = "", creator: preselected = "" } = await searchParams;
-  const listed = await listCreatorsForDirectOffer(q, preselected);
-  const performance = await getPerformanceSummaries(listed.map((creator) => creator.id));
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const [listed, membership] = await Promise.all([
+    listCreatorsForDirectOffer(q, preselected),
+    supabase
+      .from("restaurant_memberships")
+      .select("restaurants(area)")
+      .eq("user_id", authData.user?.id ?? "")
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const restaurant = membership.data?.restaurants as { area: string } | { area: string }[] | null | undefined;
+  const restaurantArea = (Array.isArray(restaurant) ? restaurant[0]?.area : restaurant?.area) ?? "";
 
-  // Most recent 30-day reach first; Creators without data keep name order.
-  const creators = [...listed].sort(
-    (a, b) =>
-      Number(b.id === preselected) - Number(a.id === preselected) ||
-      (performance.get(b.id)?.medianViews ?? -1) - (performance.get(a.id)?.medianViews ?? -1),
+  // Best fit for this restaurant's area first (the reward is not decided yet).
+  const matchCreators = await loadMatchCreators(
+    listed.map((creator) => ({
+      id: creator.id,
+      display_name: creator.displayName,
+      base_area: creator.baseArea,
+      min_reward: creator.minReward,
+      bio: creator.bio,
+    })),
   );
+  const ranked = rankCreators({ area: restaurantArea, category: "", cashReward: null }, matchCreators);
+  const byId = new Map(listed.map((creator) => [creator.id, creator]));
+  const creators = ranked
+    .map(({ creator, match }) => ({ ...byId.get(creator.id)!, match, performance: creator.performance }))
+    .sort((a, b) => Number(b.id === preselected) - Number(a.id === preselected));
 
   return (
     <main className="creator-shell">
@@ -80,7 +103,8 @@ export default async function NewDirectOfferPage({
                         ? " ・ 目安 ¥" + creator.minReward.toLocaleString() + "〜"
                         : ""}
                     </p>
-                    <PerformanceChip summary={performance.get(creator.id)} />
+                    <MatchReasons compact match={creator.match} />
+                    <PerformanceChip summary={creator.performance} />
                     <Link className="creator-option-link" href={`/restaurant/creators/${creator.id}`}>
                       実績を見る →
                     </Link>

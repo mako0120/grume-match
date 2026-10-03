@@ -47,6 +47,7 @@ export async function GET() {
       supabase.from("signal_events").select("id", { head: true }).limit(1),
       supabase.from("creator_post_metrics").select("id", { head: true }).limit(1),
       supabase.from("creator_performance_evidence").select("id", { head: true }).limit(1),
+      supabase.from("campaign_invitations").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {

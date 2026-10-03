@@ -176,6 +176,14 @@ Restaurant:
 - [ ] Direct OFFER picker lists Creators by reach; "この人に指名オファー" preselects the Creator.
 - [ ] Another Creator cannot see グルメ日誌's numbers; the screenshot is never visible to Restaurants.
 
+## M. Matching
+
+- [ ] Publish a campaign → message says how many matching Creators were notified; they see 「招待あり」 first.
+- [ ] Applicants are ordered best fit first, with reasons and cautions.
+- [ ] おすすめCreator lists non-applicants (new Creators in the area included); 招待する notifies them once.
+- [ ] A Creator whose minimum reward is above the campaign reward is never recommended or auto-invited.
+- [ ] Direct OFFER picker lists Creators by fit to the restaurant's area.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

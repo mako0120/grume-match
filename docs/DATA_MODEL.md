@@ -293,6 +293,16 @@ Visible to the Creator and the Operator only.
 
 See `docs/CREATOR_PERFORMANCE.md`.
 
+## Matching
+
+### campaign_invitations
+- campaign_id / creator_id (unique pair)
+- source: restaurant | auto (auto = invited on publish by match score)
+- invited_by / created_at
+
+Public, recruiting campaigns only; ≤10 per call, ≤30 per campaign.
+Scoring rules: `docs/MATCHING.md`.
+
 ## Status constraints
 
 ステータス遷移はAPI層で明示的に制限する。

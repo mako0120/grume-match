@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { TapSchedule } from "@/components/tap-schedule";
 import { describeUsageRights } from "@/lib/content-rights";
 import { platformLabels } from "@/lib/status-labels";
+import { MatchReasons } from "@/components/match-reasons";
 import { getCreatorCampaign } from "@/server/queries/campaigns";
+import { getMyCampaignMatches } from "@/server/queries/matching";
 
 export default async function CreatorCampaignDetailPage({
   params,
@@ -14,6 +16,8 @@ export default async function CreatorCampaignDetailPage({
   const campaign = await getCreatorCampaign(id);
 
   if (!campaign) notFound();
+
+  const match = (await getMyCampaignMatches([campaign])).get(campaign.id);
 
   return (
     <main className="creator-shell">
@@ -36,6 +40,13 @@ export default async function CreatorCampaignDetailPage({
           <small style={{ color: "rgba(255,255,255,.75)" }}>現金報酬</small>
         </div>
       </section>
+
+      {match && (match.reasons.length || match.cautions.length) ? (
+        <section className="match-panel">
+          <strong>{match.invited ? "店舗から招待されています" : "あなたとの相性"}</strong>
+          <MatchReasons match={match} />
+        </section>
+      ) : null}
 
       <section className="summary-grid">
         <div className="summary-item">

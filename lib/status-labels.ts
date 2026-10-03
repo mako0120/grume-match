@@ -33,6 +33,7 @@ export const notificationTypeLabels: Record<string, string> = {
   direct_offer_received: "指名",
   usage_license_expiring: "素材利用",
   performance_reviewed: "実績",
+  campaign_invitation: "招待",
 };
 
 

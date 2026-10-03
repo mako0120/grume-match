@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 import { createClient } from "@/lib/supabase/server";
+import { autoInviteMatches } from "@/server/actions/matching";
 import { readUsageRightsForm } from "@/server/actions/usage-rights-form";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
@@ -137,7 +138,23 @@ export async function createCampaign(formData: FormData) {
     redirect("/restaurant/campaigns/new?message=" + encodeURIComponent(message));
   }
 
-  redirect("/restaurant/campaigns/" + data + "/applications");
+  const invited = await autoInviteMatches(String(data), {
+    area,
+    category,
+    cashReward,
+    kind: "market",
+  });
+
+  redirect(
+    "/restaurant/campaigns/" +
+      data +
+      "/applications?message=" +
+      encodeURIComponent(
+        invited > 0
+          ? `公開しました。条件に合うCreator${invited}人に自動でお知らせしました。`
+          : "公開しました。応募が届くと通知します。",
+      ),
+  );
 }
 
 
