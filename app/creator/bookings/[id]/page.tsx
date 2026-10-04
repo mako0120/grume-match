@@ -1,3 +1,4 @@
+import { isCalendarExportable } from "@/lib/calendar-export";
 import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -87,6 +88,11 @@ export default async function CreatorBookingDetailPage({
           <Link className="secondary-button" href={`/creator/bookings/${booking.id}/reschedule`}>
             来店日時を変更
           </Link>
+        ) : null}
+        {isCalendarExportable(booking.status) ? (
+          <a className="secondary-button" href={`/bookings/${booking.id}/calendar.ics`} download>
+            カレンダーに追加
+          </a>
         ) : null}
         <Link className="secondary-button" href="/notifications">
           通知を見る

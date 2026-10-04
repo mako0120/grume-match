@@ -45,7 +45,7 @@ Exit:
 - 支払期限リマインド
 - no-show / cancellation reason
 - Reliability metrics
-- Calendar export
+- Calendar export ✅ (booking .ics for Creator / Restaurant)
 - Campaign template
 - Creator rate card
 - Auto media kit

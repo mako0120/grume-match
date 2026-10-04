@@ -4,6 +4,7 @@ import { PostReportCard } from "@/components/post-report-card";
 import { PrReviewSection } from "@/components/pr-review-section";
 import { UgcAssetGrid } from "@/components/ugc-asset-grid";
 import { UsageLicenseSummary } from "@/components/usage-license-summary";
+import { isCalendarExportable } from "@/lib/calendar-export";
 import { ugcKindForPlatform } from "@/lib/content-rights";
 import {
   paymentStatusLabels,
@@ -58,6 +59,14 @@ export default async function RestaurantBookingDetailPage({
         <p>{booking.campaignTitle}</p>
         <div className="booking-visit">{booking.visitLabel}</div>
       </section>
+
+      {isCalendarExportable(booking.status) ? (
+        <section className="booking-actions">
+          <a className="secondary-button" href={`/bookings/${booking.id}/calendar.ics`} download>
+            カレンダーに追加
+          </a>
+        </section>
+      ) : null}
 
       <section className="summary-grid">
         <div className="summary-item">

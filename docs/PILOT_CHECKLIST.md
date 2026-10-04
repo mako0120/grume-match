@@ -68,6 +68,15 @@ Repeat once and reject:
 - [ ] Reschedule action disappears after the original visit starts.
 - [ ] Direct RPC attempt after visit start is rejected.
 
+### Calendar export
+
+- [ ] Creator booking detail shows 「カレンダーに追加」 for a confirmed booking and the .ics opens in Google Calendar / iPhone カレンダー at the right JST time.
+- [ ] Restaurant booking detail shows the same button; the event names the Creator, not the Restaurant.
+- [ ] After an approved reschedule, downloading again updates the same event (same UID) instead of adding a second one.
+- [ ] The .ics contains no reward, fee or payment status.
+- [ ] Another Creator, an unrelated user and a logged-out visitor cannot download it (404 / login redirect).
+- [ ] Cancelled / no-show / visited bookings show no button and return 404.
+
 ## E. Deliverable
 
 Creator:
