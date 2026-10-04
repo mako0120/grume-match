@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { paymentStatusLabels, verificationStatusLabels } from "@/lib/status-labels";
+import { PostReportCard } from "@/components/post-report-card";
+import { PrReviewSection } from "@/components/pr-review-section";
+import { UgcAssetGrid } from "@/components/ugc-asset-grid";
+import { UsageLicenseSummary } from "@/components/usage-license-summary";
+import { ugcKindForPlatform } from "@/lib/content-rights";
+import {
+  paymentStatusLabels,
+  platformLabels,
+  verificationStatusLabels,
+} from "@/lib/status-labels";
 import { reviewDeliverable } from "@/server/actions/deliverables";
+import { formatReward, platformFeeStatusLabels } from "@/lib/pricing";
+import { getBookingFee } from "@/server/queries/billing";
+import { getBookingPostReports, getBookingReviews } from "@/server/queries/pr-feedback";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
-
-const platformLabels: Record<string, string> = {
-  instagram_feed: "Instagram Feed",
-  instagram_reel: "Instagram Reel",
-  instagram_story: "Instagram Story",
-  tiktok: "TikTok",
-  youtube_shorts: "YouTube Shorts",
-  ugc_photo: "UGC写真",
-  ugc_video: "UGC動画",
-};
 
 export default async function RestaurantBookingDetailPage({
   params,
@@ -23,9 +25,21 @@ export default async function RestaurantBookingDetailPage({
 }) {
   const { id } = await params;
   const { message, status } = await searchParams;
-  const booking = await getRestaurantBooking(id);
+  const [booking, reviews, reports] = await Promise.all([
+    getRestaurantBooking(id),
+    getBookingReviews(id, "restaurant"),
+    getBookingPostReports(id),
+  ]);
 
   if (!booking) notFound();
+
+  const fee = await getBookingFee(booking.id, booking.cashReward);
+
+  // PR cost (reward + fee) spread over the posts, for the cost per 1,000 views.
+  const prCost = booking.cashReward + fee.fee;
+  const costPerPost = booking.deliverables.length
+    ? Math.round(prCost / booking.deliverables.length)
+    : prCost;
 
   return (
     <main className="creator-shell">
@@ -56,7 +70,19 @@ export default async function RestaurantBookingDetailPage({
         </div>
         <div className="summary-item">
           <span>報酬</span>
-          <strong>¥{booking.cashReward.toLocaleString()}</strong>
+          <strong>{formatReward(booking.cashReward)}</strong>
+          {booking.license && booking.license.fee > 0 ? (
+            <small>うち二次利用料 ¥{booking.license.fee.toLocaleString()}</small>
+          ) : null}
+        </div>
+        <div className="summary-item">
+          <span>手数料</span>
+          <strong>¥{fee.fee.toLocaleString()}</strong>
+          <small>
+            {fee.estimate
+              ? fee.note ?? "PR完了時（投稿承認時）に確定"
+              : fee.note ?? platformFeeStatusLabels[fee.status] ?? fee.status}
+          </small>
         </div>
         <div className="summary-item">
           <span>支払い状態</span>
@@ -75,10 +101,12 @@ export default async function RestaurantBookingDetailPage({
         </div>
       ) : null}
 
+      {booking.license ? <UsageLicenseSummary license={booking.license} /> : null}
+
       <section className="deliverable-section">
         <h2>投稿確認</h2>
         <p className="schedule-hint">
-          Creatorが提出したURLを確認し、承認または修正依頼を行います。
+          Creatorが提出したURL・素材を確認し、承認または修正依頼を行います。
         </p>
 
         {booking.deliverables.map((deliverable) => (
@@ -89,12 +117,20 @@ export default async function RestaurantBookingDetailPage({
             <div className="deliverable-head">
               <strong>{platformLabels[deliverable.platform] ?? deliverable.platform}</strong>
               <span className={`status-chip status-${deliverable.verification_status}`}>
-                {verificationStatusLabels[deliverable.verification_status] ??
-                  deliverable.verification_status}
+                {deliverable.submitted_at || deliverable.verification_status === "approved"
+                  ? verificationStatusLabels[deliverable.verification_status] ??
+                    deliverable.verification_status
+                  : "未提出"}
               </span>
             </div>
 
-            {deliverable.submitted_url ? (
+            {ugcKindForPlatform(deliverable.platform) ? (
+              deliverable.submitted_at ? (
+                <UgcAssetGrid assets={deliverable.assets} showDownload />
+              ) : (
+                <div className="pending-box">まだ素材が納品されていません。</div>
+              )
+            ) : deliverable.submitted_url ? (
               <a
                 className="submitted-link"
                 href={deliverable.submitted_url}
@@ -107,7 +143,15 @@ export default async function RestaurantBookingDetailPage({
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
 
-            {deliverable.submitted_url &&
+            {reports.get(deliverable.id)?.status === "verified" ? (
+              <PostReportCard costYen={costPerPost} report={reports.get(deliverable.id)!} />
+            ) : deliverable.submitted_url && !ugcKindForPlatform(deliverable.platform) ? (
+              <div className="pending-box">
+                閲覧数のレポートは、投稿から1週間ほどでCreatorがインサイトを送り、運営が確認すると表示されます。
+              </div>
+            ) : null}
+
+            {deliverable.submitted_at &&
             deliverable.verification_status !== "approved" ? (
               <>
                 <label>
@@ -139,6 +183,13 @@ export default async function RestaurantBookingDetailPage({
           </form>
         ))}
       </section>
+
+      <PrReviewSection
+        bookingId={booking.id}
+        counterpart={`${booking.creatorName}さん`}
+        state={reviews}
+        viewer="restaurant"
+      />
     </main>
   );
 }

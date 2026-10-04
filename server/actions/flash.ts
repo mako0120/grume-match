@@ -33,7 +33,7 @@ export async function createFlashCampaign(formData: FormData) {
   const durationMinutes = Number(formData.get("durationMinutes") ?? 120);
   const platforms = formData.getAll("platforms").map(String).filter(Boolean);
 
-  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+  if (!category || !Number.isInteger(cashReward) || cashReward < 0 || creatorSlots <= 0 || !platforms.length) {
     redirect(
       "/restaurant/flash/new?message=" +
         encodeURIComponent("報酬・ジャンル・投稿先を確認してください。"),

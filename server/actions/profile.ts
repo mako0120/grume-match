@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { CREATOR_BASE_AREAS } from "@/lib/areas";
 import { createClient } from "@/lib/supabase/server";
 
 const allowedPlatforms = new Set(["instagram", "tiktok", "youtube"]);
@@ -17,10 +18,10 @@ export async function saveCreatorBasics(formData: FormData) {
   const minReward = nonNegativeInteger(formData.get("minReward"), 0);
   const travelRadiusKm = nonNegativeInteger(formData.get("travelRadiusKm"), 20);
 
-  if (!displayName || !baseArea) {
+  if (!displayName || !(CREATOR_BASE_AREAS as readonly string[]).includes(baseArea)) {
     redirect(
       "/creator/profile?message=" +
-        encodeURIComponent("表示名と活動エリアを入力してください。"),
+        encodeURIComponent("表示名と活動エリアを入力してください（現在は大阪で提供中）。"),
     );
   }
 
@@ -124,4 +125,33 @@ export async function savePrimarySocialAccount(formData: FormData) {
   }
 
   redirect("/creator/campaigns");
+}
+
+const requestPageErrors: Array<[string, string]> = [
+  ["invalid_request_slug", "URLは英小文字・数字・_ - で3〜30文字にしてください。"],
+  ["request_slug_reserved", "このURLは使えません。別の文字にしてください。"],
+  ["request_slug_taken", "このURLはすでに使われています。"],
+];
+
+/** Public PR request page that Creators send in reply to DM requests. */
+export async function saveRequestPage(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const enabled = formData.get("enabled") === "on";
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_creator_request_page", {
+    p_slug: slug,
+    p_enabled: enabled,
+  });
+
+  if (error) {
+    const reason = error.message ?? "";
+    const known = requestPageErrors.find(([key]) => reason.includes(key));
+    redirect("/creator/profile?message=" + encodeURIComponent(known?.[1] ?? "保存できませんでした。"));
+  }
+
+  redirect(
+    "/creator/profile?message=" +
+      encodeURIComponent(enabled ? "依頼受付ページを公開しました。" : "依頼受付ページを非公開にしました。"),
+  );
 }

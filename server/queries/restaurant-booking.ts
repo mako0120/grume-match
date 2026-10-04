@@ -1,4 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  presentLicense,
+  signContentAssets,
+  type RawContentAsset,
+  type RawUsageLicense,
+} from "@/server/queries/ugc-assets";
 
 type Relation<T> = T | T[] | null;
 
@@ -24,7 +30,9 @@ type RawBooking = {
     submitted_at: string | null;
     verification_status: string;
     verification_note: string | null;
+    content_assets?: RawContentAsset[] | null;
   }[] | null;
+  content_usage_licenses?: RawUsageLicense | RawUsageLicense[] | null;
   payments: Relation<{ amount: number; status: string }>;
 };
 
@@ -69,8 +77,10 @@ export async function getRestaurantBooking(bookingId: string) {
         submitted_url,
         submitted_at,
         verification_status,
-        verification_note
+        verification_note,
+        content_assets(id,kind,storage_path,mime_type,byte_size,created_at)
       ),
+      content_usage_licenses(usage_scope,duration_days,fee,status,starts_at,expires_at),
       payments(amount,status)
     `)
     .eq("id", bookingId)
@@ -87,6 +97,12 @@ export async function getRestaurantBooking(bookingId: string) {
   const instagram = creator?.creator_social_accounts?.find(
     (account) => account.platform === "instagram",
   );
+  const deliverables = await Promise.all(
+    (row.deliverables ?? []).map(async ({ content_assets, ...deliverable }) => ({
+      ...deliverable,
+      assets: await signContentAssets(supabase, content_assets ?? []),
+    })),
+  );
 
   return {
     id: row.id,
@@ -99,6 +115,9 @@ export async function getRestaurantBooking(bookingId: string) {
     visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
     cashReward: payment?.amount ?? campaign?.cash_reward ?? 0,
     paymentStatus: payment?.status ?? "pending",
-    deliverables: row.deliverables ?? [],
+    deliverables: deliverables
+      .slice()
+      .sort((a, b) => a.platform.localeCompare(b.platform) || a.id.localeCompare(b.id)),
+    license: presentLicense(row.content_usage_licenses ?? null),
   };
 }

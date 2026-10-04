@@ -1,15 +1,50 @@
+import { FeeNote } from "@/components/fee-note";
 import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createDirectOffer } from "@/server/actions/offers";
+import { MatchReasons } from "@/components/match-reasons";
+import { PerformanceChip } from "@/components/performance-summary";
+import { rankCreators } from "@/lib/matching";
+import { createClient } from "@/lib/supabase/server";
 import { listCreatorsForDirectOffer } from "@/server/queries/creators";
+import { loadMatchCreators } from "@/server/queries/matching";
 
 export default async function NewDirectOfferPage({
   searchParams,
 }: {
-  searchParams: Promise<{ message?: string; q?: string }>;
+  searchParams: Promise<{ message?: string; q?: string; creator?: string }>;
 }) {
-  const { message, q = "" } = await searchParams;
-  const creators = await listCreatorsForDirectOffer(q);
+  const { message, q = "", creator: preselected = "" } = await searchParams;
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const [listed, membership] = await Promise.all([
+    listCreatorsForDirectOffer(q, preselected),
+    supabase
+      .from("restaurant_memberships")
+      .select("restaurants(area)")
+      .eq("user_id", authData.user?.id ?? "")
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const restaurant = membership.data?.restaurants as { area: string } | { area: string }[] | null | undefined;
+  const restaurantArea = (Array.isArray(restaurant) ? restaurant[0]?.area : restaurant?.area) ?? "";
+
+  // Best fit for this restaurant's area first (the reward is not decided yet).
+  const matchCreators = await loadMatchCreators(
+    listed.map((creator) => ({
+      id: creator.id,
+      display_name: creator.displayName,
+      base_area: creator.baseArea,
+      min_reward: creator.minReward,
+      bio: creator.bio,
+    })),
+  );
+  const ranked = rankCreators({ area: restaurantArea, category: "", cashReward: null }, matchCreators);
+  const byId = new Map(listed.map((creator) => [creator.id, creator]));
+  const creators = ranked
+    .map(({ creator, match }) => ({ ...byId.get(creator.id)!, match, performance: creator.performance }))
+    .sort((a, b) => Number(b.id === preselected) - Number(a.id === preselected));
 
   return (
     <main className="creator-shell">
@@ -49,11 +84,33 @@ export default async function NewDirectOfferPage({
           <span className="eyebrow">01 CREATOR</span>
           <h2>依頼する人</h2>
 
+          <label className="creator-option invite-option">
+            <input name="creatorId" type="radio" value="invite" />
+            <div>
+              <strong>まだ登録していない人を招待</strong>
+              <span>InstagramのDMで依頼している人など</span>
+              <p>アカウント名を入れると招待リンクができます。DMで送ると、登録してそのまま応募できます。</p>
+              <input
+                autoCapitalize="none"
+                autoComplete="off"
+                maxLength={31}
+                name="instagramHandle"
+                placeholder="@instagramのアカウント名"
+              />
+            </div>
+          </label>
+
           {creators.length ? (
             <div className="creator-picker">
               {creators.map((creator) => (
                 <label className="creator-option" key={creator.id}>
-                  <input name="creatorId" required type="radio" value={creator.id} />
+                  <input
+                    defaultChecked={creator.id === preselected}
+                    name="creatorId"
+                    required
+                    type="radio"
+                    value={creator.id}
+                  />
                   <div>
                     <strong>{creator.displayName}</strong>
                     <span>{creator.baseArea}</span>
@@ -63,6 +120,11 @@ export default async function NewDirectOfferPage({
                         ? " ・ 目安 ¥" + creator.minReward.toLocaleString() + "〜"
                         : ""}
                     </p>
+                    <MatchReasons compact match={creator.match} />
+                    <PerformanceChip summary={creator.performance} />
+                    <Link className="creator-option-link" href={`/restaurant/creators/${creator.id}`}>
+                      実績を見る →
+                    </Link>
                   </div>
                 </label>
               ))}
@@ -82,8 +144,8 @@ export default async function NewDirectOfferPage({
 
           <div className="field-row">
             <label>
-              現金報酬（税込）
-              <input defaultValue="6000" min="1" name="cashReward" required type="number" />
+              現金報酬（税込・0円なら食事招待のみ）
+              <input defaultValue="6000" min="0" name="cashReward" required type="number" />
             </label>
             <label>
               来店人数
@@ -94,6 +156,7 @@ export default async function NewDirectOfferPage({
               </select>
             </label>
           </div>
+          <FeeNote />
 
           <label>
             食事提供
@@ -113,6 +176,14 @@ export default async function NewDirectOfferPage({
               <input name="platforms" type="checkbox" value="instagram_story" />
               Story
             </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_photo" />
+              UGC写真（納品）
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_video" />
+              UGC縦動画（納品）
+            </label>
           </div>
 
           <label>
@@ -124,6 +195,8 @@ export default async function NewDirectOfferPage({
             />
           </label>
         </section>
+
+        <UsageRightsFields />
 
         <section className="form-section">
           <span className="eyebrow">03 DATE</span>

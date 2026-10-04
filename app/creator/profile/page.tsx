@@ -1,7 +1,12 @@
+import Link from "next/link";
+import { CopyButton } from "@/components/copy-button";
+import { creatorReplyTemplate } from "@/lib/dm-templates";
+import { getSiteOrigin } from "@/lib/site-origin";
 import { createClient } from "@/lib/supabase/server";
 import {
   saveCreatorBasics,
   savePrimarySocialAccount,
+  saveRequestPage,
 } from "@/server/actions/profile";
 
 export default async function CreatorProfilePage({
@@ -15,7 +20,7 @@ export default async function CreatorProfilePage({
 
   const { data: profile } = await supabase
     .from("creator_profiles")
-    .select("id,display_name,bio,base_area,min_reward,travel_radius_km")
+    .select("id,display_name,bio,base_area,min_reward,travel_radius_km,request_slug,request_page_enabled")
     .eq("user_id", authData.user!.id)
     .single();
 
@@ -27,6 +32,9 @@ export default async function CreatorProfilePage({
     : { data: [] };
 
   const primary = socials?.[0];
+  const origin = await getSiteOrigin();
+  const requestUrl = profile?.request_slug ? `${origin}/c/${profile.request_slug}` : null;
+  const suggestedSlug = (primary?.handle ?? "").replace(/^@/, "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
 
   return (
     <main className="creator-shell">
@@ -41,6 +49,65 @@ export default async function CreatorProfilePage({
       </p>
 
       {message ? <div className="form-message">{message}</div> : null}
+
+      <Link className="proof-link-card" href="/creator/performance">
+        <div>
+          <span className="eyebrow">PROOF</span>
+          <strong>過去30日の実績</strong>
+          <p>スクショを送るだけ。応募や指名で店舗に選ばれやすくなります。</p>
+        </div>
+        <span>→</span>
+      </Link>
+
+      <section className="form-section request-page-section">
+        <span className="eyebrow">DM → APP</span>
+        <h2>PR依頼の受付ページ</h2>
+        <p className="field-help">
+          お店からDMでPRを頼まれたら、このページのリンクを返信してください。お店はあなたの実績（運営確認済みの投稿だけ）を見て、日程つきで依頼できます。連絡先は表示されません。
+        </p>
+        <form action={saveRequestPage} className="campaign-form">
+          <label>
+            ページのURL
+            <div className="slug-field">
+              <span>/c/</span>
+              <input
+                defaultValue={profile?.request_slug ?? suggestedSlug}
+                maxLength={30}
+                minLength={3}
+                name="slug"
+                pattern="[a-z0-9][a-z0-9_\-]{2,29}"
+                placeholder="gourmet_nisshi"
+                required
+              />
+            </div>
+          </label>
+          <label className="inline-check">
+            <input defaultChecked={profile?.request_page_enabled ?? false} name="enabled" type="checkbox" />
+            公開する
+          </label>
+          <button className="secondary-button" type="submit">
+            保存
+          </button>
+        </form>
+        {requestUrl && profile?.request_page_enabled ? (
+          <>
+            <div className="signal-link-row">
+              <code>{requestUrl}</code>
+              <CopyButton value={requestUrl} />
+            </div>
+            <pre className="dm-template">
+              {creatorReplyTemplate({ displayName: profile.display_name, url: requestUrl })}
+            </pre>
+            <CopyButton
+              label="DMの返信文をコピー"
+              value={creatorReplyTemplate({ displayName: profile.display_name, url: requestUrl })}
+            />
+            <Link className="submitted-link" href={`/c/${profile.request_slug}`}>
+              公開ページを見る →
+            </Link>
+          </>
+        ) : null}
+      </section>
 
       <form action={saveCreatorBasics} className="campaign-form">
         <section className="form-section">
@@ -58,11 +125,18 @@ export default async function CreatorProfilePage({
             </label>
             <label>
               活動エリア
-              <input
-                defaultValue={profile?.base_area ?? ""}
+              <select
+                defaultValue={
+                  ["大阪", "大阪・兵庫"].includes(profile?.base_area ?? "")
+                    ? profile?.base_area
+                    : "大阪"
+                }
                 name="baseArea"
                 required
-              />
+              >
+                <option value="大阪">大阪</option>
+                <option value="大阪・兵庫">大阪・兵庫（兵庫からも通える）</option>
+              </select>
             </label>
           </div>
 
@@ -78,7 +152,7 @@ export default async function CreatorProfilePage({
 
           <div className="field-row">
             <label>
-              最低報酬
+              最低報酬（0円なら食事招待も届きます）
               <input
                 defaultValue={profile?.min_reward ?? 0}
                 min="0"

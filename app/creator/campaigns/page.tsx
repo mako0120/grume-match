@@ -1,13 +1,26 @@
 import Link from "next/link";
 import { CampaignCard } from "@/components/campaign-card";
 import { listCreatorCampaigns } from "@/server/queries/campaigns";
+import { getMyCampaignMatches } from "@/server/queries/matching";
 import { getCreatorStandbyStatus } from "@/server/queries/standby";
 
 export default async function CreatorCampaignListPage() {
-  const [campaigns, standby] = await Promise.all([
+  const [listed, standby] = await Promise.all([
     listCreatorCampaigns(),
     getCreatorStandbyStatus(),
   ]);
+  const matches = await getMyCampaignMatches(listed);
+
+  // Invitations first, then the best fit for me, then newest.
+  const campaigns = [...listed].sort((a, b) => {
+    const left = matches.get(a.id);
+    const right = matches.get(b.id);
+    return (
+      Number(Boolean(right?.invited)) - Number(Boolean(left?.invited)) ||
+      Number(Boolean(left?.blocked)) - Number(Boolean(right?.blocked)) ||
+      (right?.score ?? 0) - (left?.score ?? 0)
+    );
+  });
 
   return (
     <main className="creator-shell">
@@ -25,7 +38,7 @@ export default async function CreatorCampaignListPage() {
 
       <h1 className="page-title">PR案件を探す</h1>
       <p className="page-subtitle">
-        食事提供とは別に、現金報酬が明示された案件を掲載します。
+        あなたの実績エリア・希望報酬に合う順に並んでいます。食事招待（現金報酬なし）と現金報酬つきの案件があります。
       </p>
 
       <Link className="quick-status-link" href="/creator/applications">
@@ -53,7 +66,7 @@ export default async function CreatorCampaignListPage() {
       {campaigns.length ? (
         <section className="campaign-list" aria-label="PR案件一覧">
           {campaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
+            <CampaignCard campaign={campaign} key={campaign.id} match={matches.get(campaign.id)} />
           ))}
         </section>
       ) : (

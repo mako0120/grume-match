@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { CampaignCard } from "@/components/campaign-card";
 import { listCreatorCampaigns } from "@/server/queries/campaigns";
+import { getMyCampaignMatches } from "@/server/queries/matching";
 
 export default async function CreatorFlashPage() {
-  const campaigns = await listCreatorCampaigns("flash");
+  const listed = await listCreatorCampaigns("flash");
+  const matches = await getMyCampaignMatches(
+    listed.map((campaign) => ({ ...campaign, kind: "flash" as const })),
+  );
+  const campaigns = [...listed].sort(
+    (a, b) => (matches.get(b.id)?.score ?? 0) - (matches.get(a.id)?.score ?? 0),
+  );
 
   return (
     <main className="creator-shell">
@@ -28,7 +35,7 @@ export default async function CreatorFlashPage() {
       {campaigns.length ? (
         <section className="campaign-list">
           {campaigns.map((campaign) => (
-            <CampaignCard campaign={campaign} key={campaign.id} />
+            <CampaignCard campaign={campaign} key={campaign.id} match={matches.get(campaign.id)} />
           ))}
         </section>
       ) : (

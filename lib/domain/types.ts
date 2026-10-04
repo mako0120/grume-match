@@ -29,7 +29,10 @@ export type CampaignSlot = {
 
 export type DemoCampaign = {
   id: string;
+  restaurantId?: string;
   restaurantName: string;
+  /** Creators' ratings of this Restaurant, e.g. "★4.6（5件）". */
+  restaurantRating?: string | null;
   title: string;
   area: string;
   category: string;
@@ -39,6 +42,13 @@ export type DemoCampaign = {
   creatorSlots: number;
   visibility?: "public" | "direct";
   platforms: Platform[];
+  usageRights?: CampaignUsageRights | null;
   visitPeriod: string;
   slots: CampaignSlot[];
+};
+
+export type CampaignUsageRights = {
+  usageScope: "organic" | "organic_and_ads";
+  durationDays: number;
+  fee: number;
 };

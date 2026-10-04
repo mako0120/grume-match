@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { LICENSE_EXPIRING_DAYS } from "@/lib/content-rights";
 import { createAdminClient } from "@/lib/supabase/admin";
+
+const expiryFormatter = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  month: "long",
+  day: "numeric",
+});
+
+function memberRank(role: string) {
+  return role === "owner" ? 0 : role === "manager" ? 1 : 2;
+}
 
 function isAuthorized(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -34,9 +45,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const licenseWindowEnd = new Date(
+    now + LICENSE_EXPIRING_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   const [
     { data: upcomingBookings, error: bookingError },
     { data: dueDeliverables, error: deliverableError },
+    { data: expiringLicenses, error: licenseError },
   ] = await Promise.all([
     supabase
       .from("bookings")
@@ -64,14 +80,27 @@ export async function GET(request: NextRequest) {
       .neq("verification_status", "approved")
       .gte("due_at", nowIso)
       .lte("due_at", dueWindowEnd),
+    supabase
+      .from("content_usage_licenses")
+      .select(`
+        id,
+        restaurant_id,
+        expires_at,
+        creator_profiles(display_name),
+        restaurants(restaurant_memberships(user_id,role))
+      `)
+      .eq("status", "active")
+      .gt("expires_at", nowIso)
+      .lte("expires_at", licenseWindowEnd),
   ]);
 
-  if (bookingError || deliverableError) {
+  if (bookingError || deliverableError || licenseError) {
     return NextResponse.json(
       {
         error: "query_failed",
         bookingError: bookingError?.message ?? null,
         deliverableError: deliverableError?.message ?? null,
+        licenseError: licenseError?.message ?? null,
       },
       { status: 500 },
     );
@@ -129,6 +158,29 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  for (const license of expiringLicenses ?? []) {
+    const creator = Array.isArray(license.creator_profiles)
+      ? license.creator_profiles[0]
+      : license.creator_profiles;
+    const restaurant = Array.isArray(license.restaurants)
+      ? license.restaurants[0]
+      : license.restaurants;
+    const members = [...(restaurant?.restaurant_memberships ?? [])].sort(
+      (a, b) => memberRank(a.role) - memberRank(b.role),
+    );
+    const target = members[0];
+
+    if (!target?.user_id) continue;
+
+    notifications.push({
+      user_id: target.user_id,
+      type: "usage_license_expiring",
+      title: "素材の利用期限が近づいています",
+      body: `${creator?.display_name ?? "Creator"}さんの素材は${expiryFormatter.format(new Date(license.expires_at))}まで利用できます。期限後は広告・投稿から外してください。`,
+      dedupe_key: `usage-license-expiring:${license.id}`,
+    });
+  }
+
   if (notifications.length) {
     const { error: insertError } = await supabase
       .from("notifications")
@@ -145,9 +197,22 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // SIGNAL retention: raw events are kept for 13 months.
+  const { data: purgedSignalEvents, error: purgeError } = await supabase.rpc(
+    "purge_expired_signal_events",
+  );
+
+  if (purgeError) {
+    return NextResponse.json(
+      { error: "signal_purge_failed", detail: purgeError.message },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({
     ok: true,
     campaignsClosed: closedCampaigns?.length ?? 0,
     generated: notifications.length,
+    signalEventsPurged: purgedSignalEvents ?? 0,
   });
 }

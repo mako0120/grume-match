@@ -210,6 +210,96 @@ DB transactionで、
 - after_json nullable
 - created_at
 
+## STUDIO tables (P2-03)
+
+### campaign_usage_rights
+Campaign-level secondary-use terms. Optional; required when the campaign
+asks for `ugc_photo` / `ugc_video`.
+
+- campaign_id PK/FK
+- usage_scope: organic | organic_and_ads
+- duration_days: 30 | 90 | 365 (no perpetual option)
+- fee integer (> 0 when ads use is included)
+
+Locked after the first application (same rule as price and deliverables).
+
+### content_usage_licenses
+Per-booking snapshot of the terms.
+
+- booking_id unique
+- campaign_id / restaurant_id / creator_id
+- usage_scope / duration_days / fee
+- status: pending | active
+- starts_at / expires_at (set when every deliverable is approved)
+
+`fee` is added to `payments.amount` when the booking is confirmed.
+
+### content_assets
+UGC files in the private `ugc-assets` Storage bucket.
+
+- deliverable_id / booking_id / creator_id / restaurant_id
+- kind: photo | video
+- storage_path unique (`<creator uid>/<deliverable id>/<file>`)
+- mime_type / byte_size (copied from Storage metadata, not the client)
+
+Restaurants can open files while reviewing and while the license is active.
+
+A deliverable counts as submitted when `deliverables.submitted_at` is set
+(URL deliverables also carry `submitted_url`).
+
+## SIGNAL tables (P3-01)
+
+### tracking_links
+- code unique (8 chars, alphabet without I/O/0/1)
+- booking_id unique / campaign_id / restaurant_id / creator_id
+- disabled_at nullable (set when the booking is cancelled)
+
+### signal_events
+- tracking_link_id
+- kind: landing_view | visit
+- occurred_at
+- party_size nullable (visit only)
+- revenue_yen nullable (visit only)
+- recorded_by nullable (Restaurant user for visits)
+- voided_at nullable
+
+No visitor identifiers (cookie, IP, user agent, guest name/contact) are
+stored. Raw events are deleted after 13 months. Reservations are out of scope: the
+product does not track reservation buttons or reservation records.
+
+## PROOF tables (Creator performance)
+
+### creator_post_metrics
+One row per post per insights snapshot (self-reported).
+
+- creator_id / platform (instagram | tiktok | youtube | threads)
+- area / headline / post_url (https, optional)
+- posted_on (+ posted_on_approx when derived from "3週間")
+- measured_on (snapshot date; replace = same platform + date)
+- views (+ views_approx when entered as "2.7万") / likes / comments / reposts / shares / saves
+- verified_at (Operator only; cleared when the Creator edits the numbers)
+
+Visible to the Creator, active Restaurants and the Operator. Summaries use
+the latest snapshot and posts from the 30 days before it.
+
+### creator_performance_evidence
+Insights screenshot in the private `creator-evidence` bucket.
+Visible to the Creator and the Operator only.
+
+- status: pending | verified | rejected
+
+See `docs/CREATOR_PERFORMANCE.md`.
+
+## Matching
+
+### campaign_invitations
+- campaign_id / creator_id (unique pair)
+- source: restaurant | auto (auto = invited on publish by match score)
+- invited_by / created_at
+
+Public, recruiting campaigns only; ≤10 per call, ≤30 per campaign.
+Scoring rules: `docs/MATCHING.md`.
+
 ## Status constraints
 
 ステータス遷移はAPI層で明示的に制限する。
@@ -230,12 +320,82 @@ UIから任意のstatus文字列を直接更新させない。
 
 - offers
 - creator_rate_cards
-- content_assets
-- content_usage_rights
-- tracking_links
-- conversions
 - disputes
 - creator_metrics_daily
 - restaurant_subscriptions
 - payout_accounts
 - flash_campaigns
+
+## After the PR (reviews and post reports)
+
+### pr_reviews
+- booking_id / direction (restaurant_to_creator | creator_to_restaurant), unique per pair
+- creator_id / restaurant_id / reviewer_user_id
+- rating 1–5 / tags (fixed lists, `pr_review_tags()`) / comment ≤300
+- followed_up_at (Operator closes ★2-or-lower follow-ups)
+
+Open only after the post is approved. Immutable. The other side sees a
+review only after reviewing too, or 14 days later (`booking_pr_reviews`).
+Summaries (`creator_review_summaries`, `restaurant_review_summaries`) use
+revealed reviews only and carry no comments.
+
+### pr_post_reports
+- deliverable_id unique / booking_id / creator_id / restaurant_id
+- storage_path (creator-evidence bucket; Creator and Operator only)
+- status pending | verified | rejected / review_note
+- measured_on / views / reach / likes / comments / saves / shares / follows
+
+The Creator only attaches a screenshot; the Operator or Claude registers the
+numbers (`import_pr_post_report`, service role allowed). Visible to the two
+parties. Reach can never exceed views.
+
+## Platform fees
+
+### platform_fees
+- booking_id unique / restaurant_id
+- base_amount (the Creator payment: reward + usage fee) / fee
+- status pending | invoiced | paid | waived / note
+- invoiced_at / paid_at
+
+Recorded by a trigger when the payment becomes approved (= the PR is
+complete). fee = `platform_fee_for(base_amount)` = 20%, at least ¥2,000.
+The Restaurant's first completed PR is `waived`. Visible to the Restaurant
+and the Operator; only the Operator / service role changes the status.
+
+Meal-only invitations: `campaigns.cash_reward = 0` is allowed (the paid
+campaign guard was removed in `202610030009_meal_invitations.sql`). Their ¥0
+payment settles as `paid` when the PR completes, without payment
+notifications, and the fee is the ¥2,000 minimum.
+
+## DM onboarding
+
+### creator_profiles (added)
+- request_slug unique (`^[a-z0-9][a-z0-9_-]{2,29}$`) / request_page_enabled
+
+`get_creator_request_page(slug)` (anon) returns the enabled page: name, area,
+bio, minimum reward, completed PRs, revealed rating and verified posts of
+the last 60 days. No contact details.
+
+### offer_invites
+- token (20 chars) / campaign_id unique / restaurant_id / instagram_handle
+- claimed_by_creator_id / claimed_at
+
+`create_offer_invite` creates a 1-person direct campaign with no target.
+`get_offer_invite(token)` is the anon preview (no address).
+`claim_offer_invite(token)` adds the signed-in Creator as the target, which
+sends the usual direct offer notification. One Creator per invite.
+
+## Stripe invoices
+
+### restaurants (added)
+- billing_email / stripe_customer_id
+
+### platform_invoices
+- restaurant_id / period (YYYY-MM) — one live invoice per Restaurant and month
+- stripe_invoice_id unique / hosted_invoice_url
+- subtotal / tax / total (= subtotal + tax)
+- status open | paid | void / paid_at
+
+`platform_fees.invoice_id` links the fees. `record_platform_invoice` (service
+role) accepts exactly the pending fees and their sum; `apply_stripe_invoice_event`
+(webhook) marks paid or returns voided fees to pending, idempotently.

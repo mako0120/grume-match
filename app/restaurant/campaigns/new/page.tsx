@@ -1,4 +1,6 @@
+import { FeeNote } from "@/components/fee-note";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { UsageRightsFields } from "@/components/usage-rights-fields";
 import { createCampaign } from "@/server/actions/campaigns";
 
 const weekdays = [
@@ -58,10 +60,10 @@ export default async function NewCampaignPage({
 
           <div className="field-row">
             <label>
-              現金報酬（税込）
+              現金報酬（税込・0円なら食事招待のみ）
               <input
                 defaultValue="6000"
-                min="1"
+                min="0"
                 name="cashReward"
                 required
                 type="number"
@@ -79,6 +81,7 @@ export default async function NewCampaignPage({
               />
             </label>
           </div>
+          <FeeNote />
 
           <label>
             食事提供
@@ -116,8 +119,18 @@ export default async function NewCampaignPage({
               <input name="platforms" type="checkbox" value="tiktok" />
               TikTok
             </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_photo" />
+              UGC写真（納品）
+            </label>
+            <label>
+              <input name="platforms" type="checkbox" value="ugc_video" />
+              UGC縦動画（納品）
+            </label>
           </div>
         </section>
+
+        <UsageRightsFields />
 
         <section className="form-section">
           <span className="eyebrow">03 DATE</span>

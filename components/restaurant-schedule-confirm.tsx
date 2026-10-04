@@ -1,7 +1,8 @@
 "use client";
 
+import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { type ReactNode, useMemo, useState, useTransition } from "react";
 import type { CampaignSlot } from "@/lib/domain/types";
 import type { RestaurantApplicationChoice } from "@/server/queries/restaurant-applications";
 import { rejectCampaignApplication } from "@/server/actions/applications";
@@ -16,6 +17,8 @@ type Props = {
   cashReward: number;
   partySize: number;
   choices: RestaurantApplicationChoice[];
+  /** Rendered on the server: the applicant's 30-day performance. */
+  performance?: ReactNode;
 };
 
 function localDateKey(iso: string) {
@@ -42,6 +45,7 @@ export function RestaurantScheduleConfirm({
   cashReward,
   partySize,
   choices,
+  performance,
 }: Props) {
   const [confirmedSlotId, setConfirmedSlotId] = useState<string | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
@@ -135,9 +139,10 @@ export function RestaurantScheduleConfirm({
           <span className="eyebrow">APPLICANT</span>
           <h2>{creatorName}</h2>
           <p>Instagram {followerCount.toLocaleString()} followers</p>
+          {performance}
         </div>
         <div className="applicant-reward">
-          ¥{cashReward.toLocaleString()}
+          {formatReward(cashReward)}
           <small>報酬</small>
         </div>
       </div>

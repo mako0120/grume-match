@@ -1,8 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import type { DemoCampaign, CampaignSlot, Platform } from "@/lib/domain/types";
+import { formatRating } from "@/lib/pr-feedback";
+import { getRestaurantReviewSummaries } from "@/server/queries/pr-feedback";
 
 type RawRestaurant = { name: string };
 type RawPlatform = { platform: Platform };
+type RawUsageRights = {
+  usage_scope: "organic" | "organic_and_ads";
+  duration_days: number;
+  fee: number;
+};
 type RawSlot = {
   id: string;
   starts_at: string;
@@ -14,6 +21,7 @@ type RawSlot = {
 
 type RawCampaign = {
   id: string;
+  restaurant_id: string;
   title: string;
   area: string;
   category: string;
@@ -28,6 +36,7 @@ type RawCampaign = {
   restaurants: RawRestaurant | RawRestaurant[] | null;
   campaign_platforms: RawPlatform[] | null;
   campaign_slots: RawSlot[] | null;
+  campaign_usage_rights: RawUsageRights | RawUsageRights[] | null;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -72,8 +81,13 @@ function presentSlot(slot: RawSlot): CampaignSlot {
 }
 
 function presentCampaign(row: RawCampaign): DemoCampaign {
+  const usageRights = Array.isArray(row.campaign_usage_rights)
+    ? row.campaign_usage_rights[0] ?? null
+    : row.campaign_usage_rights;
+
   return {
     id: row.id,
+    restaurantId: row.restaurant_id,
     restaurantName: restaurantName(row.restaurants),
     title: row.title,
     area: row.area,
@@ -84,6 +98,13 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
     creatorSlots: row.creator_slots,
     visibility: row.visibility,
     platforms: (row.campaign_platforms ?? []).map((item) => item.platform),
+    usageRights: usageRights
+      ? {
+          usageScope: usageRights.usage_scope,
+          durationDays: usageRights.duration_days,
+          fee: usageRights.fee,
+        }
+      : null,
     visitPeriod: visitPeriod(row.visit_period_start, row.visit_period_end),
     slots: (row.campaign_slots ?? [])
       .map(presentSlot)
@@ -93,6 +114,7 @@ function presentCampaign(row: RawCampaign): DemoCampaign {
 
 const campaignSelect = `
   id,
+  restaurant_id,
   title,
   area,
   category,
@@ -106,8 +128,20 @@ const campaignSelect = `
   visit_period_end,
   restaurants(name),
   campaign_platforms(platform),
-  campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status)
+  campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status),
+  campaign_usage_rights(usage_scope,duration_days,fee)
 `;
+
+/** Adds how other Creators rated each Restaurant (revealed reviews only). */
+async function withRestaurantRatings(campaigns: DemoCampaign[]) {
+  const summaries = await getRestaurantReviewSummaries(
+    campaigns.map((campaign) => campaign.restaurantId ?? "").filter(Boolean),
+  );
+  return campaigns.map((campaign) => {
+    const summary = campaign.restaurantId ? summaries.get(campaign.restaurantId) : undefined;
+    return { ...campaign, restaurantRating: summary ? formatRating(summary) : null };
+  });
+}
 
 export async function listCreatorCampaigns(
   kind: "market" | "flash" = "market",
@@ -144,10 +178,10 @@ export async function listCreatorCampaigns(
         .map((row) => row.id),
     );
 
-    return presented.filter((campaign) => visibleIds.has(campaign.id));
+    return withRestaurantRatings(presented.filter((campaign) => visibleIds.has(campaign.id)));
   }
 
-  return presented;
+  return withRestaurantRatings(presented);
 }
 
 export async function getCreatorCampaign(id: string) {
@@ -164,5 +198,7 @@ export async function getCreatorCampaign(id: string) {
   if (error || !data) return null;
 
   const campaign = presentCampaign(data as unknown as RawCampaign);
-  return campaign.slots.some((slot) => slot.isOpen) ? campaign : null;
+  if (!campaign.slots.some((slot) => slot.isOpen)) return null;
+  const [rated] = await withRestaurantRatings([campaign]);
+  return rated;
 }

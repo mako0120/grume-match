@@ -8,7 +8,7 @@ type SocialAccount = {
   local_audience_ratio: number | null;
 };
 
-export async function listCreatorsForDirectOffer(search = "") {
+export async function listCreatorsForDirectOffer(search = "", keepId = "") {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -52,7 +52,7 @@ export async function listCreatorsForDirectOffer(search = "") {
       localAudienceRatio: instagram?.local_audience_ratio ?? null,
     };
   }).filter((creator) => {
-    if (!normalizedSearch) return true;
+    if (!normalizedSearch || creator.id === keepId) return true;
 
     return [
       creator.displayName,

@@ -29,6 +29,7 @@ type RawAvailability = {
 
 type RawApplication = {
   id: string;
+  creator_id: string;
   party_size: number;
   status: string;
   creator_profiles: RawCreator | RawCreator[] | null;
@@ -52,6 +53,7 @@ export type RestaurantApplicationChoice =
 
 export type RestaurantApplicationView = {
   applicationId: string;
+  creatorId: string;
   creatorName: string;
   followerCount: number;
   partySize: number;
@@ -116,6 +118,7 @@ export async function getRestaurantCampaignApplications(
       campaign_slots(id,starts_at,ends_at,capacity,reserved_count,status),
       applications(
         id,
+        creator_id,
         party_size,
         status,
         creator_profiles(
@@ -159,6 +162,7 @@ export async function getRestaurantCampaignApplications(
 
       return {
         applicationId: application.id,
+        creatorId: application.creator_id,
         creatorName: creator?.display_name ?? "Creator",
         followerCount: instagram?.followers ?? 0,
         partySize: application.party_size,
