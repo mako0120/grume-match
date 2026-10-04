@@ -14,7 +14,8 @@
     "test:db": "bash supabase/tests/run.sh",
     "insights": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/insights-queue.mjs",
     "post-reports": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/post-report-queue.mjs",
-    "ops": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ops-queues.mjs"
+    "ops": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ops-queues.mjs",
+    "billing": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/billing.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

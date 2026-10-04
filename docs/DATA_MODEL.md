@@ -384,3 +384,18 @@ the last 60 days. No contact details.
 `get_offer_invite(token)` is the anon preview (no address).
 `claim_offer_invite(token)` adds the signed-in Creator as the target, which
 sends the usual direct offer notification. One Creator per invite.
+
+## Stripe invoices
+
+### restaurants (added)
+- billing_email / stripe_customer_id
+
+### platform_invoices
+- restaurant_id / period (YYYY-MM) — one live invoice per Restaurant and month
+- stripe_invoice_id unique / hosted_invoice_url
+- subtotal / tax / total (= subtotal + tax)
+- status open | paid | void / paid_at
+
+`platform_fees.invoice_id` links the fees. `record_platform_invoice` (service
+role) accepts exactly the pending fees and their sum; `apply_stripe_invoice_event`
+(webhook) marks paid or returns voided fees to pending, idempotently.

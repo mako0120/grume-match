@@ -39,6 +39,61 @@ const monthFormatter = new Intl.DateTimeFormat("ja-JP", {
   month: "long",
 });
 
+export type InvoiceRow = {
+  id: string;
+  period: string;
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: "open" | "paid" | "void";
+  hostedInvoiceUrl: string | null;
+  createdAt: string;
+};
+
+/** The signed-in Restaurant's billing settings and Stripe invoices. */
+export async function getRestaurantInvoices() {
+  const supabase = await createClient();
+  const { data: authData } = await supabase.auth.getUser();
+  const { data: membership } = await supabase
+    .from("restaurant_memberships")
+    .select("restaurant_id,restaurants(billing_email)")
+    .eq("user_id", authData.user?.id ?? "")
+    .limit(1)
+    .maybeSingle();
+
+  const { data } = await supabase
+    .from("platform_invoices")
+    .select("id,period,subtotal,tax,total,status,hosted_invoice_url,created_at")
+    .neq("status", "void")
+    .order("period", { ascending: false })
+    .limit(24);
+
+  return {
+    restaurantId: (membership?.restaurant_id as string | undefined) ?? null,
+    billingEmail:
+      single(membership?.restaurants as Relation<{ billing_email: string | null }> ?? null)?.billing_email ?? null,
+    invoices: ((data ?? []) as {
+      id: string;
+      period: string;
+      subtotal: number;
+      tax: number;
+      total: number;
+      status: InvoiceRow["status"];
+      hosted_invoice_url: string | null;
+      created_at: string;
+    }[]).map((row) => ({
+      id: row.id,
+      period: row.period,
+      subtotal: row.subtotal,
+      tax: row.tax,
+      total: row.total,
+      status: row.status,
+      hostedInvoiceUrl: row.hosted_invoice_url,
+      createdAt: row.created_at,
+    })),
+  };
+}
+
 /** The signed-in Restaurant's fees, grouped by month (newest first). */
 export async function getRestaurantBilling() {
   const supabase = await createClient();

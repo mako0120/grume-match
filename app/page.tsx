@@ -117,7 +117,7 @@ export default function HomePage() {
           <article className="feature-card">
             <strong>手数料はPRが完了した時だけ</strong>
             <p>
-              投稿を承認した時に、Creator報酬の{PLATFORM_FEE_RATE * 100}%（最低¥{PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}）。
+              投稿を承認した時に、Creator報酬の{PLATFORM_FEE_RATE * 100}%（最低¥{PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}・税抜）。
               報酬¥8,000なら手数料¥{platformFee(8000).toLocaleString("ja-JP")}。Creatorには報酬を全額お支払いします。
             </p>
           </article>

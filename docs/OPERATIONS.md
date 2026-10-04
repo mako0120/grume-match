@@ -25,7 +25,7 @@ Web では `/admin`（運営Inbox）にも同じ例外が出る。
 | マッチング | `campaigns-no-applicants` | 公開3日で応募0件の案件に、おすすめCreatorを招待。報酬・日程の見直し案を店舗に出す | `/restaurant/campaigns/<id>/applications` の「おすすめCreator」 | 店舗の許可なく条件を変える |
 | 品質管理 | `reviews-low` | ★2以下の評価について双方に事情を聞き、記録して閉じる | `npm run ops -- followed-up <reviewId>` | 評価の削除・書き換え（できない設計） |
 | 店舗開拓 | （キューなし） | Creatorから「DMで依頼が来た」と聞いたら、依頼受付ページのリンクを返すよう案内する。招待リンクが登録待ちのまま3日たった店舗には、相手に再送するよう案内 | `/restaurant/offers/invites`、Creatorの `/creator/profile` | 店舗やCreatorになりすましてDMを送る |
-| 経理 | `payments-ready`、`fees` | 支払承認済みの報酬を振込予定・支払済みにする。月初に店舗ごとの手数料を集計し請求書の下書きを作る。入金確認後に状態を更新 | `/admin/payments`、`npm run ops -- fees`、`npm run ops -- fee-status invoiced <feeId...>`（入金後は `paid`） | 振込・請求書の送付・入金確認はアプリ外で必ず人間が実行。手数料の金額は変えない（初回無料は自動） |
+| 経理 | `payments-ready`、`fees` | 支払承認済みの報酬を振込予定・支払済みにする。月初に `npm run billing -- preview` で前月の手数料を確認し、人間の確認後に `send --yes` でStripeの請求書を送る。入金はWebhookで自動反映。期限切れの「請求済み」は店舗に連絡 | `/admin/payments`、`npm run billing`、`npm run ops -- fees`、`docs/BILLING.md` | Creator報酬の振込は必ず人間が実行。手数料の金額は変えない（初回無料は自動）。人間の確認なしに `--yes` で送らない |
 
 人間が必ず行うこと：振込の実行、規約違反の判断（アカウント停止）、料金・規約の変更、トラブル時の最終回答。
 

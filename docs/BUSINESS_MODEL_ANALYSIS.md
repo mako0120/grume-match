@@ -122,7 +122,7 @@
 
 見直す条件：店舗が月3件以上を継続するようになったら、B案（月額＋低い手数料）を選択肢として追加する。C案（来店成果型）はPRコードの来店記録が十分たまってから検証する。
 
-実装：`lib/pricing.ts`、`supabase/migrations/202610030008_platform_fees.sql`（支払いが承認された時に記録、初回は自動で無料）、店舗の `/restaurant/billing`、経理キュー `npm run ops -- fees`。
+実装：Stripe Invoicingで月1回請求（税抜＋消費税10%、`docs/BILLING.md`）、`lib/pricing.ts`、`supabase/migrations/202610030008_platform_fees.sql`（支払いが承認された時に記録、初回は自動で無料）、店舗の `/restaurant/billing`、経理キュー `npm run ops -- fees`。
 
 ### 守るべき点
 - **資金の流れ**：店舗の支払いを運営が預かってCreatorへ渡す形にすると、資金移動・収納代行の法的確認が必要。パイロットは現状どおり手動振込とし、Stripe Connect等は確認後に導入（`docs/ROADMAP.md` Phase 3）。

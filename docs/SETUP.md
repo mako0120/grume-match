@@ -58,6 +58,15 @@ Optional public origin for SIGNAL tracking links (falls back to the request host
 NEXT_PUBLIC_SITE_URL=https://<production-domain>
 ```
 
+Platform-fee invoices through Stripe (server-side only; see `docs/BILLING.md`):
+
+```env
+STRIPE_SECRET_KEY=
+STRIPE_TAX_RATE_ID=
+STRIPE_WEBHOOK_SECRET=
+INVOICE_REGISTRATION_NUMBER=
+```
+
 Use the modern Supabase secret key for new deployments when available.
 Never expose either server secret to the browser or commit it to Git.
 

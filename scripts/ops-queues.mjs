@@ -178,7 +178,7 @@ const queues = {
   },
   fees: {
     role: "経理",
-    next: "月初に店舗ごとの合計を請求書にして送る → npm run ops -- fee-status invoiced <feeId...>。入金を確認したら fee-status paid",
+    next: "月初に npm run billing -- preview YYYY-MM → 人間が確認 → send YYYY-MM --yes（Stripeで請求書を送付。入金はWebhookで自動反映）。入金期限を過ぎた「請求済み」は店舗に連絡",
     load: (db) =>
       db
         .from("platform_fees")

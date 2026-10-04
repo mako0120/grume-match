@@ -213,6 +213,15 @@ Restaurant:
 - [ ] /i/<token> signed out shows the offer without the address; 登録して受ける → onboarding as Creator → back to the invite → この依頼を受ける → campaign detail.
 - [ ] The invite then shows 「…さんが登録済み」; a second Creator cannot take it.
 
+## Q. Stripe invoices (test mode)
+
+- [ ] Restaurant saves 請求書の送付先 on /restaurant/billing.
+- [ ] `npm run billing -- preview YYYY-MM` lists the month's pending fees with 10% tax; Restaurants without an email are flagged.
+- [ ] `send YYYY-MM --yes` creates one Stripe invoice per Restaurant (card + bank transfer, 登録番号 shown), emails it, and /restaurant/billing shows 「請求書を開く」.
+- [ ] Running `send` again creates nothing new.
+- [ ] Paying in Stripe test mode turns the invoice and its fees 「お支払い済み」 via the webhook; a wrongly signed webhook is rejected.
+- [ ] Voiding the invoice in Stripe returns the fees to 請求予定.
+
 ## Exit criteria
 
 Pilot is ready for external users only when:

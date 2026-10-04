@@ -7,6 +7,18 @@ export const PLATFORM_FEE_RATE = 0.2;
 export const PLATFORM_FEE_MINIMUM = 2000;
 
 /**
+ * Fees are quoted before consumption tax; 10% is added on the invoice.
+ * (Decided 2026-10-04 as the usual B2B form; change here and in the Stripe
+ * tax rate together if the owner decides otherwise.)
+ */
+export const PLATFORM_FEE_TAX_RATE = 0.1;
+
+/** Consumption tax on a set of fees, rounded down once per invoice. */
+export function feeTax(feeTotal: number) {
+  return Math.floor(feeTotal * PLATFORM_FEE_TAX_RATE);
+}
+
+/**
  * Fee for one completed PR, from what the Restaurant pays the Creator.
  * A meal-only invitation (¥0) pays the minimum.
  */
@@ -25,7 +37,7 @@ export function restaurantTotal(creatorPayment: number, waived = false) {
 }
 
 export function formatFeeRule() {
-  return `PRが完了した時だけ、報酬の${PLATFORM_FEE_RATE * 100}%（最低¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}。食事招待のみは¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}）`;
+  return `PRが完了した時だけ、報酬の${PLATFORM_FEE_RATE * 100}%（最低¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}。食事招待のみは¥${PLATFORM_FEE_MINIMUM.toLocaleString("ja-JP")}。税抜）`;
 }
 
 export const platformFeeStatusLabels: Record<string, string> = {
