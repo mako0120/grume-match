@@ -30,6 +30,7 @@ type RawBooking = {
     submitted_at: string | null;
     verification_status: string;
     verification_note: string | null;
+    pr_disclosure_confirmed_at: string | null;
     content_assets?: RawContentAsset[] | null;
   }[] | null;
   content_usage_licenses?: RawUsageLicense | RawUsageLicense[] | null;
@@ -78,6 +79,7 @@ export async function getRestaurantBooking(bookingId: string) {
         submitted_at,
         verification_status,
         verification_note,
+        pr_disclosure_confirmed_at,
         content_assets(id,kind,storage_path,mime_type,byte_size,created_at)
       ),
       content_usage_licenses(usage_scope,duration_days,fee,status,starts_at,expires_at),

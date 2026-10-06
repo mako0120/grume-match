@@ -36,7 +36,7 @@ begin
   if v_deliverable is null then
     raise exception 'creator cannot see own deliverable';
   end if;
-  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/abc/');
+  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/abc/', true);
 
   perform tests.act_as(p.restaurant_user_id);
   perform public.review_deliverable(v_deliverable, true, null);

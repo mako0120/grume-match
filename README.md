@@ -28,7 +28,7 @@
 
 `Creator登録 → 店舗登録 → 案件作成 → 案件一覧 → 日程をタップして応募 → 採用/日時確定 → 来店 → 投稿URL提出 → 報酬管理`
 
-詳細は `docs/PRD.md` を参照してください。運営（AI社員）の回し方は `docs/OPERATIONS.md`。
+詳細は `docs/PRD.md` を参照してください。運営（AI社員）の回し方は `docs/OPERATIONS.md`。有償公開の前にやることは `docs/COMMERCIAL_LAUNCH.md`。
 
 ## Compliance
 

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { safeNextPath, safeRole } from "@/lib/next-path";
+import { safeNextPath, safeRole, withNext } from "@/lib/next-path";
 import { createClient } from "@/lib/supabase/server";
 import {
   completeCreatorOnboarding,
@@ -21,6 +21,7 @@ export default async function OnboardingPage({
   if (!data.user) redirect("/login");
 
   const destination = await resolveSignedInDestination();
+  if (destination === "/terms/accept") redirect(withNext(destination, next, role));
   if (destination !== "/onboarding") redirect(next ?? destination);
 
   return (

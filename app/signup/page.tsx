@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TERMS_VERSION } from "@/lib/legal";
 import { safeNextPath, safeRole, withNext } from "@/lib/next-path";
 import { signUp } from "@/server/actions/auth";
 
@@ -30,6 +31,14 @@ export default async function SignupPage({
           <label>
             パスワード
             <input autoComplete="new-password" minLength={8} name="password" required type="password" />
+          </label>
+          <label className="consent-check">
+            <input name="agreeTerms" required type="checkbox" value={TERMS_VERSION} />
+            <span>
+              <Link href="/terms" target="_blank">利用規約</Link>と
+              <Link href="/privacy" target="_blank">プライバシーポリシー</Link>
+              に同意します
+            </span>
           </label>
           <button className="primary-button form-submit" type="submit">登録する</button>
         </form>

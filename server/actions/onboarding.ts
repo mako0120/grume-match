@@ -7,8 +7,9 @@ import {
   prefectureOf,
   type ServicePrefecture,
 } from "@/lib/areas";
-import { safeNextPath } from "@/lib/next-path";
+import { safeNextPath, withNext } from "@/lib/next-path";
 import { createClient } from "@/lib/supabase/server";
+import { hasAcceptedCurrentTerms } from "@/server/auth/terms";
 
 function onboardingPath(formData: FormData) {
   const next = safeNextPath(formData.get("next"));
@@ -25,6 +26,10 @@ export async function completeCreatorOnboarding(formData: FormData) {
   const { data: authData } = await supabase.auth.getUser();
 
   if (!authData.user) redirect("/login");
+  // Profile data is collected only after consent to the terms and privacy policy.
+  if (!(await hasAcceptedCurrentTerms(supabase, authData.user.id))) {
+    redirect(withNext("/terms/accept", safeNextPath(formData.get("next"))));
+  }
 
   const displayName = String(formData.get("displayName") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
@@ -57,6 +62,10 @@ export async function completeRestaurantOnboarding(formData: FormData) {
   const { data: authData } = await supabase.auth.getUser();
 
   if (!authData.user) redirect("/login");
+  // Profile data is collected only after consent to the terms and privacy policy.
+  if (!(await hasAcceptedCurrentTerms(supabase, authData.user.id))) {
+    redirect(withNext("/terms/accept", safeNextPath(formData.get("next"))));
+  }
 
   const name = String(formData.get("name") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();

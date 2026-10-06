@@ -42,7 +42,7 @@ begin
   perform tests.assert_raises(format(
     'select public.register_pr_post_report(%L, %L)', v_deliverable, v_path), 'post_not_submitted');
 
-  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/x/');
+  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/x/', true);
   v_report := public.register_pr_post_report(v_deliverable, v_path);
 
   -- Another Creator cannot attach a report to this post.

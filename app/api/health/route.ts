@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { missingOperatorEnv } from "@/lib/legal";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +13,19 @@ function environmentReady() {
   ].every(Boolean);
 }
 
+// Operator disclosure (特商法表記) readiness. Reports variable names, never values,
+// and does not change `ok`: the app works, but is not ready for paid launch.
+function legalStatus() {
+  return missingOperatorEnv().length === 0 ? "ok" : "incomplete";
+}
+
 export async function GET() {
   if (!environmentReady()) {
     return NextResponse.json(
       {
         ok: false,
         app: "GOURMET DIARY PR OS",
+        legal: legalStatus(),
         environment: "incomplete",
         database: "not_checked",
       },
@@ -55,6 +63,7 @@ export async function GET() {
         {
           ok: false,
           app: "GOURMET DIARY PR OS",
+        legal: legalStatus(),
           environment: "ready",
           database: "schema_incomplete",
         },
@@ -65,6 +74,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       app: "GOURMET DIARY PR OS",
+      legal: legalStatus(),
       environment: "ready",
       database: "ok",
     });
@@ -73,6 +83,7 @@ export async function GET() {
       {
         ok: false,
         app: "GOURMET DIARY PR OS",
+        legal: legalStatus(),
         environment: "ready",
         database: "unreachable",
       },

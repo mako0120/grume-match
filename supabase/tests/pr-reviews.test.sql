@@ -37,7 +37,7 @@ begin
 
   perform tests.act_as(p.creator_user_id);
   select id into v_deliverable from public.deliverables where booking_id = v_booking;
-  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/x/');
+  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/x/', true);
   perform tests.act_as(p.restaurant_user_id);
   perform public.review_deliverable(v_deliverable, true, null);
 

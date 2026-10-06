@@ -115,7 +115,7 @@ begin
   -- A UGC deliverable cannot be satisfied with a URL or with zero files.
   perform tests.act_as(p.creator_user_id);
   perform tests.assert_raises(
-    format('select public.submit_deliverable(%L, %L)', v_photo, 'https://example.com/a.jpg'),
+    format('select public.submit_deliverable(%L, %L, true)', v_photo, 'https://example.com/a.jpg'),
     'deliverable_requires_upload');
   perform tests.assert_raises(
     format('select public.submit_ugc_deliverable(%L)', v_photo),
@@ -175,7 +175,7 @@ begin
   end if;
 
   perform public.submit_ugc_deliverable(v_photo);
-  perform public.submit_deliverable(v_reel, 'https://www.instagram.com/reel/xyz/');
+  perform public.submit_deliverable(v_reel, 'https://www.instagram.com/reel/xyz/', true);
 
   perform tests.act_as_superuser();
   if not exists (

@@ -4,6 +4,7 @@ import { PostReportCard } from "@/components/post-report-card";
 import { PrReviewSection } from "@/components/pr-review-section";
 import { UgcAssetGrid } from "@/components/ugc-asset-grid";
 import { UsageLicenseSummary } from "@/components/usage-license-summary";
+import { isCalendarExportable } from "@/lib/calendar-export";
 import { ugcKindForPlatform } from "@/lib/content-rights";
 import {
   paymentStatusLabels,
@@ -58,6 +59,14 @@ export default async function RestaurantBookingDetailPage({
         <p>{booking.campaignTitle}</p>
         <div className="booking-visit">{booking.visitLabel}</div>
       </section>
+
+      {isCalendarExportable(booking.status) ? (
+        <section className="booking-actions">
+          <a className="secondary-button" href={`/bookings/${booking.id}/calendar.ics`} download>
+            カレンダーに追加
+          </a>
+        </section>
+      ) : null}
 
       <section className="summary-grid">
         <div className="summary-item">
@@ -142,6 +151,17 @@ export default async function RestaurantBookingDetailPage({
             ) : (
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
+
+            {!ugcKindForPlatform(deliverable.platform) && deliverable.submitted_url ? (
+              <p className="pr-disclosure-note">
+                <strong>
+                  {deliverable.pr_disclosure_confirmed_at
+                    ? "PR表記：Creatorが表記済みと確認"
+                    : "PR表記：未確認"}
+                </strong>
+                承認する前に、投稿に「PR」「広告」などの表記があるかをご確認ください。表記のない投稿は承認せず、修正を依頼してください。
+              </p>
+            ) : null}
 
             {reports.get(deliverable.id)?.status === "verified" ? (
               <PostReportCard costYen={costPerPost} report={reports.get(deliverable.id)!} />

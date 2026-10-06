@@ -178,6 +178,7 @@ DB transactionで、
 - submitted_at nullable
 - verification_status enum: pending | approved | rejected
 - verification_note nullable
+- pr_disclosure_confirmed_at nullable — set by `submit_deliverable(id, url, pr_disclosed)`; a URL cannot be submitted unless the Creator confirms the PR表記
 
 ### payments
 - id
@@ -399,3 +400,13 @@ sends the usual direct offer notification. One Creator per invite.
 `platform_fees.invoice_id` links the fees. `record_platform_invoice` (service
 role) accepts exactly the pending fees and their sum; `apply_stripe_invoice_event`
 (webhook) marks paid or returns voided fees to pending, idempotently.
+
+## Terms consent
+
+### terms_acceptances
+- user_id / terms_version (YYYY-MM-DD, primary key together) / accepted_at
+
+History of consent to 利用規約・プライバシーポリシー. The current version is
+`TERMS_VERSION` in `lib/legal.ts`; changing it asks everyone again on
+`/terms/accept`. Users read only their own rows; writes go through
+`accept_terms(version)` only, which also writes a `terms.accepted` audit log.

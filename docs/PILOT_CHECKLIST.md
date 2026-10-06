@@ -10,6 +10,10 @@ Use two separate browser profiles so Creator and Restaurant sessions do not inte
 - [ ] Creator registers Instagram metrics.
 - [ ] Restaurant signs up and completes Restaurant onboarding.
 - [ ] Restaurant dashboard opens without cross-account data leakage.
+- [ ] Signup cannot be submitted without the 利用規約・プライバシーポリシー checkbox.
+- [ ] With email confirmation on: first login goes to /terms/accept before /onboarding; after agreeing it continues to onboarding (and keeps an invite/Creator `next`).
+- [ ] An existing user without the current version is sent to /terms/accept from any /creator or /restaurant page; 同意せずにログアウト works.
+- [ ] /terms, /privacy, /legal open signed out and show the real operator details (no 未設定), and /api/health shows `legal: "ok"`.
 
 ## B. Normal MARKET transaction
 
@@ -68,10 +72,20 @@ Repeat once and reject:
 - [ ] Reschedule action disappears after the original visit starts.
 - [ ] Direct RPC attempt after visit start is rejected.
 
+### Calendar export
+
+- [ ] Creator booking detail shows 「カレンダーに追加」 for a confirmed booking and the .ics opens in Google Calendar / iPhone カレンダー at the right JST time.
+- [ ] Restaurant booking detail shows the same button; the event names the Creator, not the Restaurant.
+- [ ] After an approved reschedule, downloading again updates the same event (same UID) instead of adding a second one.
+- [ ] The .ics contains no reward, fee or payment status.
+- [ ] Another Creator, an unrelated user and a logged-out visitor cannot download it (404 / login redirect).
+- [ ] Cancelled / no-show / visited bookings show no button and return 404.
+
 ## E. Deliverable
 
 Creator:
 - [ ] Submit Instagram/TikTok URL.
+- [ ] URL cannot be submitted without the PR表記 checkbox; the Restaurant sees 「PR表記：Creatorが表記済みと確認」 next to the post.
 - [ ] Application moves to submitted when all required URLs exist.
 
 Restaurant:

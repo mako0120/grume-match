@@ -1,3 +1,4 @@
+import { isCalendarExportable } from "@/lib/calendar-export";
 import { formatReward } from "@/lib/pricing";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -87,6 +88,11 @@ export default async function CreatorBookingDetailPage({
           <Link className="secondary-button" href={`/creator/bookings/${booking.id}/reschedule`}>
             来店日時を変更
           </Link>
+        ) : null}
+        {isCalendarExportable(booking.status) ? (
+          <a className="secondary-button" href={`/bookings/${booking.id}/calendar.ics`} download>
+            カレンダーに追加
+          </a>
         ) : null}
         <Link className="secondary-button" href="/notifications">
           通知を見る
@@ -225,9 +231,17 @@ export default async function CreatorBookingDetailPage({
               ) : null}
 
               {deliverable.verification_status !== "approved" ? (
-                <button className="secondary-button" type="submit">
-                  {deliverable.submitted_url ? "URLを更新" : "投稿URLを提出"}
-                </button>
+                <>
+                  <label className="consent-check">
+                    <input name="prDisclosed" required type="checkbox" value="yes" />
+                    <span>
+                      投稿に「PR」「広告」など、広告だとわかる表記をしました（食事招待のみでも必要です）
+                    </span>
+                  </label>
+                  <button className="secondary-button" type="submit">
+                    {deliverable.submitted_url ? "URLを更新" : "投稿URLを提出"}
+                  </button>
+                </>
               ) : (
                 <div className="pending-box">承認済みの投稿URLです。</div>
               )}

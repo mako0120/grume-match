@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { hasAcceptedCurrentTerms } from "@/server/auth/terms";
 
 export type AccountDestination =
+  | "/terms/accept"
   | "/onboarding"
   | "/creator/campaigns"
   | "/restaurant"
@@ -18,7 +20,15 @@ export async function resolveSignedInDestination(): Promise<AccountDestination> 
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || userRow.status !== "active" || !userRow.onboarding_completed_at) {
+  if (!userRow || userRow.status !== "active") {
+    return "/onboarding";
+  }
+
+  if (!(await hasAcceptedCurrentTerms(supabase, authData.user.id))) {
+    return "/terms/accept";
+  }
+
+  if (!userRow.onboarding_completed_at) {
     return "/onboarding";
   }
 

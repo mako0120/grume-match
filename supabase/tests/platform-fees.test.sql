@@ -39,7 +39,7 @@ begin
     if i < 3 then
       perform tests.act_as(p.creator_user_id);
       select id into v_deliverable from public.deliverables where booking_id = v_booking;
-      perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/' || i || '/');
+      perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/' || i || '/', true);
       perform tests.act_as(p.restaurant_user_id);
       perform public.review_deliverable(v_deliverable, true, null);
     end if;
@@ -86,7 +86,7 @@ begin
     (select id from public.applications where campaign_id = v_campaign), v_slot);
   perform tests.act_as(p.creator_user_id);
   select id into v_deliverable from public.deliverables where booking_id = v_booking;
-  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/meal/');
+  perform public.submit_deliverable(v_deliverable, 'https://www.instagram.com/reel/meal/', true);
   perform tests.act_as(p.restaurant_user_id);
   perform public.review_deliverable(v_deliverable, true, null);
 
