@@ -10,6 +10,10 @@ Use two separate browser profiles so Creator and Restaurant sessions do not inte
 - [ ] Creator registers Instagram metrics.
 - [ ] Restaurant signs up and completes Restaurant onboarding.
 - [ ] Restaurant dashboard opens without cross-account data leakage.
+- [ ] Signup cannot be submitted without the 利用規約・プライバシーポリシー checkbox.
+- [ ] With email confirmation on: first login goes to /terms/accept before /onboarding; after agreeing it continues to onboarding (and keeps an invite/Creator `next`).
+- [ ] An existing user without the current version is sent to /terms/accept from any /creator or /restaurant page; 同意せずにログアウト works.
+- [ ] /terms, /privacy, /legal open signed out and show the real operator details (no 未設定), and /api/health shows `legal: "ok"`.
 
 ## B. Normal MARKET transaction
 
@@ -81,6 +85,7 @@ Repeat once and reject:
 
 Creator:
 - [ ] Submit Instagram/TikTok URL.
+- [ ] URL cannot be submitted without the PR表記 checkbox; the Restaurant sees 「PR表記：Creatorが表記済みと確認」 next to the post.
 - [ ] Application moves to submitted when all required URLs exist.
 
 Restaurant:

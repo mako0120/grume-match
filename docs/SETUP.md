@@ -67,6 +67,18 @@ STRIPE_WEBHOOK_SECRET=
 INVOICE_REGISTRATION_NUMBER=
 ```
 
+Operator disclosure shown on `/legal`, `/terms` and `/privacy` (required before
+paid launch; see `docs/COMMERCIAL_LAUNCH.md`). `/api/health` reports
+`legal: "incomplete"` until all five are set:
+
+```env
+LEGAL_OPERATOR_NAME=
+LEGAL_OPERATOR_REPRESENTATIVE=
+LEGAL_OPERATOR_ADDRESS=
+LEGAL_OPERATOR_PHONE=
+LEGAL_CONTACT_EMAIL=
+```
+
 Use the modern Supabase secret key for new deployments when available.
 Never expose either server secret to the browser or commit it to Git.
 
@@ -192,6 +204,11 @@ Creator:
 
 Public:
 - `/r/<code>` — Creator tracking link landing page (no login)
+- `/terms`, `/privacy`, `/legal` — 利用規約・プライバシーポリシー・特定商取引法に基づく表記
+
+Signed in, any role:
+- `/terms/accept` — consent to the current terms version (asked before onboarding and the app)
+- `/bookings/<id>/calendar.ics` — visit as a calendar file (booking parties only)
 
 Operator:
 - `/admin`

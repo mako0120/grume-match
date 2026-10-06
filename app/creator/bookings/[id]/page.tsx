@@ -231,9 +231,17 @@ export default async function CreatorBookingDetailPage({
               ) : null}
 
               {deliverable.verification_status !== "approved" ? (
-                <button className="secondary-button" type="submit">
-                  {deliverable.submitted_url ? "URLを更新" : "投稿URLを提出"}
-                </button>
+                <>
+                  <label className="consent-check">
+                    <input name="prDisclosed" required type="checkbox" value="yes" />
+                    <span>
+                      投稿に「PR」「広告」など、広告だとわかる表記をしました（食事招待のみでも必要です）
+                    </span>
+                  </label>
+                  <button className="secondary-button" type="submit">
+                    {deliverable.submitted_url ? "URLを更新" : "投稿URLを提出"}
+                  </button>
+                </>
               ) : (
                 <div className="pending-box">承認済みの投稿URLです。</div>
               )}

@@ -13,18 +13,29 @@ export async function submitDeliverable(formData: FormData) {
   const deliverableId = String(formData.get("deliverableId") ?? "");
   const bookingId = String(formData.get("bookingId") ?? "");
   const url = String(formData.get("url") ?? "").trim();
+  const prDisclosed = formData.get("prDisclosed") === "yes";
 
   if (!deliverableId || !bookingId || !url) return;
 
   const path = "/creator/bookings/" + bookingId;
+
+  if (!prDisclosed) {
+    redirect(withMessage(path, "投稿に「PR」などの表記をしたことを確認してください。", "error"));
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.rpc("submit_deliverable", {
     p_deliverable_id: deliverableId,
     p_url: url,
+    p_pr_disclosed: prDisclosed,
   });
 
   if (error) {
     const reason = error.message ?? "";
+
+    if (reason.includes("pr_disclosure_required")) {
+      redirect(withMessage(path, "投稿に「PR」などの表記をしたことを確認してください。", "error"));
+    }
 
     if (reason.includes("invalid_deliverable_url")) {
       redirect(withMessage(path, "投稿URLを確認してください。", "error"));

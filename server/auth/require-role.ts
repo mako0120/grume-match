@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { hasAcceptedCurrentTerms } from "@/server/auth/terms";
 
 export type AppRole = "creator" | "restaurant" | "admin";
 
@@ -19,6 +20,10 @@ export async function requireRole(allowed: AppRole[]) {
 
   if (error || !userRow || userRow.status !== "active") {
     redirect("/login");
+  }
+
+  if (!(await hasAcceptedCurrentTerms(supabase, authData.user.id))) {
+    redirect("/terms/accept");
   }
 
   if (!userRow.onboarding_completed_at) {

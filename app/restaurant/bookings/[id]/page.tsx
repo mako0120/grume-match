@@ -152,6 +152,17 @@ export default async function RestaurantBookingDetailPage({
               <div className="pending-box">まだ投稿URLが提出されていません。</div>
             )}
 
+            {!ugcKindForPlatform(deliverable.platform) && deliverable.submitted_url ? (
+              <p className="pr-disclosure-note">
+                <strong>
+                  {deliverable.pr_disclosure_confirmed_at
+                    ? "PR表記：Creatorが表記済みと確認"
+                    : "PR表記：未確認"}
+                </strong>
+                承認する前に、投稿に「PR」「広告」などの表記があるかをご確認ください。表記のない投稿は承認せず、修正を依頼してください。
+              </p>
+            ) : null}
+
             {reports.get(deliverable.id)?.status === "verified" ? (
               <PostReportCard costYen={costPerPost} report={reports.get(deliverable.id)!} />
             ) : deliverable.submitted_url && !ugcKindForPlatform(deliverable.platform) ? (
