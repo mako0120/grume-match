@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export type RestaurantTask = {
   id: string;
-  kind: "application" | "reschedule" | "deliverable";
+  kind: "application" | "reschedule" | "deliverable" | "visit";
   title: string;
   detail: string;
   href: string;
@@ -24,7 +24,9 @@ export async function getRestaurantDashboard() {
   if (membershipError || !membership) return null;
 
   const restaurantId = membership.restaurant_id;
-  const now = new Date().toISOString();
+  const nowMs = Date.now();
+  const now = new Date(nowMs).toISOString();
+  const recentCutoff = new Date(nowMs - 6 * 60 * 60 * 1000).toISOString();
 
   const [
     campaignsResult,
@@ -52,7 +54,7 @@ export async function getRestaurantDashboard() {
       .from("bookings")
       .select("id,status,campaign_id,creator_profiles(display_name),campaign_slots!inner(starts_at),campaigns!inner(restaurant_id,title)")
       .eq("campaigns.restaurant_id", restaurantId)
-      .gte("campaign_slots.starts_at", now)
+      .gte("campaign_slots.starts_at", recentCutoff)
       .in("status", ["confirmed", "reschedule_requested"])
       .order("campaign_slots(starts_at)", { ascending: true })
       .limit(10),
