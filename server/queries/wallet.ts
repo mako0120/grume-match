@@ -29,6 +29,7 @@ export async function getCreatorWallet() {
   const totals = payments.reduce(
     (acc, payment) => {
       const amount = Number(payment.amount ?? 0);
+      if (payment.status === "cancelled") return acc;
       acc.total += amount;
       if (payment.status === "paid") acc.paid += amount;
       else if (payment.status === "approved" || payment.status === "scheduled") acc.upcoming += amount;
