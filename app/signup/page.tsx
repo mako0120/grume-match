@@ -26,6 +26,15 @@ export default async function SignupPage({
             パスワード
             <input autoComplete="new-password" minLength={8} name="password" required type="password" />
           </label>
+          <label className="policy-confirm-row">
+            <input name="policyConsent" required type="checkbox" />
+            <span>
+              <Link href="/legal/terms" target="_blank">利用規約</Link>、
+              <Link href="/legal/privacy" target="_blank">プライバシーポリシー</Link>、
+              <Link href="/legal/pr-guidelines" target="_blank">PRガイドライン</Link>
+              を確認しました。
+            </span>
+          </label>
           <button className="primary-button form-submit" type="submit">登録する</button>
         </form>
 
