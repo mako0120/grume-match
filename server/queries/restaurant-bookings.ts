@@ -27,7 +27,8 @@ const visitFormatter = new Intl.DateTimeFormat("ja-JP", {
 
 export async function listRestaurantUpcomingBookings() {
   const supabase = await createClient();
-  const now = new Date().toISOString();
+  const nowMs = Date.now();
+  const cutoff = new Date(nowMs - 6 * 60 * 60 * 1000).toISOString();
 
   const { data, error } = await supabase
     .from("bookings")
@@ -39,8 +40,8 @@ export async function listRestaurantUpcomingBookings() {
       campaigns(title),
       creator_profiles(display_name)
     `)
-    .in("status", ["confirmed", "reschedule_requested"])
-    .gte("campaign_slots.starts_at", now)
+    .in("status", ["confirmed", "reschedule_requested", "visited"])
+    .gte("campaign_slots.starts_at", cutoff)
     .limit(100);
 
   if (error) throw new Error(error.message);
@@ -59,6 +60,10 @@ export async function listRestaurantUpcomingBookings() {
         visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
         campaignTitle: campaign?.title ?? "PR案件",
         creatorName: creator?.display_name ?? "Creator",
+        needsVisitConfirmation:
+          row.status === "confirmed" &&
+          Boolean(slot) &&
+          new Date(slot!.starts_at).getTime() <= nowMs,
       };
     })
     .filter((row) => row.startsAt)
