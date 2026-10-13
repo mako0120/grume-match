@@ -96,7 +96,21 @@ export async function getRestaurantBooking(bookingId: string) {
     restaurantName: restaurant?.name ?? "店舗",
     creatorName: creator?.display_name ?? "Creator",
     followerCount: instagram?.followers ?? 0,
+    startsAt: slot?.starts_at ?? "",
+    endsAt: slot?.ends_at ?? "",
     visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
+    canMarkVisited:
+      ["confirmed", "reschedule_requested"].includes(row.status) &&
+      Boolean(slot) &&
+      new Date(slot!.starts_at).getTime() <= Date.now(),
+    canCancel:
+      ["confirmed", "reschedule_requested"].includes(row.status) &&
+      Boolean(slot) &&
+      new Date(slot!.starts_at).getTime() > Date.now(),
+    canMarkNoShow:
+      ["confirmed", "reschedule_requested"].includes(row.status) &&
+      Boolean(slot) &&
+      new Date(slot!.starts_at).getTime() + 30 * 60 * 1000 <= Date.now(),
     cashReward: payment?.amount ?? campaign?.cash_reward ?? 0,
     paymentStatus: payment?.status ?? "pending",
     deliverables: row.deliverables ?? [],
