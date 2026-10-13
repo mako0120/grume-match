@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { bookingStatusLabels } from "@/lib/status-labels";
 import { listRestaurantUpcomingBookings } from "@/server/queries/restaurant-bookings";
 
 export default async function RestaurantBookingsPage() {
@@ -8,12 +9,12 @@ export default async function RestaurantBookingsPage() {
     <main className="creator-shell">
       <header className="creator-header">
         <strong>GOURMET DIARY</strong>
-        <span className="status-pill">来店予定</span>
+        <span className="status-pill">来店管理</span>
       </header>
 
-      <h1 className="page-title">来店予定</h1>
+      <h1 className="page-title">来店管理</h1>
       <p className="page-subtitle">
-        確定したPR来店だけを、日時が近い順に表示します。
+        これからの来店と、直近で確認が必要な来店をまとめて表示します。
       </p>
 
       {bookings.length ? (
@@ -25,10 +26,16 @@ export default async function RestaurantBookingsPage() {
               key={booking.id}
             >
               <div>
-                <span className="meta-pill">{booking.visitLabel}</span>
+                <div className="booking-meta-row">
+                  <span className="meta-pill">{booking.visitLabel}</span>
+                  <span className="meta-pill">
+                    {bookingStatusLabels[booking.status] ?? booking.status}
+                  </span>
+                </div>
                 <h2>{booking.creatorName}</h2>
                 <p>
                   {booking.campaignTitle}・{booking.partySize}名
+                  {booking.needsVisitConfirmation ? "・来店確認待ち" : ""}
                 </p>
               </div>
 
@@ -38,8 +45,8 @@ export default async function RestaurantBookingsPage() {
         </section>
       ) : (
         <section className="section-card">
-          <strong>現在、来店予定はありません</strong>
-          <p>Creatorの採用日時が確定すると、ここに表示されます。</p>
+          <strong>現在、確認する来店はありません</strong>
+          <p>来店日時が確定すると、ここに表示されます。</p>
         </section>
       )}
     </main>
