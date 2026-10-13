@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { CURRENT_POLICY_VERSION, REQUIRED_POLICIES } from "@/lib/policies";
 import { createClient } from "@/lib/supabase/server";
 
 export type AppRole = "creator" | "restaurant" | "admin";
@@ -11,14 +12,26 @@ export async function requireRole(allowed: AppRole[]) {
     redirect("/login");
   }
 
-  const { data: userRow, error } = await supabase
-    .from("users")
-    .select("role,status,onboarding_completed_at")
-    .eq("id", authData.user.id)
-    .single();
+  const [{ data: userRow, error }, { data: acceptedRows }] = await Promise.all([
+    supabase
+      .from("users")
+      .select("role,status,onboarding_completed_at")
+      .eq("id", authData.user.id)
+      .single(),
+    supabase
+      .from("user_policy_acceptances")
+      .select("policy")
+      .eq("user_id", authData.user.id)
+      .eq("version", CURRENT_POLICY_VERSION),
+  ]);
 
   if (error || !userRow || userRow.status !== "active") {
     redirect("/login");
+  }
+
+  const accepted = new Set((acceptedRows ?? []).map((row) => row.policy));
+  if (!REQUIRED_POLICIES.every((policy) => accepted.has(policy))) {
+    redirect("/legal/accept");
   }
 
   if (!userRow.onboarding_completed_at) {
