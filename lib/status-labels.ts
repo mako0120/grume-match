@@ -4,6 +4,7 @@ export const paymentStatusLabels: Record<string, string> = {
   scheduled: "振込予定",
   paid: "支払済み",
   failed: "要確認",
+  cancelled: "キャンセル",
 };
 
 export const verificationStatusLabels: Record<string, string> = {
@@ -17,6 +18,9 @@ export const notificationTypeLabels: Record<string, string> = {
   application_rejected: "募集結果",
   application_withdrawn: "応募",
   booking_confirmed: "来店確定",
+  visit_confirmed: "来店確認",
+  booking_cancelled: "キャンセル",
+  booking_no_show: "来店状況",
   reschedule_requested: "日時変更",
   reschedule_approved: "日時変更",
   reschedule_rejected: "日時変更",
@@ -33,7 +37,6 @@ export const notificationTypeLabels: Record<string, string> = {
   direct_offer_received: "指名",
 };
 
-
 export const campaignStatusLabels: Record<string, string> = {
   draft: "下書き",
   published: "公開中",
@@ -44,4 +47,13 @@ export const campaignStatusLabels: Record<string, string> = {
   completed: "完了",
   cancelled: "キャンセル",
   suspended: "停止中",
+};
+
+export const bookingStatusLabels: Record<string, string> = {
+  held: "仮確定",
+  confirmed: "来店予定",
+  visited: "来店済み",
+  reschedule_requested: "日時変更中",
+  cancelled: "キャンセル",
+  no_show: "来店なし",
 };
