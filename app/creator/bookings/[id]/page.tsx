@@ -110,6 +110,11 @@ export default async function CreatorBookingDetailPage({
 
       <section className="deliverable-section">
         <h2>投稿物を提出</h2>
+        {!booking.canSubmitDeliverables && booking.status === "confirmed" ? (
+          <div className="pending-box">
+            投稿URLは来店開始時刻を過ぎてから提出できます。
+          </div>
+        ) : null}
         <p className="schedule-hint">
           投稿後のURLを登録すると、店舗側で確認できるようになります。
         </p>
