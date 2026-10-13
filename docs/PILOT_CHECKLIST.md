@@ -68,7 +68,22 @@ Repeat once and reject:
 - [ ] Reschedule action disappears after the original visit starts.
 - [ ] Direct RPC attempt after visit start is rejected.
 
-## E. Deliverable
+## E. Visit lifecycle
+
+Restaurant:
+- [ ] Booking remains visible for several hours after its start time until handled.
+- [ ] Mark the Creator as visited after the scheduled start.
+- [ ] Creator receives a visit confirmation notification.
+- [ ] Restaurant can cancel a future confirmed visit and the Creator is notified.
+- [ ] After 30 minutes, Restaurant can mark an unvisited booking as no-show.
+- [ ] Cancelled/no-show bookings do not remain payable.
+
+Creator:
+- [ ] Creator can cancel a future confirmed visit and the slot reopens.
+- [ ] Deliverable URL cannot be submitted before the visit starts.
+- [ ] Submitting after visit start advances the visit lifecycle.
+
+## F. Deliverable
 
 Creator:
 - [ ] Submit Instagram/TikTok URL.
@@ -89,7 +104,7 @@ Payment:
 - [ ] Creator Wallet shows approved amount.
 - [ ] Due date is created.
 
-## F. Manual payout
+## G. Manual payout
 
 Admin:
 - [ ] Approved payment appears in payout queue.
@@ -99,7 +114,7 @@ Admin:
 - [ ] Mark paid.
 - [ ] Creator Wallet shows paid.
 
-## G. FLASH
+## H. FLASH
 
 Restaurant:
 - [ ] Create an urgent campaign.
@@ -111,7 +126,7 @@ Creator:
 - [ ] FLASH campaign is visible in FLASH.
 - [ ] Open and apply using its available slot.
 
-## H. Reminders
+## I. Reminders
 
 - [ ] Cron request without secret returns 401.
 - [ ] Authorized cron succeeds.
@@ -121,7 +136,7 @@ Creator:
 - [ ] Expired recruitment moves to 募集終了 automatically.
 - [ ] Pending applicants receive their outcome when recruitment closes.
 
-## I. Operator Inbox Zero
+## J. Operator Inbox Zero
 
 - [ ] Healthy transactions do not appear as exceptions.
 - [ ] Overdue deliverable appears.
