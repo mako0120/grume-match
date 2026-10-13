@@ -78,6 +78,22 @@ export default async function CreatorBookingDetailPage({
             来店日時を変更
           </Link>
         ) : null}
+        {booking.canCancel ? (
+          <details className="danger-details booking-cancel-details">
+            <summary>来店をキャンセル</summary>
+            <form action={cancelBooking} className="danger-form">
+              <input name="bookingId" type="hidden" value={booking.id} />
+              <input name="scope" type="hidden" value="creator" />
+              <label>
+                理由（任意）
+                <input name="reason" placeholder="急な予定変更など" />
+              </label>
+              <button className="secondary-button" type="submit">
+                キャンセルを確定
+              </button>
+            </form>
+          </details>
+        ) : null}
         <Link className="secondary-button" href="/notifications">
           通知を見る
         </Link>
