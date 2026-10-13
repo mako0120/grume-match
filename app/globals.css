@@ -1837,3 +1837,29 @@ button {
   font-size: 12px;
   font-weight: 900;
 }
+
+
+.booking-lifecycle-card {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.booking-lifecycle-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.booking-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.booking-cancel-details {
+  flex: 1;
+}
