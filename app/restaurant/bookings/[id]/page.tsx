@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { paymentStatusLabels, verificationStatusLabels } from "@/lib/status-labels";
+import {
+  bookingStatusLabels,
+  paymentStatusLabels,
+  verificationStatusLabels,
+} from "@/lib/status-labels";
+import {
+  cancelBooking,
+  markBookingNoShow,
+  markBookingVisited,
+} from "@/server/actions/bookings";
 import { reviewDeliverable } from "@/server/actions/deliverables";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
 
@@ -59,12 +68,65 @@ export default async function RestaurantBookingDetailPage({
           <strong>¥{booking.cashReward.toLocaleString()}</strong>
         </div>
         <div className="summary-item">
+          <span>来店状態</span>
+          <strong>{bookingStatusLabels[booking.status] ?? booking.status}</strong>
+        </div>
+        <div className="summary-item">
           <span>支払い状態</span>
           <strong>
             {paymentStatusLabels[booking.paymentStatus] ?? booking.paymentStatus}
           </strong>
         </div>
       </section>
+
+      {booking.canMarkVisited || booking.canCancel || booking.canMarkNoShow ? (
+        <section className="booking-lifecycle-card">
+          <span className="eyebrow">VISIT</span>
+          <h2>来店状況</h2>
+
+          {booking.canMarkVisited ? (
+            <form action={markBookingVisited}>
+              <input name="bookingId" type="hidden" value={booking.id} />
+              <button className="primary-button" type="submit">
+                来店済みにする
+              </button>
+            </form>
+          ) : null}
+
+          {booking.canCancel ? (
+            <details className="danger-details">
+              <summary>この来店をキャンセル</summary>
+              <form action={cancelBooking} className="danger-form">
+                <input name="bookingId" type="hidden" value={booking.id} />
+                <input name="scope" type="hidden" value="restaurant" />
+                <label>
+                  理由（任意）
+                  <input name="reason" placeholder="急な休業など" />
+                </label>
+                <button className="secondary-button" type="submit">
+                  キャンセルを確定
+                </button>
+              </form>
+            </details>
+          ) : null}
+
+          {booking.canMarkNoShow ? (
+            <details className="danger-details">
+              <summary>来店なしとして記録</summary>
+              <form action={markBookingNoShow} className="danger-form">
+                <input name="bookingId" type="hidden" value={booking.id} />
+                <label>
+                  メモ（任意）
+                  <input name="reason" placeholder="連絡なし・30分経過など" />
+                </label>
+                <button className="secondary-button" type="submit">
+                  来店なしを確定
+                </button>
+              </form>
+            </details>
+          ) : null}
+        </section>
+      ) : null}
 
       {message ? (
         <div
