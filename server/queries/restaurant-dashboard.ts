@@ -25,7 +25,6 @@ export async function getRestaurantDashboard() {
 
   const restaurantId = membership.restaurant_id;
   const nowMs = Date.now();
-  const now = new Date(nowMs).toISOString();
   const recentCutoff = new Date(nowMs - 6 * 60 * 60 * 1000).toISOString();
 
   const [
