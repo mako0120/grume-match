@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { confirmBooking } from "@/server/services/confirm-booking";
 
 export type BookingActionResult =
@@ -38,4 +40,129 @@ export async function confirmApplicationBooking(
 
     return { ok: false, message: "予約を確定できませんでした。" };
   }
+}
+
+
+function bookingResultPath(
+  scope: "creator" | "restaurant",
+  bookingId: string,
+  status: "ok" | "error",
+  message: string,
+) {
+  const params = new URLSearchParams({ status, message });
+  return "/" + scope + "/bookings/" + bookingId + "?" + params.toString();
+}
+
+export async function markBookingVisited(formData: FormData) {
+  const bookingId = String(formData.get("bookingId") ?? "");
+  if (!bookingId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mark_booking_visited", {
+    p_booking_id: bookingId,
+  });
+
+  if (error) {
+    const reason = error.message ?? "";
+    const message = reason.includes("visit_not_started")
+      ? "来店開始時刻より前は来店済みにできません。"
+      : reason.includes("booking_not_visitable")
+        ? "この来店は現在、来店済みに変更できません。"
+        : "来店確認を更新できませんでした。";
+
+    redirect(bookingResultPath("restaurant", bookingId, "error", message));
+  }
+
+  revalidatePath("/restaurant");
+  revalidatePath("/restaurant/bookings");
+  revalidatePath("/creator/bookings");
+  revalidatePath("/creator/bookings/" + bookingId);
+  redirect(
+    bookingResultPath(
+      "restaurant",
+      bookingId,
+      "ok",
+      "来店済みにしました。Creatorは投稿URLを提出できます。",
+    ),
+  );
+}
+
+export async function cancelBooking(formData: FormData) {
+  const bookingId = String(formData.get("bookingId") ?? "");
+  const scope =
+    String(formData.get("scope") ?? "") === "restaurant"
+      ? "restaurant"
+      : "creator";
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  if (!bookingId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("cancel_booking", {
+    p_booking_id: bookingId,
+    p_reason: reason || null,
+  });
+
+  if (error) {
+    const code = error.message ?? "";
+    const message = code.includes("visit_already_started")
+      ? "来店開始後は通常キャンセルできません。店舗側で来店状況を確認してください。"
+      : code.includes("booking_not_cancellable")
+        ? "この来店はすでに処理済みです。"
+        : "キャンセル処理に失敗しました。";
+
+    redirect(bookingResultPath(scope, bookingId, "error", message));
+  }
+
+  revalidatePath("/restaurant");
+  revalidatePath("/restaurant/bookings");
+  revalidatePath("/creator/bookings");
+  revalidatePath("/creator/wallet");
+  revalidatePath("/admin");
+  redirect(
+    bookingResultPath(
+      scope,
+      bookingId,
+      "ok",
+      "来店をキャンセルしました。相手にも通知されます。",
+    ),
+  );
+}
+
+export async function markBookingNoShow(formData: FormData) {
+  const bookingId = String(formData.get("bookingId") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  if (!bookingId) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mark_booking_no_show", {
+    p_booking_id: bookingId,
+    p_reason: reason || null,
+  });
+
+  if (error) {
+    const code = error.message ?? "";
+    const message = code.includes("no_show_too_early")
+      ? "来店予定時刻から30分経過するまで来店なしにはできません。"
+      : code.includes("booking_not_no_showable")
+        ? "この来店はすでに処理済みです。"
+        : "来店なしを記録できませんでした。";
+
+    redirect(bookingResultPath("restaurant", bookingId, "error", message));
+  }
+
+  revalidatePath("/restaurant");
+  revalidatePath("/restaurant/bookings");
+  revalidatePath("/creator/bookings");
+  revalidatePath("/creator/wallet");
+  revalidatePath("/admin");
+  redirect(
+    bookingResultPath(
+      "restaurant",
+      bookingId,
+      "ok",
+      "来店なしとして記録しました。運営Inboxにも反映されます。",
+    ),
+  );
 }
