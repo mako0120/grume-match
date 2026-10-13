@@ -1,16 +1,9 @@
+import { paymentStatusLabels } from "@/lib/status-labels";
 import { getCreatorWallet } from "@/server/queries/wallet";
 
 function relationOne<T>(value: T | T[] | null | undefined): T | null {
   return Array.isArray(value) ? value[0] ?? null : value ?? null;
 }
-
-const statusLabels: Record<string, string> = {
-  pending: "確認待ち",
-  approved: "支払承認済み",
-  scheduled: "振込予定",
-  paid: "支払済み",
-  failed: "要確認",
-};
 
 export default async function CreatorWalletPage() {
   const { payments, totals } = await getCreatorWallet();
@@ -57,7 +50,7 @@ export default async function CreatorWalletPage() {
               <article className="booking-card" key={payment.id}>
                 <div>
                   <span className="meta-pill">
-                    {statusLabels[payment.status] ?? payment.status}
+                    {paymentStatusLabels[payment.status] ?? payment.status}
                   </span>
                   <h2>{restaurant?.name ?? "店舗"}</h2>
                   <p>{campaign?.title ?? "PR案件"}</p>
