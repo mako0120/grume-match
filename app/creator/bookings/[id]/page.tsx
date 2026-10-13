@@ -5,6 +5,7 @@ import {
   paymentStatusLabels,
   verificationStatusLabels,
 } from "@/lib/status-labels";
+import { cancelBooking } from "@/server/actions/bookings";
 import { submitDeliverable } from "@/server/actions/deliverables";
 import { getCreatorBooking } from "@/server/queries/bookings";
 
