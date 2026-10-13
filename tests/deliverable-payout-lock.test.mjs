@@ -19,7 +19,8 @@ test("primary booking UI hides mutable controls for approved deliverables", asyn
     readFile("app/restaurant/bookings/[id]/page.tsx", "utf8"),
   ]);
 
-  assert.match(creator, /disabled=\{deliverable\.verification_status === "approved"\}/);
+  assert.match(creator, /deliverable\.verification_status === "approved"/);
+  assert.match(creator, /!booking\.canSubmitDeliverables/);
   assert.match(creator, /承認済みの投稿URLです/);
   assert.match(restaurant, /deliverable\.verification_status !== "approved"/);
   assert.match(restaurant, /承認済みです/);
