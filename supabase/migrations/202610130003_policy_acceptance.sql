@@ -14,3 +14,8 @@ alter table public.user_policy_acceptances enable row level security;
 create policy "users read own policy acceptances"
 on public.user_policy_acceptances for select
 using (user_id = auth.uid() or public.is_admin());
+
+
+create policy "users create own policy acceptances"
+on public.user_policy_acceptances for insert
+with check (user_id = auth.uid());
