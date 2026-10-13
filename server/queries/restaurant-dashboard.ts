@@ -115,6 +115,29 @@ export async function getRestaurantDashboard() {
     });
   }
 
+  for (const item of upcomingBookings) {
+    const slot = Array.isArray(item.campaign_slots)
+      ? item.campaign_slots[0]
+      : item.campaign_slots;
+    const creator = Array.isArray(item.creator_profiles)
+      ? item.creator_profiles[0]
+      : item.creator_profiles;
+
+    if (
+      item.status === "confirmed" &&
+      slot?.starts_at &&
+      new Date(slot.starts_at).getTime() <= nowMs
+    ) {
+      tasks.push({
+        id: "visit:" + item.id,
+        kind: "visit",
+        title: "来店を確認",
+        detail: (creator?.display_name ?? "Creator") + "・来店時刻を過ぎています",
+        href: "/restaurant/bookings/" + item.id,
+      });
+    }
+  }
+
   for (const item of reschedules) {
     const booking = Array.isArray(item.bookings)
       ? item.bookings[0]
@@ -161,7 +184,12 @@ export async function getRestaurantDashboard() {
         ["published", "recruiting"].includes(item.status),
       ).length,
       applications: applications.length,
-      upcoming: upcomingBookings.length,
+      upcoming: upcomingBookings.filter((item) => {
+        const slot = Array.isArray(item.campaign_slots)
+          ? item.campaign_slots[0]
+          : item.campaign_slots;
+        return slot?.starts_at && new Date(slot.starts_at).getTime() >= nowMs;
+      }).length,
       deliverables: deliverables.length,
       reschedules: reschedules.length,
     },
