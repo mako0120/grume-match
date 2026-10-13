@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { paymentStatusLabels, verificationStatusLabels } from "@/lib/status-labels";
+import {
+  bookingStatusLabels,
+  paymentStatusLabels,
+  verificationStatusLabels,
+} from "@/lib/status-labels";
 import { submitDeliverable } from "@/server/actions/deliverables";
 import { getCreatorBooking } from "@/server/queries/bookings";
 
@@ -52,6 +56,10 @@ export default async function CreatorBookingDetailPage({
         <div className="summary-item">
           <span>報酬</span>
           <strong>¥{booking.payment?.amount.toLocaleString() ?? "—"}</strong>
+        </div>
+        <div className="summary-item">
+          <span>来店状態</span>
+          <strong>{bookingStatusLabels[booking.status] ?? booking.status}</strong>
         </div>
         <div className="summary-item">
           <span>支払い</span>
