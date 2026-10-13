@@ -40,6 +40,7 @@ export async function GET() {
       supabase.from("creator_standby").select("creator_id", { head: true }).limit(1),
       supabase.from("booking_reschedule_requests").select("id", { head: true }).limit(1),
       supabase.from("notifications").select("id", { head: true }).limit(1),
+      supabase.from("user_policy_acceptances").select("user_id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {
