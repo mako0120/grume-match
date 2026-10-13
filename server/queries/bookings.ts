@@ -100,7 +100,17 @@ export async function getCreatorBooking(bookingId: string) {
     restaurantName: restaurant?.name ?? "店舗",
     restaurantAddress: restaurant?.address ?? "",
     foodOffer: campaign?.food_offer ?? "",
+    startsAt: slot?.starts_at ?? "",
     visitLabel: slot ? visitFormatter.format(new Date(slot.starts_at)) : "",
+    canCancel:
+      ["confirmed", "reschedule_requested"].includes(row.status) &&
+      Boolean(slot) &&
+      new Date(slot!.starts_at).getTime() > Date.now(),
+    canSubmitDeliverables:
+      row.status === "visited" ||
+      (row.status === "confirmed" &&
+        Boolean(slot) &&
+        new Date(slot!.starts_at).getTime() <= Date.now()),
     canReschedule:
       row.status === "confirmed" &&
       Boolean(slot) &&
