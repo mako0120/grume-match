@@ -66,10 +66,31 @@ export default async function AccountPage() {
         ) : null}
 
         {userRow.role === "creator" ? (
-          <Link className="secondary-button" href="/creator/profile">
-            Creatorプロフィールを編集
+          <>
+            <Link className="secondary-button" href="/creator/profile">
+              Creatorプロフィールを編集
+            </Link>
+            <Link className="secondary-button" href="/creator/payout">
+              振込先を設定
+            </Link>
+          </>
+        ) : null}
+
+        {userRow.role === "restaurant" ? (
+          <Link className="secondary-button" href="/restaurant/settings">
+            店舗情報を編集
           </Link>
         ) : null}
+
+        <Link className="secondary-button" href="/legal/terms">
+          利用規約
+        </Link>
+        <Link className="secondary-button" href="/legal/privacy">
+          プライバシーポリシー
+        </Link>
+        <Link className="secondary-button" href="/legal/pr-guidelines">
+          PRガイドライン
+        </Link>
 
         <Link className="secondary-button" href="/notifications">
           通知を見る
