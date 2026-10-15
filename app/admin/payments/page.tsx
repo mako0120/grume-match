@@ -78,6 +78,24 @@ export default async function AdminPaymentsPage() {
                 <form action={updatePaymentStatus} className="payment-admin-actions">
                   <input name="id" type="hidden" value={payment.id} />
 
+                  <label>
+                    振込参照番号
+                    <input
+                      defaultValue={payment.transfer_reference ?? ""}
+                      name="transferReference"
+                      placeholder="振込明細の受付番号など"
+                    />
+                  </label>
+
+                  <label>
+                    運営メモ（任意）
+                    <input
+                      defaultValue={payment.transfer_note ?? ""}
+                      name="transferNote"
+                      placeholder="振込日・確認事項など"
+                    />
+                  </label>
+
                   {payment.status !== "scheduled" ? (
                     <button
                       className="secondary-button"
