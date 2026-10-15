@@ -34,7 +34,9 @@ export async function saveCreatorPayoutProfile(formData: FormData) {
       ? "口座番号は半角数字4〜8桁で入力してください。"
       : reason.includes("invalid_account_type")
         ? "口座種別を確認してください。"
-        : "振込先を保存できませんでした。";
+        : reason.includes("payout_profile_locked_by_active_payment")
+          ? "支払い処理中の報酬があるため、現在は振込先を変更できません。振込エラー時は運営確認後に変更できます。"
+          : "振込先を保存できませんでした.";
 
     redirect(messagePath(message, "error"));
   }
