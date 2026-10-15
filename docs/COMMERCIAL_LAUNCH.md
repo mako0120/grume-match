@@ -46,6 +46,8 @@ Official references:
 - [x] Baseline security response headers are enabled.
 - [x] Auth session is refreshed at the request boundary.
 - [x] Health endpoint checks the PR OS schema, not only environment variables.
+- [x] Unverified Creator / Restaurant accounts cannot transact paid PR.
+- [x] Account suspension is blocked while unresolved commercial transactions remain.
 - [ ] Apply every migration to the dedicated PR OS Supabase project.
 - [ ] Run cross-tenant negative tests against the deployed database.
 - [ ] Rotate secrets before public launch if any were used during development.
@@ -57,9 +59,9 @@ Official references:
 - [x] Creator Wallet separates approved, scheduled and paid states.
 - [x] Reminders are deduplicated.
 - [x] Superseded PR CI runs are cancelled to reduce GitHub Actions usage.
-- [ ] Define support response target and escalation path.
-- [ ] Define cancellation/no-show exception process for disputed cases.
-- [ ] Define payout reconciliation procedure and evidence retained for each transfer.
+- [x] Define support response target and escalation path in docs/OPERATIONS_RUNBOOK.md.
+- [x] Define cancellation/no-show exception process for disputed cases.
+- [x] Define payout reconciliation procedure and evidence retained for each transfer.
 - [ ] Test backup/recovery procedure.
 
 ## 5. Deployment
