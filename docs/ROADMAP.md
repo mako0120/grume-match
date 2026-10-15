@@ -56,7 +56,7 @@ Exit:
 ## Phase 2 — OFFER / FLASH / STUDIO
 
 - Restaurant → Creator direct offer
-- structured counter-offer
+- fixed Direct OFFER (price negotiation / counter-offer is intentionally out of scope)
 - Creator standby availability
 - FLASH campaign
 - UGC photo/video deliverables
