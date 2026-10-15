@@ -9,6 +9,7 @@ const labels = {
   dispute: "紛争",
   no_show: "来店",
   account_closure: "アカウント",
+  verification: "確認",
 } as const;
 
 export default async function AdminPage() {
