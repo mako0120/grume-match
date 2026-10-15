@@ -30,13 +30,54 @@ export async function signIn(formData: FormData) {
 export async function signUp(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const policyConsent = formData.get("policyConsent") === "on";
+  const alphaAccessCode = String(formData.get("alphaAccessCode") ?? "").trim();
+
+  if (process.env.PUBLIC_LAUNCH_ENABLED !== "true") {
+    const expectedAccessCode = process.env.PRIVATE_ALPHA_ACCESS_CODE?.trim();
+
+    if (!expectedAccessCode) {
+      redirect(
+        withMessage(
+          "/signup",
+          "現在は招待制です。運営側のPrivate Alpha設定が完了していません。",
+        ),
+      );
+    }
+
+    if (alphaAccessCode !== expectedAccessCode) {
+      redirect(withMessage("/signup", "招待コードを確認してください。"));
+    }
+  }
+
+  if (!policyConsent) {
+    redirect(
+      withMessage(
+        "/signup",
+        "利用規約・プライバシーポリシー・PRガイドラインの確認が必要です。",
+      ),
+    );
+  }
 
   if (!email || password.length < 8) {
     redirect(withMessage("/signup", "8文字以上のパスワードとメールアドレスを入力してください。"));
   }
 
+  const requestHeaders = await headers();
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+    requestHeaders.get("origin");
+
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: origin
+      ? {
+          emailRedirectTo: origin + "/auth/confirm",
+        }
+      : undefined,
+  });
 
   if (error) {
     redirect(withMessage("/signup", "アカウントを作成できませんでした。"));
@@ -46,7 +87,7 @@ export async function signUp(formData: FormData) {
     redirect(withMessage("/login", "確認メールを送信しました。認証後にログインしてください。"));
   }
 
-  redirect("/onboarding");
+  redirect(await resolveSignedInDestination());
 }
 
 export async function signOut() {
