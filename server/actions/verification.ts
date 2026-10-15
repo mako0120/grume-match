@@ -17,9 +17,20 @@ export async function verifyParticipant(formData: FormData) {
   });
 
   if (error) {
+    const reason = error.message ?? "";
+    const message = reason.includes("creator_social_required")
+      ? "Creatorは確認前にSNSアカウント登録が必要です。"
+      : reason.includes("creator_profile_incomplete")
+        ? "Creatorの表示名・活動エリアを確認してください。"
+        : reason.includes("restaurant_profile_incomplete")
+          ? "店舗名・住所・エリアを確認してください。"
+          : reason.includes("restaurant_owner_required")
+            ? "有効な店舗担当者が必要です。"
+            : "確認済みにできませんでした。";
+
     redirect(
       "/admin/verification?status=error&message=" +
-        encodeURIComponent("確認済みにできませんでした。"),
+        encodeURIComponent(message),
     );
   }
 
