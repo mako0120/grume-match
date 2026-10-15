@@ -6,6 +6,7 @@ export default async function AdminReadinessPage() {
 
   const rows = [
     ...readiness.checks,
+    ...readiness.approvalChecks,
     {
       key: "database_schema",
       label: "PR OSデータベース構成",
