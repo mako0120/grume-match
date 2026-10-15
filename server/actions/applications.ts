@@ -57,6 +57,12 @@ export async function submitCampaignApplication(
     if (message.includes("campaign_not_accepting_applications")) {
       return { ok: false, message: "この案件の募集は終了しました。" };
     }
+    if (message.includes("creator_not_verified")) {
+      return { ok: false, message: "Creator情報は現在、運営確認中です。確認完了後に応募できます。" };
+    }
+    if (message.includes("restaurant_not_verified")) {
+      return { ok: false, message: "この店舗は現在、運営確認中のため応募できません。" };
+    }
 
     return { ok: false, message: "応募できませんでした。時間を変更して再度お試しください。" };
   }
