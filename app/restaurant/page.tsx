@@ -46,6 +46,17 @@ export default async function RestaurantDashboardPage({
         応募・来店・投稿確認など、次に対応するものから確認できます。
       </p>
 
+      <section className="section-card">
+        <span className={restaurant?.verified_at ? "status-chip status-approved" : "status-chip status-pending"}>
+          {restaurant?.verified_at ? "店舗確認済み" : "運営確認待ち"}
+        </span>
+        <p>
+          {restaurant?.verified_at
+            ? "有償PR案件を公開できます。"
+            : "店舗情報を確認中です。確認完了後にMARKET・指名・FLASHを公開できます。"}
+        </p>
+      </section>
+
       {message ? (
         <div
           className={status === "error" ? "form-message error-message" : "form-message inline-success"}
