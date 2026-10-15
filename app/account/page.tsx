@@ -91,6 +91,12 @@ export default async function AccountPage() {
         <Link className="secondary-button" href="/legal/pr-guidelines">
           PRガイドライン
         </Link>
+        <Link className="secondary-button" href="/legal/operator">
+          運営者情報
+        </Link>
+        <Link className="secondary-button" href="/support">
+          お問い合わせ
+        </Link>
 
         <Link className="secondary-button" href="/notifications">
           通知を見る
