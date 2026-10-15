@@ -39,3 +39,15 @@ test("participant-facing actions explain verification blocks", async () => {
   assert.match(applications, /creator_not_verified/);
   assert.match(bookings, /Creatorの利用確認/);
 });
+
+
+test("Admin Inbox surfaces pending participant verification work", async () => {
+  const [inbox, admin] = await Promise.all([
+    readFile("server/queries/admin-inbox.ts", "utf8"),
+    readFile("app/admin/page.tsx", "utf8"),
+  ]);
+
+  assert.match(inbox, /kind: "verification"/);
+  assert.match(inbox, /\/admin\/verification/);
+  assert.match(admin, /verification: "確認"/);
+});
