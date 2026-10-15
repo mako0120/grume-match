@@ -26,6 +26,12 @@ type RawBooking = {
     verification_note: string | null;
   }[] | null;
   payments: Relation<{ amount: number; status: string }>;
+  booking_disputes: {
+    id: string;
+    status: string;
+    reason: string;
+    created_at: string;
+  }[] | null;
 };
 
 function single<T>(value: Relation<T>): T | null {
@@ -71,7 +77,8 @@ export async function getRestaurantBooking(bookingId: string) {
         verification_status,
         verification_note
       ),
-      payments(amount,status)
+      payments(amount,status),
+      booking_disputes(id,status,reason,created_at)
     `)
     .eq("id", bookingId)
     .single();
@@ -84,6 +91,9 @@ export async function getRestaurantBooking(bookingId: string) {
   const creator = single(row.creator_profiles);
   const slot = single(row.campaign_slots);
   const payment = single(row.payments);
+  const openDispute = (row.booking_disputes ?? []).find(
+    (item) => item.status === "open",
+  );
   const instagram = creator?.creator_social_accounts?.find(
     (account) => account.platform === "instagram",
   );
@@ -113,6 +123,13 @@ export async function getRestaurantBooking(bookingId: string) {
       new Date(slot!.starts_at).getTime() + 30 * 60 * 1000 <= Date.now(),
     cashReward: payment?.amount ?? campaign?.cash_reward ?? 0,
     paymentStatus: payment?.status ?? "pending",
+    dispute: openDispute
+      ? {
+          id: openDispute.id,
+          reason: openDispute.reason,
+          createdAt: openDispute.created_at,
+        }
+      : null,
     deliverables: row.deliverables ?? [],
   };
 }
