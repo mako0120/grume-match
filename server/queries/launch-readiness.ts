@@ -83,13 +83,47 @@ export async function getLaunchReadiness() {
   const publicLaunchEnabled =
     process.env.PUBLIC_LAUNCH_ENABLED === "true";
 
+  const approvalChecks: LaunchCheck[] = [
+    {
+      key: "legal_review",
+      label: "法務レビュー",
+      ok: process.env.LEGAL_REVIEW_COMPLETED === "true",
+    },
+    {
+      key: "accounting_review",
+      label: "会計・税務レビュー",
+      ok: process.env.ACCOUNTING_REVIEW_COMPLETED === "true",
+    },
+    {
+      key: "payout_security_review",
+      label: "振込先情報のセキュリティレビュー",
+      ok: process.env.PAYOUT_SECURITY_REVIEW_COMPLETED === "true",
+    },
+    {
+      key: "rls_e2e",
+      label: "実DB RLS負例テスト",
+      ok: process.env.RLS_E2E_VERIFIED === "true",
+    },
+    {
+      key: "pilot_e2e",
+      label: "実有償PR E2E",
+      ok: process.env.PILOT_E2E_COMPLETED === "true",
+    },
+  ];
+
+  const environmentReady = checks.every((check) => check.ok);
+  const approvalsReady = approvalChecks.every((check) => check.ok);
+
   return {
     checks,
-    environmentReady: checks.every((check) => check.ok),
+    approvalChecks,
+    environmentReady,
+    approvalsReady,
     databaseReady,
     publicLaunchEnabled,
     ready:
-      checks.every((check) => check.ok) &&
+      environmentReady &&
+      approvalsReady &&
       databaseReady &&
       publicLaunchEnabled,
   };
