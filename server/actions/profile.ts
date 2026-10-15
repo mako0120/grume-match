@@ -1,6 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import {
+  boundedMetric,
+  normalizeSocialHandle,
+  validSocialHandle,
+  validSocialProfileUrl,
+} from "@/lib/social-profile";
 import { createClient } from "@/lib/supabase/server";
 
 const allowedPlatforms = new Set(["instagram", "tiktok", "youtube"]);
@@ -54,29 +60,27 @@ export async function saveCreatorBasics(formData: FormData) {
 
 export async function savePrimarySocialAccount(formData: FormData) {
   const platform = String(formData.get("platform") ?? "");
-  const handle = String(formData.get("handle") ?? "").trim().replace(/^@/, "");
+  const handle = normalizeSocialHandle(String(formData.get("handle") ?? ""));
   const profileUrl = String(formData.get("profileUrl") ?? "").trim();
-  const followers = Math.max(0, Math.floor(Number(formData.get("followers") ?? 0)));
-  const avgViews = Math.max(0, Math.floor(Number(formData.get("avgViews") ?? 0)));
-  const avgSaves = Math.max(0, Math.floor(Number(formData.get("avgSaves") ?? 0)));
+  const followers = boundedMetric(formData.get("followers"));
+  const avgViews = boundedMetric(formData.get("avgViews"));
+  const avgSaves = boundedMetric(formData.get("avgSaves"));
   const localAudienceRatio = Math.min(
     100,
     Math.max(0, Number(formData.get("localAudienceRatio") ?? 0)),
   );
 
-  if (!allowedPlatforms.has(platform) || !handle || !profileUrl) {
-    redirect("/creator/profile?message=" + encodeURIComponent("SNS情報を確認してください。"));
-  }
-
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(profileUrl);
-  } catch {
-    redirect("/creator/profile?message=" + encodeURIComponent("プロフィールURLが正しくありません。"));
-  }
-
-  if (!["https:", "http:"].includes(parsedUrl.protocol)) {
-    redirect("/creator/profile?message=" + encodeURIComponent("プロフィールURLが正しくありません。"));
+  if (
+    !allowedPlatforms.has(platform) ||
+    !validSocialHandle(handle) ||
+    !validSocialProfileUrl(platform, profileUrl)
+  ) {
+    redirect(
+      "/creator/profile?message=" +
+        encodeURIComponent(
+          "SNSのユーザー名と公式プロフィールURLを確認してください。",
+        ),
+    );
   }
 
   const supabase = await createClient();
