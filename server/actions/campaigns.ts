@@ -3,6 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildCampaignSlots } from "@/lib/campaign-slot-builder";
+import {
+  COMMERCIAL_LIMITS,
+  validCompanions,
+  validCreatorSlots,
+  validPlatforms,
+  validReward,
+  validText,
+} from "@/lib/commercial-limits";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
 import { createClient } from "@/lib/supabase/server";
 
@@ -54,10 +62,20 @@ export async function createCampaign(formData: FormData) {
     .map(String)
     .filter(Boolean);
 
-  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+  if (
+    !validText(category, COMMERCIAL_LIMITS.category, true) ||
+    !validText(description, COMMERCIAL_LIMITS.campaignDescription) ||
+    !validText(foodOffer, COMMERCIAL_LIMITS.foodOffer, true) ||
+    !validReward(cashReward) ||
+    !validCreatorSlots(creatorSlots) ||
+    !validCompanions(maxCompanions) ||
+    !validPlatforms(platforms)
+  ) {
     redirect(
       "/restaurant/campaigns/new?message=" +
-        encodeURIComponent("ジャンル・報酬・募集人数・投稿先を確認してください。"),
+        encodeURIComponent(
+          "ジャンル・報酬・募集人数・同伴者・投稿先・説明文を確認してください。",
+        ),
     );
   }
 
