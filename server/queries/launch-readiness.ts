@@ -83,6 +83,14 @@ export async function getLaunchReadiness() {
   const publicLaunchEnabled =
     process.env.PUBLIC_LAUNCH_ENABLED === "true";
 
+  checks.push({
+    key: "private_alpha_access_control",
+    label: "Private Alpha招待制",
+    ok:
+      publicLaunchEnabled ||
+      Boolean(process.env.PRIVATE_ALPHA_ACCESS_CODE?.trim()),
+  });
+
   const approvalChecks: LaunchCheck[] = [
     {
       key: "legal_review",
