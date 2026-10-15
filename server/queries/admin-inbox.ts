@@ -8,7 +8,8 @@ export type AdminInboxItem = {
     | "payment_overdue"
     | "payment_failed"
     | "dispute"
-    | "no_show";
+    | "no_show"
+    | "account_closure";
   title: string;
   detail: string;
   href: string | null;
@@ -30,6 +31,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     failedPaymentsResult,
     disputesResult,
     noShowsResult,
+    accountClosuresResult,
   ] = await Promise.all([
     supabase
       .from("deliverables")
@@ -88,6 +90,13 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .is("no_show_reviewed_at", null)
       .order("no_show_at", { ascending: true })
       .limit(20),
+
+    supabase
+      .from("account_closure_requests")
+      .select("id,user_id,created_at,reason,users(email,role)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(20),
   ]);
 
   const inboxError = [
@@ -97,6 +106,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     failedPaymentsResult.error,
     disputesResult.error,
     noShowsResult.error,
+    accountClosuresResult.error,
   ].find(Boolean);
 
   if (inboxError) {
@@ -109,6 +119,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   const failedPayments = failedPaymentsResult.data ?? [];
   const disputes = disputesResult.data ?? [];
   const noShows = noShowsResult.data ?? [];
+  const accountClosures = accountClosuresResult.data ?? [];
 
   const items: AdminInboxItem[] = [];
 
@@ -235,6 +246,22 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
         (campaign?.title ?? "PR案件"),
       href: "/admin/no-shows",
       occurredAt: row.no_show_at ?? now,
+    });
+  }
+
+  for (const row of accountClosures) {
+    const user = one(row.users);
+
+    items.push({
+      id: "account-closure:" + row.id,
+      kind: "account_closure",
+      title: "アカウント停止依頼",
+      detail:
+        (user?.email ?? "利用者") +
+        "・" +
+        (user?.role ?? "user"),
+      href: "/admin/accounts",
+      occurredAt: row.created_at,
     });
   }
 
