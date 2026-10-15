@@ -98,9 +98,14 @@ export async function createDirectOffer(formData: FormData) {
   });
 
   if (error || !data) {
+    const reason = error?.message ?? "";
+    const message = reason.includes("restaurant_not_verified")
+      ? "店舗情報は現在、運営確認中です。確認完了後に指名オファーを送信できます。"
+      : "指名オファーを送信できませんでした。";
+
     redirect(
       "/restaurant/offers/new?message=" +
-        encodeURIComponent("指名オファーを送信できませんでした。"),
+        encodeURIComponent(message),
     );
   }
 
