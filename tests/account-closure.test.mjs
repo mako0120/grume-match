@@ -16,3 +16,18 @@ test("account closure is reviewed instead of deleting transactional records inli
   assert.match(account, /アカウント停止・削除について相談/);
   assert.match(admin, /アカウントを停止/);
 });
+
+test("commercial participants cannot be suspended with unresolved transactions", async () => {
+  const [migration, action] = await Promise.all([
+    readFile(
+      "supabase/migrations/202610150003_account_closure_transaction_guard.sql",
+      "utf8",
+    ),
+    readFile("server/actions/account-closure.ts", "utf8"),
+  ]);
+
+  assert.match(migration, /user_has_open_commercial_transactions/);
+  assert.match(migration, /closure_has_active_transactions/);
+  assert.match(migration, /p\.status not in \('paid', 'cancelled'\)/);
+  assert.match(action, /未完了の案件・来店・報酬/);
+});
