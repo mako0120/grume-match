@@ -10,7 +10,8 @@ export type AdminInboxItem = {
     | "dispute"
     | "no_show"
     | "account_closure"
-    | "verification";
+    | "verification"
+    | "email_failed";
   title: string;
   detail: string;
   href: string | null;
@@ -35,6 +36,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     accountClosuresResult,
     unverifiedCreatorsResult,
     unverifiedRestaurantsResult,
+    failedEmailsResult,
   ] = await Promise.all([
     supabase
       .from("deliverables")
@@ -111,6 +113,13 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .select("id", { count: "exact", head: true })
       .eq("status", "active")
       .is("verified_at", null),
+
+    supabase
+      .from("notification_email_outbox")
+      .select("id,subject,attempts,updated_at")
+      .eq("status", "failed")
+      .order("updated_at", { ascending: true })
+      .limit(20),
   ]);
 
   const inboxError = [
@@ -123,6 +132,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     accountClosuresResult.error,
     unverifiedCreatorsResult.error,
     unverifiedRestaurantsResult.error,
+    failedEmailsResult.error,
   ].find(Boolean);
 
   if (inboxError) {
@@ -139,6 +149,7 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   const verificationCount =
     (unverifiedCreatorsResult.count ?? 0) +
     (unverifiedRestaurantsResult.count ?? 0);
+  const failedEmails = failedEmailsResult.data ?? [];
 
   const items: AdminInboxItem[] = [];
 
@@ -281,6 +292,21 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
         (user?.role ?? "user"),
       href: "/admin/accounts",
       occurredAt: row.created_at,
+    });
+  }
+
+  for (const row of failedEmails) {
+    items.push({
+      id: "email-failed:" + row.id,
+      kind: "email_failed",
+      title: "通知メール送信エラー",
+      detail:
+        row.subject +
+        "・試行" +
+        Number(row.attempts).toLocaleString() +
+        "回",
+      href: "/admin/email",
+      occurredAt: row.updated_at,
     });
   }
 
