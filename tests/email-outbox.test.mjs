@@ -50,3 +50,16 @@ test("email delivery uses a lease and provider idempotency key", async () => {
   assert.match(route, /claimed_at/);
   assert.match(route, /leaseUntil/);
 });
+
+
+test("suspension results can reach a suspended account through the email outbox", async () => {
+  const source = await readFile(
+    "supabase/migrations/202610150009_suspension_notifications.sql",
+    "utf8",
+  );
+
+  assert.match(source, /participant_suspended/);
+  assert.match(source, /account_suspended/);
+  assert.match(source, /account_closure_dismissed/);
+  assert.match(source, /notify_account_closure_result/);
+});
