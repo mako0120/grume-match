@@ -47,9 +47,16 @@ export async function reviewAccountClosure(formData: FormData) {
   });
 
   if (error) {
+    const reason = error.message ?? "";
+    const message = reason.includes("closure_has_active_transactions")
+      ? "未完了の案件・来店・報酬があるため、まだアカウントを停止できません。"
+      : reason.includes("closure_request_already_resolved")
+        ? "この依頼はすでに処理済みです。"
+        : "アカウント依頼を処理できませんでした。";
+
     redirect(
       "/admin/accounts?status=error&message=" +
-        encodeURIComponent("アカウント依頼を処理できませんでした。"),
+        encodeURIComponent(message),
     );
   }
 
