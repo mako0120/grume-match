@@ -23,6 +23,7 @@ export default async function AdminPage() {
           <Link href="/admin/no-shows">来店例外</Link>
           <Link href="/admin/audit">監査</Link>
           <Link href="/admin/readiness">商用化</Link>
+          <Link href="/admin/accounts">アカウント</Link>
           <Link href="/notifications">通知</Link>
         </nav>
       </header>
