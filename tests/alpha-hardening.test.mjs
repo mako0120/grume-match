@@ -10,11 +10,16 @@ test("Creator campaign queries reject expired detail and filter FLASH expiry", a
   assert.match(source, /new Date\(row\.flash_expires_at\)\.getTime\(\) > now/);
 });
 
-test("Admin payouts use audited RPC rather than direct payment updates", async () => {
-  const source = await readFile("server/actions/payments.ts", "utf8");
+test("Admin payouts use audited reconciliation RPC rather than direct payment updates", async () => {
+  const [action, migration] = await Promise.all([
+    readFile("server/actions/payments.ts", "utf8"),
+    readFile("supabase/migrations/202610130020_payment_reconciliation.sql", "utf8"),
+  ]);
 
-  assert.match(source, /admin_update_payment_status/);
-  assert.doesNotMatch(source, /\.from\("payments"\)\.update/);
+  assert.match(action, /admin_record_payment_status/);
+  assert.match(migration, /admin_update_payment_status/);
+  assert.match(migration, /payment\.transfer_recorded/);
+  assert.doesNotMatch(action, /\.from\("payments"\)\.update/);
 });
 
 test("Security migration scopes Creator metrics and one Direct OFFER target", async () => {
