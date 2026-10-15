@@ -43,6 +43,7 @@ export async function GET() {
       supabase.from("user_policy_acceptances").select("user_id", { head: true }).limit(1),
       supabase.from("creator_payout_profiles").select("creator_id", { head: true }).limit(1),
       supabase.from("booking_disputes").select("id", { head: true }).limit(1),
+      supabase.from("account_closure_requests").select("id", { head: true }).limit(1),
     ]);
 
     if (checks.some((result) => result.error)) {
