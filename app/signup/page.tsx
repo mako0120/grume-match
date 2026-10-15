@@ -27,6 +27,18 @@ export default async function SignupPage({
             パスワード
             <input autoComplete="new-password" minLength={8} name="password" required type="password" />
           </label>
+
+          {privateAlpha ? (
+            <label>
+              Private Alpha 招待コード
+              <input
+                autoComplete="off"
+                name="alphaAccessCode"
+                required
+                type="password"
+              />
+            </label>
+          ) : null}
           <label className="policy-confirm-row">
             <input name="policyConsent" required type="checkbox" />
             <span>
