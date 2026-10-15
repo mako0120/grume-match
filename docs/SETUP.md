@@ -7,7 +7,7 @@ Requirements:
 - npm 11
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run dev
 ```
@@ -134,8 +134,21 @@ Import the GitHub repository and configure:
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY` (preferred) or `SUPABASE_SERVICE_ROLE_KEY` (legacy fallback)
 - `CRON_SECRET`
+- `PRIVATE_ALPHA_ACCESS_CODE` while `PUBLIC_LAUNCH_ENABLED=false`
+- `NEXT_PUBLIC_OPERATOR_NAME`
+- `NEXT_PUBLIC_SUPPORT_EMAIL`
 
 Never configure a Supabase server secret with a `NEXT_PUBLIC_` prefix.
+
+Private Alpha registration is fail-closed: when `PUBLIC_LAUNCH_ENABLED` is not `true`, signup requires the server-side `PRIVATE_ALPHA_ACCESS_CODE`. Do not put that code in a `NEXT_PUBLIC_` variable.
+
+Human launch gates remain false until actually completed:
+
+- `LEGAL_REVIEW_COMPLETED`
+- `ACCOUNTING_REVIEW_COMPLETED`
+- `PAYOUT_SECURITY_REVIEW_COMPLETED`
+- `RLS_E2E_VERIFIED`
+- `PILOT_E2E_COMPLETED`
 
 Before enabling real restaurant onboarding, verify:
 - production Supabase URL
@@ -158,15 +171,21 @@ Creator:
 
 Restaurant:
 - `/restaurant`
+- `/restaurant/settings`
 - `/restaurant/campaigns/new`
+- `/restaurant/offers/new`
 - `/restaurant/flash/new`
+- `/restaurant/bookings`
 - `/restaurant/reschedules`
 
 Operator:
 - `/admin`
+- `/admin/verification`
 - `/admin/payments`
 - `/admin/disputes`
 - `/admin/no-shows`
+- `/admin/accounts`
+- `/admin/readiness`
 - `/admin/audit`
 
 Shared:
@@ -191,8 +210,11 @@ Current flow:
 Creator submit
 → Restaurant approve
 → Payment approved
+→ Creator registers a private payout destination
+→ Operator may mark scheduled
 → Operator transfers money outside the app
-→ Admin marks scheduled / paid
+→ Operator records a transfer reference and marks paid
+→ paid evidence becomes immutable
 → Creator Wallet updates
 ```
 
@@ -223,4 +245,6 @@ Recommended first controlled pilot:
 - 1 deliverable
 - 1 manual payout
 
-Only after the full transaction succeeds should external Creators/restaurants be invited.
+Before either side can transact, the Operator verifies the Creator and Restaurant in `/admin/verification`.
+
+Only after the full transaction succeeds should external Creators/restaurants be invited. Keep `PUBLIC_LAUNCH_ENABLED=false` until every readiness gate is genuinely complete.
