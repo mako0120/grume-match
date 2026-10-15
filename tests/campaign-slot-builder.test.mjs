@@ -54,3 +54,21 @@ test("returns no slots when no selected weekday appears in the date range", () =
 
   assert.deepEqual(slots, []);
 });
+
+
+test("rejects campaign date ranges longer than 90 days", () => {
+  assert.throws(
+    () =>
+      buildCampaignSlots({
+        startDate: "2026-10-01",
+        endDate: "2027-01-15",
+        weekdays: [0, 1, 2, 3, 4, 5, 6],
+        startTime: "00:00",
+        endTime: "23:30",
+        intervalMinutes: 30,
+        visitDurationMinutes: 60,
+        capacity: 1,
+      }),
+    /date_range_too_large/,
+  );
+});
