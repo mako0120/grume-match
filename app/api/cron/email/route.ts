@@ -9,15 +9,31 @@ function isAuthorized(request: NextRequest) {
 }
 
 function nextAttemptAt(attempts: number) {
-  const delayMinutes = Math.min(60, Math.max(5, 5 * 2 ** Math.max(0, attempts)));
+  const delayMinutes = Math.min(
+    60,
+    Math.max(5, 5 * 2 ** Math.max(0, attempts)),
+  );
   return new Date(Date.now() + delayMinutes * 60 * 1000).toISOString();
 }
 
 function safeError(value: unknown) {
   const message =
-    value instanceof Error ? value.message : typeof value === "string" ? value : "email_send_failed";
+    value instanceof Error
+      ? value.message
+      : typeof value === "string"
+        ? value
+        : "email_send_failed";
 
   return message.slice(0, 500);
+}
+
+function providerMessageId(value: string) {
+  try {
+    const parsed = JSON.parse(value) as { id?: unknown };
+    return typeof parsed.id === "string" ? parsed.id.slice(0, 255) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -32,6 +48,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       configured: false,
+      processed: 0,
+      claimed: 0,
       sent: 0,
       failed: 0,
     });
@@ -42,8 +60,8 @@ export async function GET(request: NextRequest) {
 
   const { data: rows, error } = await supabase
     .from("notification_email_outbox")
-    .select("id,email,subject,body,attempts")
-    .in("status", ["pending", "failed"])
+    .select("id,notification_id,email,subject,body,attempts")
+    .in("status", ["pending", "failed", "processing"])
     .lt("attempts", 5)
     .lte("available_at", now)
     .order("created_at", { ascending: true })
@@ -56,11 +74,37 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  let claimed = 0;
   let sent = 0;
   let failed = 0;
+  let skipped = 0;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
 
   for (const row of rows ?? []) {
+    const claimedAt = new Date().toISOString();
+    const leaseUntil = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+    const { data: claim, error: claimError } = await supabase
+      .from("notification_email_outbox")
+      .update({
+        status: "processing",
+        claimed_at: claimedAt,
+        available_at: leaseUntil,
+        updated_at: claimedAt,
+      })
+      .eq("id", row.id)
+      .in("status", ["pending", "failed", "processing"])
+      .lte("available_at", now)
+      .select("id")
+      .maybeSingle();
+
+    if (claimError || !claim) {
+      skipped += 1;
+      continue;
+    }
+
+    claimed += 1;
+
     const body = siteUrl
       ? row.body + "\n\n確認: " + siteUrl + "/notifications"
       : row.body;
@@ -71,6 +115,7 @@ export async function GET(request: NextRequest) {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          "Idempotency-Key": "gourmet-diary-notification/" + row.notification_id,
         },
         body: JSON.stringify({
           from,
@@ -80,8 +125,9 @@ export async function GET(request: NextRequest) {
         }),
       });
 
+      const responseBody = await response.text();
+
       if (!response.ok) {
-        const detail = safeError(await response.text());
         const attempts = row.attempts + 1;
 
         await supabase
@@ -90,10 +136,12 @@ export async function GET(request: NextRequest) {
             status: "failed",
             attempts,
             available_at: nextAttemptAt(attempts),
-            last_error: detail,
+            claimed_at: null,
+            last_error: safeError(responseBody),
             updated_at: new Date().toISOString(),
           })
-          .eq("id", row.id);
+          .eq("id", row.id)
+          .eq("status", "processing");
 
         failed += 1;
         continue;
@@ -105,10 +153,13 @@ export async function GET(request: NextRequest) {
           status: "sent",
           attempts: row.attempts + 1,
           sent_at: new Date().toISOString(),
+          claimed_at: null,
+          provider_message_id: providerMessageId(responseBody),
           last_error: null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", row.id);
+        .eq("id", row.id)
+        .eq("status", "processing");
 
       sent += 1;
     } catch (sendError) {
@@ -120,10 +171,12 @@ export async function GET(request: NextRequest) {
           status: "failed",
           attempts,
           available_at: nextAttemptAt(attempts),
+          claimed_at: null,
           last_error: safeError(sendError),
           updated_at: new Date().toISOString(),
         })
-        .eq("id", row.id);
+        .eq("id", row.id)
+        .eq("status", "processing");
 
       failed += 1;
     }
@@ -133,7 +186,9 @@ export async function GET(request: NextRequest) {
     ok: true,
     configured: true,
     processed: rows?.length ?? 0,
+    claimed,
     sent,
     failed,
+    skipped,
   });
 }
