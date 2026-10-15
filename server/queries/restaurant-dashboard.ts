@@ -16,7 +16,7 @@ export async function getRestaurantDashboard() {
 
   const { data: membership, error: membershipError } = await supabase
     .from("restaurant_memberships")
-    .select("restaurant_id,restaurants(name,area)")
+    .select("restaurant_id,restaurants(name,area,verified_at)")
     .eq("user_id", authData.user.id)
     .limit(1)
     .single();
