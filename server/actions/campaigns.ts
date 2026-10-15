@@ -120,9 +120,14 @@ export async function createCampaign(formData: FormData) {
   });
 
   if (error || !data) {
+    const reason = error?.message ?? "";
+    const message = reason.includes("restaurant_not_verified")
+      ? "店舗情報は現在、運営確認中です。確認完了後に案件を公開できます。"
+      : "案件を公開できませんでした。入力内容をご確認ください。";
+
     redirect(
       "/restaurant/campaigns/new?message=" +
-        encodeURIComponent("案件を公開できませんでした。入力内容をご確認ください。"),
+        encodeURIComponent(message),
     );
   }
 
