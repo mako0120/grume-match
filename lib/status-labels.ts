@@ -38,6 +38,7 @@ export const notificationTypeLabels: Record<string, string> = {
   flash_for_standby: "FLASH",
   direct_offer_received: "指名",
   participant_verified: "利用確認",
+  participant_suspended: "利用状態",
 };
 
 export const campaignStatusLabels: Record<string, string> = {
