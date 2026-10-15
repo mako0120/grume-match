@@ -28,9 +28,12 @@ Create one Supabase project for the pilot.
 Required public values:
 
 ```env
+NEXT_PUBLIC_SITE_URL=
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
+
+`NEXT_PUBLIC_SITE_URL` must be the canonical HTTPS URL used by password recovery and Auth redirects.
 
 Required server-only value (preferred):
 
@@ -73,6 +76,8 @@ For the pilot:
 - Add local redirect URL when developing locally.
 - Keep email confirmation enabled for external pilot users.
 - Use the SSR confirmation endpoint already implemented at `/auth/confirm`.
+- Add the production `/auth/confirm` URL to allowed Auth redirects.
+- Test signup confirmation and password recovery separately.
 
 For the **Confirm signup** email template, use a token-hash URL:
 
@@ -124,6 +129,7 @@ Notifications use a dedupe key so an hourly cron does not create repeated copies
 
 Import the GitHub repository and configure:
 
+- `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY` (preferred) or `SUPABASE_SERVICE_ROLE_KEY` (legacy fallback)
@@ -148,6 +154,7 @@ Creator:
 - `/creator/bookings`
 - `/creator/wallet`
 - `/creator/profile`
+- `/creator/payout`
 
 Restaurant:
 - `/restaurant`
@@ -158,11 +165,20 @@ Restaurant:
 Operator:
 - `/admin`
 - `/admin/payments`
+- `/admin/disputes`
+- `/admin/no-shows`
+- `/admin/audit`
 
 Shared:
 - `/login`
 - `/signup`
+- `/forgot-password`
+- `/update-password`
 - `/onboarding`
+- `/legal/accept`
+- `/legal/terms`
+- `/legal/privacy`
+- `/legal/pr-guidelines`
 - `/notifications`
 
 ## 7. Money handling in SOLO MVP
