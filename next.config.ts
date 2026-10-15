@@ -11,6 +11,13 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
+const privateHeaders = [
+  {
+    key: "Cache-Control",
+    value: "private, no-store, max-age=0",
+  },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
@@ -19,6 +26,18 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      ...[
+        "/creator/:path*",
+        "/restaurant/:path*",
+        "/admin/:path*",
+        "/account",
+        "/notifications",
+        "/onboarding",
+        "/legal/accept",
+      ].map((source) => ({
+        source,
+        headers: privateHeaders,
+      })),
     ];
   },
 };
