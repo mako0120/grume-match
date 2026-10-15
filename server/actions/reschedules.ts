@@ -22,6 +22,9 @@ export async function requestReschedule(bookingId: string, slotId: string) {
     if (reason.includes("slot_unavailable")) {
       return { ok: false as const, message: "その時間は埋まりました。別の時間を選択してください。" };
     }
+    if (reason.includes("booking_locked_by_dispute") || reason.includes("application_locked_by_dispute")) {
+      return { ok: false as const, message: "この案件は運営確認中のため、日時変更できません。" };
+    }
 
     return { ok: false as const, message: "日時変更を申請できませんでした。" };
   }
@@ -44,6 +47,10 @@ export async function reviewReschedule(
   });
 
   if (error) {
+    const reason = error.message ?? "";
+    if (reason.includes("booking_locked_by_dispute") || reason.includes("application_locked_by_dispute")) {
+      return { ok: false as const, message: "この案件は運営確認中のため、日時変更を処理できません。" };
+    }
     return { ok: false as const, message: "日時変更を処理できませんでした。" };
   }
 
