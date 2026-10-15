@@ -39,6 +39,8 @@ export const notificationTypeLabels: Record<string, string> = {
   direct_offer_received: "指名",
   participant_verified: "利用確認",
   participant_suspended: "利用状態",
+  account_suspended: "アカウント",
+  account_closure_dismissed: "アカウント",
 };
 
 export const campaignStatusLabels: Record<string, string> = {
