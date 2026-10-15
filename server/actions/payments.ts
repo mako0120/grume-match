@@ -8,19 +8,26 @@ const allowed = new Set(["scheduled", "paid", "failed"]);
 export async function updatePaymentStatus(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
+  const transferReference = String(formData.get("transferReference") ?? "").trim();
+  const transferNote = String(formData.get("transferNote") ?? "").trim();
 
   if (!id || !allowed.has(status)) return;
 
   const supabase = await createClient();
 
-  const { error } = await supabase.rpc("admin_update_payment_status", {
+  const { error } = await supabase.rpc("admin_record_payment_status", {
     p_payment_id: id,
     p_status: status,
+    p_transfer_reference: transferReference || null,
+    p_transfer_note: transferNote || null,
   });
 
   if (error) {
     const reason = error.message ?? "";
 
+    if (reason.includes("transfer_reference_required")) {
+      throw new Error("支払済みにする場合は振込参照番号を入力してください。");
+    }
     if (reason.includes("creator_payout_profile_required")) {
       throw new Error("Creatorの振込先が未登録です。");
     }
