@@ -34,8 +34,9 @@ export async function listAdminPayments() {
         )
       )
     `)
-    .in("status", ["approved", "scheduled", "failed"])
-    .order("created_at", { ascending: true });
+    .in("status", ["approved", "scheduled", "failed", "paid"])
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) throw new Error(error.message);
   return data ?? [];
