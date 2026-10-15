@@ -46,6 +46,14 @@ export async function getLaunchReadiness() {
       label: "Cron認証",
       ok: Boolean(process.env.CRON_SECRET),
     },
+    {
+      key: "transactional_email",
+      label: "通知メール配信",
+      ok: Boolean(
+        process.env.RESEND_API_KEY?.trim() &&
+          process.env.EMAIL_FROM?.trim(),
+      ),
+    },
   ];
 
   let databaseReady = false;
