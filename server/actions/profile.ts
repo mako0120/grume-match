@@ -127,5 +127,10 @@ export async function savePrimarySocialAccount(formData: FormData) {
     redirect("/creator/profile?message=" + encodeURIComponent("SNS情報を保存できませんでした。"));
   }
 
-  redirect("/creator/campaigns");
+  redirect(
+    "/creator/profile?message=" +
+      encodeURIComponent(
+        "SNS情報を保存しました。SNSアカウントやURLを変更した場合は運営確認が再度必要です。",
+      ),
+  );
 }
