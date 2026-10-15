@@ -122,6 +122,9 @@ export default async function AccountPage({
         <Link className="secondary-button" href="/support">
           お問い合わせ
         </Link>
+        <a className="secondary-button" href="/api/account/export">
+          自分のデータを書き出す
+        </a>
 
         <Link className="secondary-button" href="/notifications">
           通知を見る
