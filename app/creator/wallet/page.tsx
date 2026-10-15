@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { paymentStatusLabels } from "@/lib/status-labels";
 import { getCreatorWallet } from "@/server/queries/wallet";
 
@@ -19,6 +20,10 @@ export default async function CreatorWalletPage() {
       <p className="page-subtitle">
         PR案件ごとの報酬と支払い状況を一か所で確認します。
       </p>
+
+      <Link className="quick-status-link" href="/creator/payout">
+        振込先を登録・確認 →
+      </Link>
 
       <section className="wallet-summary">
         <div>
