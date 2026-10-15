@@ -12,6 +12,11 @@ const paymentLabels: Record<string, string> = {
   failed: "要確認",
 };
 
+const accountTypeLabels: Record<string, string> = {
+  ordinary: "普通",
+  current: "当座",
+};
+
 export default async function AdminPaymentsPage() {
   const payments = await listAdminPayments();
 
@@ -33,6 +38,7 @@ export default async function AdminPaymentsPage() {
         <section className="campaign-list">
           {payments.map((payment) => {
             const creator = relationOne(payment.creator_profiles);
+            const payout = relationOne(creator?.creator_payout_profiles);
             const booking = relationOne(payment.bookings);
             const campaign = relationOne(booking?.campaigns);
             const restaurant = relationOne(campaign?.restaurants);
@@ -53,12 +59,29 @@ export default async function AdminPaymentsPage() {
                   ¥{Number(payment.amount).toLocaleString()}
                 </div>
 
+                {payout ? (
+                  <section className="section-card">
+                    <strong>振込先</strong>
+                    <p>{payout.bank_name} {payout.branch_name}</p>
+                    <p>
+                      {accountTypeLabels[payout.account_type] ?? payout.account_type}
+                      ・{payout.account_number}
+                      ・{payout.account_holder}
+                    </p>
+                  </section>
+                ) : (
+                  <div className="form-message error-message">
+                    Creatorの振込先が未登録です。
+                  </div>
+                )}
+
                 <form action={updatePaymentStatus} className="payment-admin-actions">
                   <input name="id" type="hidden" value={payment.id} />
 
                   {payment.status !== "scheduled" ? (
                     <button
                       className="secondary-button"
+                      disabled={!payout}
                       name="status"
                       type="submit"
                       value="scheduled"
@@ -70,6 +93,7 @@ export default async function AdminPaymentsPage() {
                   {payment.status !== "failed" ? (
                     <button
                       className="primary-button review-approve"
+                      disabled={!payout}
                       name="status"
                       type="submit"
                       value="paid"
