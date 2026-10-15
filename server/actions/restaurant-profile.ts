@@ -34,6 +34,8 @@ export async function saveRestaurantProfile(formData: FormData) {
   revalidatePath("/restaurant/settings");
   redirect(
     "/restaurant/settings?status=ok&message=" +
-      encodeURIComponent("店舗情報を保存しました。"),
+      encodeURIComponent(
+        "店舗情報を保存しました。店舗名または住所を変更した場合は運営確認が再度必要です。",
+      ),
   );
 }
