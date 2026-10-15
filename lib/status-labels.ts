@@ -37,6 +37,7 @@ export const notificationTypeLabels: Record<string, string> = {
   deliverable_due_24h: "投稿期限",
   flash_for_standby: "FLASH",
   direct_offer_received: "指名",
+  participant_verified: "利用確認",
 };
 
 export const campaignStatusLabels: Record<string, string> = {
