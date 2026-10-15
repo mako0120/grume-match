@@ -74,6 +74,7 @@ export async function getLaunchReadiness() {
         "booking_disputes",
         "creator_payout_profiles",
         "user_policy_acceptances",
+        "notification_email_outbox",
       ] as const;
 
       const results = await Promise.all(
