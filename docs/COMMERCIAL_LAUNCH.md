@@ -12,7 +12,10 @@ This file defines the minimum bar for moving GOURMET DIARY PR OS from private al
 - [x] No-show is recorded separately from cancellation.
 - [x] Deliverables cannot be submitted before the scheduled visit starts.
 - [x] Approved deliverables cannot be silently rewritten.
-- [x] Payout state distinguishes approved / scheduled / paid / failed / cancelled.
+- [x] Payout state distinguishes approved / on-hold / scheduled / paid / failed / cancelled.
+- [x] Manual payout requires a private Creator payout destination before scheduling or marking paid.
+- [x] Open disputes hold unsettled payouts until Admin resolution.
+- [x] No-show exceptions leave the Inbox after explicit Admin review.
 - [x] Cancelled payouts are excluded from Creator earned totals.
 - [x] Audit logs cover key transaction changes.
 - [ ] One real paid PR transaction passes docs/PILOT_CHECKLIST.md.
