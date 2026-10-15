@@ -34,6 +34,14 @@ type RawBooking = {
     due_at: string | null;
     paid_at: string | null;
   }>;
+  booking_disputes: {
+    id: string;
+    status: string;
+    reason: string;
+    created_at: string;
+    resolution_note: string | null;
+    resolution_outcome: string | null;
+  }[] | null;
 };
 
 function single<T>(value: Relation<T>): T | null {
@@ -78,7 +86,15 @@ export async function getCreatorBooking(bookingId: string) {
         verification_status,
         verification_note
       ),
-      payments(amount,currency,status,due_at,paid_at)
+      payments(amount,currency,status,due_at,paid_at),
+      booking_disputes(
+        id,
+        status,
+        reason,
+        created_at,
+        resolution_note,
+        resolution_outcome
+      )
     `)
     .eq("id", bookingId)
     .single();
@@ -90,6 +106,9 @@ export async function getCreatorBooking(bookingId: string) {
   const restaurant = single(campaign?.restaurants ?? null);
   const slot = single(row.campaign_slots);
   const payment = single(row.payments);
+  const openDispute = (row.booking_disputes ?? []).find(
+    (item) => item.status === "open",
+  );
 
   return {
     id: row.id,
@@ -116,6 +135,13 @@ export async function getCreatorBooking(bookingId: string) {
       Boolean(slot) &&
       new Date(slot!.starts_at).getTime() > Date.now(),
     deliverables: row.deliverables ?? [],
+    dispute: openDispute
+      ? {
+          id: openDispute.id,
+          reason: openDispute.reason,
+          createdAt: openDispute.created_at,
+        }
+      : null,
     payment: payment
       ? {
           amount: payment.amount,
@@ -155,7 +181,15 @@ export async function listCreatorBookings() {
         verification_status,
         verification_note
       ),
-      payments(amount,currency,status,due_at,paid_at)
+      payments(amount,currency,status,due_at,paid_at),
+      booking_disputes(
+        id,
+        status,
+        reason,
+        created_at,
+        resolution_note,
+        resolution_outcome
+      )
     `)
     .order("confirmed_at", { ascending: false });
 
