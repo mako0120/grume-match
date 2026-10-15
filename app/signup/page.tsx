@@ -39,6 +39,17 @@ export default async function SignupPage({
               />
             </label>
           ) : null}
+          {privateAlpha ? (
+            <label>
+              Private Alpha 招待コード
+              <input
+                autoComplete="off"
+                name="privateAlphaAccessCode"
+                required
+                type="password"
+              />
+            </label>
+          ) : null}
           <label className="policy-confirm-row">
             <input name="policyConsent" required type="checkbox" />
             <span>
