@@ -13,7 +13,16 @@ export async function listAdminPayments() {
       due_at,
       paid_at,
       created_at,
-      creator_profiles(display_name),
+      creator_profiles(
+        display_name,
+        creator_payout_profiles(
+          bank_name,
+          branch_name,
+          account_type,
+          account_number,
+          account_holder
+        )
+      ),
       bookings(
         id,
         campaigns(
