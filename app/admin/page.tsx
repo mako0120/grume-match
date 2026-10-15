@@ -8,6 +8,7 @@ const labels = {
   payment_failed: "支払",
   dispute: "紛争",
   no_show: "来店",
+  account_closure: "アカウント",
 } as const;
 
 export default async function AdminPage() {
