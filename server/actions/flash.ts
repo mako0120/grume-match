@@ -1,6 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import {
+  COMMERCIAL_LIMITS,
+  validCompanions,
+  validCreatorSlots,
+  validPlatforms,
+  validReward,
+  validText,
+  validVisitDuration,
+} from "@/lib/commercial-limits";
 import { buildFlashTiming } from "@/lib/flash-timing";
 import { createClient } from "@/lib/supabase/server";
 
@@ -33,10 +42,19 @@ export async function createFlashCampaign(formData: FormData) {
   const durationMinutes = Number(formData.get("durationMinutes") ?? 120);
   const platforms = formData.getAll("platforms").map(String).filter(Boolean);
 
-  if (!category || cashReward <= 0 || creatorSlots <= 0 || !platforms.length) {
+  if (
+    !validText(category, COMMERCIAL_LIMITS.category, true) ||
+    !validText(description, COMMERCIAL_LIMITS.campaignDescription) ||
+    !validText(foodOffer, COMMERCIAL_LIMITS.foodOffer, true) ||
+    !validReward(cashReward) ||
+    !validCreatorSlots(creatorSlots) ||
+    !validCompanions(maxCompanions) ||
+    !validVisitDuration(durationMinutes) ||
+    !validPlatforms(platforms)
+  ) {
     redirect(
       "/restaurant/flash/new?message=" +
-        encodeURIComponent("報酬・ジャンル・投稿先を確認してください。"),
+        encodeURIComponent("報酬・ジャンル・人数・時間・投稿先を確認してください。"),
     );
   }
 
