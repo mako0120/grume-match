@@ -15,8 +15,11 @@ type BuildCampaignSlotsInput = {
   capacity: number;
 };
 
+const MAX_CAMPAIGN_DAYS = 90;
+const MAX_CAMPAIGN_SLOTS = 1000;
+
 function parseDate(value: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
   if (!match) throw new Error("invalid_date");
   return {
     year: Number(match[1]),
@@ -26,7 +29,7 @@ function parseDate(value: string) {
 }
 
 function parseTime(value: string) {
-  const match = /^(\d{2}):(\d{2})$/.exec(value);
+  const match = /^(\\d{2}):(\\d{2})$/.exec(value);
   if (!match) throw new Error("invalid_time");
   const hour = Number(match[1]);
   const minute = Number(match[2]);
@@ -68,6 +71,11 @@ export function buildCampaignSlots(input: BuildCampaignSlotsInput): SlotInput[] 
   const endUtc = Date.UTC(end.year, end.month - 1, end.day);
   if (endUtc < startUtc) throw new Error("invalid_date_range");
 
+  const rangeDays = Math.floor((endUtc - startUtc) / 86_400_000) + 1;
+  if (rangeDays > MAX_CAMPAIGN_DAYS) {
+    throw new Error("date_range_too_large");
+  }
+
   const allowedWeekdays = new Set(input.weekdays);
   const slots: SlotInput[] = [];
 
@@ -90,6 +98,10 @@ export function buildCampaignSlots(input: BuildCampaignSlotsInput): SlotInput[] 
         ends_at: `${dateLabel}T${toTimeString(endVisit)}:00+09:00`,
         capacity: input.capacity,
       });
+
+      if (slots.length > MAX_CAMPAIGN_SLOTS) {
+        throw new Error("too_many_slots");
+      }
     }
   }
 
