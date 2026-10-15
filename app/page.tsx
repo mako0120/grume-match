@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 export default function HomePage() {
+  const publicLaunch = process.env.PUBLIC_LAUNCH_ENABLED === "true";
+
   return (
     <main className="site-shell">
       <section className="hero-panel">
@@ -18,7 +20,9 @@ export default function HomePage() {
           <Link className="secondary-button" href="/login">
             ログイン
           </Link>
-          <span className="status-pill">Osaka Alpha</span>
+          <span className="status-pill">
+            {publicLaunch ? "Public" : "Osaka Private Alpha"}
+          </span>
         </div>
       </section>
 
@@ -38,6 +42,14 @@ export default function HomePage() {
           <p>Creator1名での参加と、1人運営の店舗・運営者を前提に設計。</p>
         </article>
       </section>
+
+      <footer className="site-footer">
+        <Link href="/legal/terms">利用規約</Link>
+        <Link href="/legal/privacy">プライバシー</Link>
+        <Link href="/legal/pr-guidelines">PRガイドライン</Link>
+        <Link href="/legal/operator">運営者情報</Link>
+        <Link href="/support">お問い合わせ</Link>
+      </footer>
     </main>
   );
 }
