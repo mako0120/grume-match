@@ -10,8 +10,8 @@ test("Supabase migration versions are unique", async () => {
   const seen = new Map();
 
   for (const file of files) {
-    const match = file.match(/^(\d{14})_/);
-    assert.ok(match, "Migration must start with a 14-digit version: " + file);
+    const match = file.match(/^(\d{12})_/);
+    assert.ok(match, "Migration must start with a 12-digit version: " + file);
 
     const version = match[1];
     assert.equal(
