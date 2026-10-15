@@ -30,6 +30,9 @@ export default async function LoginPage({
         </form>
 
         <p className="auth-switch">
+          <Link href="/forgot-password">パスワードを忘れた方</Link>
+        </p>
+        <p className="auth-switch">
           初めてですか？ <Link href="/signup">アカウントを作成</Link>
         </p>
       </section>
