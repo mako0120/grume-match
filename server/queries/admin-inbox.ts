@@ -9,7 +9,8 @@ export type AdminInboxItem = {
     | "payment_failed"
     | "dispute"
     | "no_show"
-    | "account_closure";
+    | "account_closure"
+    | "verification";
   title: string;
   detail: string;
   href: string | null;
@@ -32,6 +33,8 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     disputesResult,
     noShowsResult,
     accountClosuresResult,
+    unverifiedCreatorsResult,
+    unverifiedRestaurantsResult,
   ] = await Promise.all([
     supabase
       .from("deliverables")
@@ -97,6 +100,17 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .eq("status", "pending")
       .order("created_at", { ascending: true })
       .limit(20),
+
+    supabase
+      .from("creator_profiles")
+      .select("id", { count: "exact", head: true })
+      .is("verified_at", null),
+
+    supabase
+      .from("restaurants")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active")
+      .is("verified_at", null),
   ]);
 
   const inboxError = [
@@ -107,6 +121,8 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     disputesResult.error,
     noShowsResult.error,
     accountClosuresResult.error,
+    unverifiedCreatorsResult.error,
+    unverifiedRestaurantsResult.error,
   ].find(Boolean);
 
   if (inboxError) {
@@ -120,6 +136,9 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   const disputes = disputesResult.data ?? [];
   const noShows = noShowsResult.data ?? [];
   const accountClosures = accountClosuresResult.data ?? [];
+  const verificationCount =
+    (unverifiedCreatorsResult.count ?? 0) +
+    (unverifiedRestaurantsResult.count ?? 0);
 
   const items: AdminInboxItem[] = [];
 
@@ -262,6 +281,17 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
         (user?.role ?? "user"),
       href: "/admin/accounts",
       occurredAt: row.created_at,
+    });
+  }
+
+  if (verificationCount > 0) {
+    items.push({
+      id: "verification:pending",
+      kind: "verification",
+      title: "利用確認待ち",
+      detail: verificationCount + "件のCreator・店舗確認があります",
+      href: "/admin/verification",
+      occurredAt: now,
     });
   }
 
