@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requestAccountClosure } from "@/server/actions/account-closure";
 import { signOut } from "@/server/actions/auth";
 
 const roleLabels: Record<string, string> = {
@@ -9,7 +10,12 @@ const roleLabels: Record<string, string> = {
   admin: "運営",
 };
 
-export default async function AccountPage() {
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string; status?: string }>;
+}) {
+  const { message, status } = await searchParams;
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
 
@@ -24,6 +30,16 @@ export default async function AccountPage() {
   if (!userRow || userRow.status !== "active") {
     redirect("/login");
   }
+
+  const { data: closureRequest } =
+    userRow.role === "admin"
+      ? { data: null }
+      : await supabase
+          .from("account_closure_requests")
+          .select("id,status,created_at,reason")
+          .eq("user_id", authData.user.id)
+          .eq("status", "pending")
+          .maybeSingle();
 
   const homeHref =
     userRow.role === "admin"
@@ -46,6 +62,15 @@ export default async function AccountPage() {
       <p className="page-subtitle">
         ログイン情報と、必要な設定だけをまとめています。
       </p>
+
+      {message ? (
+        <div
+          aria-live="polite"
+          className={status === "error" ? "form-message error-message" : "form-message inline-success"}
+        >
+          {message}
+        </div>
+      ) : null}
 
       <section className="section-card account-card">
         <div>
@@ -101,6 +126,36 @@ export default async function AccountPage() {
         <Link className="secondary-button" href="/notifications">
           通知を見る
         </Link>
+
+        {userRow.role !== "admin" ? (
+          closureRequest ? (
+            <section className="section-card">
+              <span className="meta-pill">受付済み</span>
+              <strong>アカウント停止の依頼を確認中です</strong>
+              <p>運営が未完了案件や必要な記録を確認してから対応します。</p>
+            </section>
+          ) : (
+            <details className="section-card">
+              <summary>アカウント停止・削除について相談</summary>
+              <form action={requestAccountClosure} className="form-stack">
+                <label>
+                  理由・希望（任意）
+                  <textarea
+                    name="reason"
+                    placeholder="停止希望、個人情報の削除相談など"
+                    rows={3}
+                  />
+                </label>
+                <div className="pending-box">
+                  取引記録や法令・会計上必要な情報は、確認なしに即時削除しません。
+                </div>
+                <button className="secondary-button" type="submit">
+                  運営へ依頼する
+                </button>
+              </form>
+            </details>
+          )
+        ) : null}
 
         <form action={signOut}>
           <button className="secondary-button account-signout" type="submit">
