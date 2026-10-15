@@ -82,10 +82,11 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     supabase
       .from("bookings")
       .select(
-        "id,campaign_id,confirmed_at,status,creator_profiles(display_name),campaigns(title,restaurants(name))",
+        "id,campaign_id,no_show_at,status,creator_profiles(display_name),campaigns(title,restaurants(name))",
       )
       .eq("status", "no_show")
-      .order("confirmed_at", { ascending: false })
+      .is("no_show_reviewed_at", null)
+      .order("no_show_at", { ascending: true })
       .limit(20),
   ]);
 
@@ -225,15 +226,15 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
     items.push({
       id: "no-show:" + row.id,
       kind: "no_show",
-      title: "来店未確認",
+      title: "来店例外の確認",
       detail:
         (creator?.display_name ?? "Creator") +
         "・" +
         (restaurant?.name ?? "店舗") +
         "・" +
         (campaign?.title ?? "PR案件"),
-      href: "/restaurant/bookings/" + row.id,
-      occurredAt: row.confirmed_at,
+      href: "/admin/no-shows",
+      occurredAt: row.no_show_at ?? now,
     });
   }
 
