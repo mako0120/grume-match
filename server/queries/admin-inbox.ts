@@ -71,12 +71,12 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
       .limit(20),
 
     supabase
-      .from("applications")
+      .from("booking_disputes")
       .select(
-        "id,campaign_id,updated_at,status,creator_profiles(display_name),campaigns(title,restaurants(name))",
+        "id,booking_id,reason,created_at,status,bookings(creator_profiles(display_name),campaigns(title,restaurants(name)))",
       )
-      .eq("status", "dispute")
-      .order("updated_at", { ascending: true })
+      .eq("status", "open")
+      .order("created_at", { ascending: true })
       .limit(20),
 
     supabase
@@ -197,22 +197,23 @@ export async function getAdminInbox(): Promise<AdminInboxItem[]> {
   }
 
   for (const row of disputes) {
-    const creator = one(row.creator_profiles);
-    const campaign = one(row.campaigns);
+    const booking = one(row.bookings);
+    const creator = one(booking?.creator_profiles);
+    const campaign = one(booking?.campaigns);
     const restaurant = one(campaign?.restaurants);
 
     items.push({
       id: "dispute:" + row.id,
       kind: "dispute",
-      title: "確認が必要な案件",
+      title: "運営確認が必要",
       detail:
         (creator?.display_name ?? "Creator") +
         "・" +
         (restaurant?.name ?? "店舗") +
         "・" +
         (campaign?.title ?? "PR案件"),
-      href: "/restaurant/campaigns/" + row.campaign_id + "/applications",
-      occurredAt: row.updated_at,
+      href: "/admin/disputes",
+      occurredAt: row.created_at,
     });
   }
 
