@@ -12,6 +12,9 @@ export async function listAdminPayments() {
       status,
       due_at,
       paid_at,
+      transfer_reference,
+      transfer_note,
+      transfer_recorded_at,
       created_at,
       creator_profiles(
         display_name,
