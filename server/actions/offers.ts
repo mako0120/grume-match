@@ -1,6 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import {
+  COMMERCIAL_LIMITS,
+  validCompanions,
+  validPlatforms,
+  validReward,
+  validText,
+  validVisitDuration,
+} from "@/lib/commercial-limits";
 import { buildDirectOfferSchedule } from "@/lib/direct-offer-schedule";
 import { createClient } from "@/lib/supabase/server";
 
@@ -51,17 +59,29 @@ export async function createDirectOffer(formData: FormData) {
     );
   }
 
-  if (cashReward <= 0) {
+  if (!validReward(cashReward)) {
     redirect(
       "/restaurant/offers/new?message=" +
         encodeURIComponent("現金報酬を入力してください。"),
     );
   }
 
-  if (!platforms.length) {
+  if (!validPlatforms(platforms)) {
     redirect(
       "/restaurant/offers/new?message=" +
         encodeURIComponent("投稿先を1つ以上選択してください。"),
+    );
+  }
+
+  if (
+    !validText(foodOffer, COMMERCIAL_LIMITS.foodOffer, true) ||
+    !validText(note, COMMERCIAL_LIMITS.note) ||
+    !validCompanions(maxCompanions) ||
+    !validVisitDuration(durationMinutes)
+  ) {
+    redirect(
+      "/restaurant/offers/new?message=" +
+        encodeURIComponent("提供内容・同伴者・時間・メモを確認してください。"),
     );
   }
 
