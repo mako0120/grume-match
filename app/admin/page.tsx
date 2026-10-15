@@ -10,6 +10,7 @@ const labels = {
   no_show: "来店",
   account_closure: "アカウント",
   verification: "確認",
+  email_failed: "メール",
 } as const;
 
 export default async function AdminPage() {
