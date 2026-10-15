@@ -33,3 +33,20 @@ test("Admin can review and retry failed email delivery", async () => {
   assert.match(action, /admin_retry_notification_email/);
   assert.match(inbox, /email_failed/);
 });
+
+
+test("email delivery uses a lease and provider idempotency key", async () => {
+  const [migration, route] = await Promise.all([
+    readFile("supabase/migrations/202610150008_email_delivery_claim.sql", "utf8"),
+    readFile("app/api/cron/email/route.ts", "utf8"),
+  ]);
+
+  assert.match(migration, /'processing'/);
+  assert.match(migration, /provider_message_id/);
+  assert.match(migration, /email_not_retryable/);
+  assert.match(route, /Idempotency-Key/);
+  assert.match(route, /gourmet-diary-notification/);
+  assert.match(route, /status: "processing"/);
+  assert.match(route, /claimed_at/);
+  assert.match(route, /leaseUntil/);
+});
