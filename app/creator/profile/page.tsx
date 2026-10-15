@@ -15,7 +15,7 @@ export default async function CreatorProfilePage({
 
   const { data: profile } = await supabase
     .from("creator_profiles")
-    .select("id,display_name,bio,base_area,min_reward,travel_radius_km")
+    .select("id,display_name,bio,base_area,min_reward,travel_radius_km,verified_at")
     .eq("user_id", authData.user!.id)
     .single();
 
@@ -41,6 +41,17 @@ export default async function CreatorProfilePage({
       </p>
 
       {message ? <div className="form-message">{message}</div> : null}
+
+      <section className="section-card">
+        <span className={profile?.verified_at ? "status-chip status-approved" : "status-chip status-pending"}>
+          {profile?.verified_at ? "利用確認済み" : "運営確認待ち"}
+        </span>
+        <p>
+          {profile?.verified_at
+            ? "有償PR案件へ応募できます。"
+            : "SNS情報を保存すると運営が確認します。確認完了後に有償PRへ応募できます。"}
+        </p>
+      </section>
 
       <form action={saveCreatorBasics} className="campaign-form">
         <section className="form-section">
