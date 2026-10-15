@@ -11,6 +11,7 @@ import {
   markBookingVisited,
 } from "@/server/actions/bookings";
 import { reviewDeliverable } from "@/server/actions/deliverables";
+import { openBookingDispute } from "@/server/actions/disputes";
 import { getRestaurantBooking } from "@/server/queries/restaurant-booking";
 
 const platformLabels: Record<string, string> = {
@@ -126,6 +127,34 @@ export default async function RestaurantBookingDetailPage({
             </details>
           ) : null}
         </section>
+      ) : null}
+
+      {booking.dispute ? (
+        <section className="section-card">
+          <span className="meta-pill">運営確認中</span>
+          <strong>この案件は運営が確認しています</strong>
+          <p>{booking.dispute.reason}</p>
+        </section>
+      ) : booking.status !== "cancelled" ? (
+        <details className="section-card">
+          <summary>運営に確認を依頼する</summary>
+          <form action={openBookingDispute} className="form-stack">
+            <input name="bookingId" type="hidden" value={booking.id} />
+            <input name="scope" type="hidden" value="restaurant" />
+            <label>
+              確認してほしい内容
+              <textarea
+                name="reason"
+                placeholder="来店状況・投稿条件・報酬など、確認してほしい内容を入力"
+                required
+                rows={3}
+              />
+            </label>
+            <button className="secondary-button" type="submit">
+              運営確認を開始
+            </button>
+          </form>
+        </details>
       ) : null}
 
       {message ? (
