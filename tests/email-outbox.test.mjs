@@ -54,7 +54,7 @@ test("email delivery uses a lease and provider idempotency key", async () => {
 
 test("suspension results can reach a suspended account through the email outbox", async () => {
   const source = await readFile(
-    "supabase/migrations/202610150009_suspension_notifications.sql",
+    "supabase/migrations/202610150011_suspension_notifications.sql",
     "utf8",
   );
 
