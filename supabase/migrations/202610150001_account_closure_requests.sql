@@ -47,6 +47,10 @@ begin
     raise exception 'active_user_required' using errcode = 'P0001';
   end if;
 
+  if v_role = 'admin' then
+    raise exception 'admin_closure_requires_manual_review' using errcode = 'P0001';
+  end if;
+
   insert into public.account_closure_requests(user_id, reason)
   values(
     auth.uid(),
