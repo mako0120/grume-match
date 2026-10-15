@@ -20,6 +20,7 @@ export default async function AdminPage() {
         <nav className="mini-nav">
           <Link href="/admin/payments">報酬支払い</Link>
           <Link href="/admin/disputes">運営確認</Link>
+          <Link href="/admin/no-shows">来店例外</Link>
           <Link href="/admin/audit">監査</Link>
           <Link href="/notifications">通知</Link>
         </nav>
