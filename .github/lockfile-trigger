@@ -1,1 +1,1 @@
-generate package-lock.json for deterministic commercial builds
+generate deterministic package-lock.json and commit it
