@@ -166,10 +166,12 @@ Creatorは複数候補をタップできる。
 ## 7. State machines
 
 ### Campaign
-`draft → published → recruiting → filled → in_progress → completed`
+`draft → published → recruiting → closed | filled → in_progress → completed`
 
 例外:
 `cancelled / suspended`
+
+`closed` は「新規応募だけ終了」であり、確定済み来店は保持する。
 
 ### Application
 `applied → shortlisted → accepted | rejected | withdrawn`
@@ -215,9 +217,13 @@ MVPでは以下をサポート。
 Status:
 - pending
 - approved
+- on_hold
 - scheduled
 - paid
 - failed
+- cancelled
+
+`on_hold` は運営確認中、`cancelled` は未払いの支払対象外。
 
 ### Later
 Stripe Connect等を利用したマーケットプレイス決済を検討する。法務・税務・資金移動の仕様を確認した後に導入する。
