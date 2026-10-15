@@ -38,6 +38,10 @@ export async function submitDeliverable(formData: FormData) {
       redirect(withMessage(path, "この投稿はすでに承認済みのため変更できません。", "error"));
     }
 
+    if (reason.includes("booking_locked_by_dispute") || reason.includes("application_locked_by_dispute")) {
+      redirect(withMessage(path, "この案件は運営確認中のため、現在は更新できません。", "error"));
+    }
+
     redirect(withMessage(path, "投稿URLを保存できませんでした。もう一度お試しください。", "error"));
   }
 
@@ -74,6 +78,10 @@ export async function reviewDeliverable(formData: FormData) {
 
     if (reason.includes("deliverable_review_locked_after_payout_approval")) {
       redirect(withMessage(path, "報酬承認後の投稿状態は変更できません。", "error"));
+    }
+
+    if (reason.includes("application_locked_by_dispute") || reason.includes("payment_locked_by_dispute")) {
+      redirect(withMessage(path, "この案件は運営確認中のため、現在は投稿確認を変更できません。", "error"));
     }
 
     redirect(withMessage(path, "投稿確認を更新できませんでした。もう一度お試しください。", "error"));
