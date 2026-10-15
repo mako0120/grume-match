@@ -68,7 +68,9 @@ export async function markBookingVisited(formData: FormData) {
       ? "来店開始時刻より前は来店済みにできません。"
       : reason.includes("booking_not_visitable")
         ? "この来店は現在、来店済みに変更できません。"
-        : "来店確認を更新できませんでした。";
+        : reason.includes("booking_locked_by_dispute")
+          ? "この案件は運営確認中のため、来店状態を変更できません。"
+          : "来店確認を更新できませんでした。";
 
     redirect(bookingResultPath("restaurant", bookingId, "error", message));
   }
@@ -109,7 +111,9 @@ export async function cancelBooking(formData: FormData) {
       ? "来店開始後は通常キャンセルできません。店舗側で来店状況を確認してください。"
       : code.includes("booking_not_cancellable")
         ? "この来店はすでに処理済みです。"
-        : "キャンセル処理に失敗しました。";
+        : code.includes("booking_locked_by_dispute")
+          ? "この案件は運営確認中のため、現在はキャンセルできません。"
+          : "キャンセル処理に失敗しました。";
 
     redirect(bookingResultPath(scope, bookingId, "error", message));
   }
@@ -147,7 +151,9 @@ export async function markBookingNoShow(formData: FormData) {
       ? "来店予定時刻から30分経過するまで来店なしにはできません。"
       : code.includes("booking_not_no_showable")
         ? "この来店はすでに処理済みです。"
-        : "来店なしを記録できませんでした。";
+        : code.includes("booking_locked_by_dispute")
+          ? "この案件は運営確認中のため、来店状態を変更できません。"
+          : "来店なしを記録できませんでした。";
 
     redirect(bookingResultPath("restaurant", bookingId, "error", message));
   }
