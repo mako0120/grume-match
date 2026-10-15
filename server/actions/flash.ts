@@ -71,9 +71,14 @@ export async function createFlashCampaign(formData: FormData) {
   });
 
   if (error || !data) {
+    const reason = error?.message ?? "";
+    const message = reason.includes("restaurant_not_verified")
+      ? "店舗情報は現在、運営確認中です。確認完了後にFLASHを公開できます。"
+      : "FLASH案件を公開できませんでした。";
+
     redirect(
       "/restaurant/flash/new?message=" +
-        encodeURIComponent("FLASH案件を公開できませんでした。"),
+        encodeURIComponent(message),
     );
   }
 
