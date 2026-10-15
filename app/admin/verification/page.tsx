@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { verifyParticipant } from "@/server/actions/verification";
+import {
+  suspendParticipant,
+  verifyParticipant,
+} from "@/server/actions/verification";
 import { listUnverifiedParticipants } from "@/server/queries/admin-verification";
 
 function relationOne<T>(value: T | T[] | null | undefined): T | null {
@@ -82,6 +85,21 @@ export default async function AdminVerificationPage({
                       Creatorを確認済みにする
                     </button>
                   </form>
+
+                  <details className="danger-details">
+                    <summary>利用不可にする</summary>
+                    <form action={suspendParticipant} className="danger-form">
+                      <input name="kind" type="hidden" value="creator" />
+                      <input name="id" type="hidden" value={creator.id} />
+                      <label>
+                        理由
+                        <textarea name="reason" required rows={2} />
+                      </label>
+                      <button className="secondary-button" type="submit">
+                        利用停止を確定
+                      </button>
+                    </form>
+                  </details>
                 </article>
               );
             })}
@@ -125,6 +143,21 @@ export default async function AdminVerificationPage({
                       店舗を確認済みにする
                     </button>
                   </form>
+
+                  <details className="danger-details">
+                    <summary>利用不可にする</summary>
+                    <form action={suspendParticipant} className="danger-form">
+                      <input name="kind" type="hidden" value="restaurant" />
+                      <input name="id" type="hidden" value={restaurant.id} />
+                      <label>
+                        理由
+                        <textarea name="reason" required rows={2} />
+                      </label>
+                      <button className="secondary-button" type="submit">
+                        利用停止を確定
+                      </button>
+                    </form>
+                  </details>
                 </article>
               );
             })}
