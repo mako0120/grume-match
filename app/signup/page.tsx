@@ -7,6 +7,7 @@ export default async function SignupPage({
   searchParams: Promise<{ message?: string }>;
 }) {
   const { message } = await searchParams;
+  const privateAlpha = process.env.PUBLIC_LAUNCH_ENABLED !== "true";
 
   return (
     <main className="auth-shell">
