@@ -19,7 +19,7 @@ const MAX_CAMPAIGN_DAYS = 90;
 const MAX_CAMPAIGN_SLOTS = 1000;
 
 function parseDate(value: string) {
-  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) throw new Error("invalid_date");
   return {
     year: Number(match[1]),
@@ -29,7 +29,7 @@ function parseDate(value: string) {
 }
 
 function parseTime(value: string) {
-  const match = /^(\\d{2}):(\\d{2})$/.exec(value);
+  const match = /^(\d{2}):(\d{2})$/.exec(value);
   if (!match) throw new Error("invalid_time");
   const hour = Number(match[1]);
   const minute = Number(match[2]);
