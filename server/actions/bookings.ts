@@ -37,6 +37,12 @@ export async function confirmApplicationBooking(
     if (message.includes("slot_not_selected_by_creator")) {
       return { ok: false, message: "Creatorが選択していない日時です。" };
     }
+    if (message.includes("creator_not_verified")) {
+      return { ok: false, message: "Creatorの利用確認が完了していないため採用できません。" };
+    }
+    if (message.includes("restaurant_not_verified")) {
+      return { ok: false, message: "店舗の利用確認が完了していないため採用できません。" };
+    }
 
     return { ok: false, message: "予約を確定できませんでした。" };
   }
