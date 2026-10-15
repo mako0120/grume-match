@@ -8,7 +8,11 @@ Use two separate browser profiles so Creator and Restaurant sessions do not inte
 - [ ] Operator account is admin.
 - [ ] Creator signs up and completes Creator onboarding.
 - [ ] Creator registers Instagram metrics.
+- [ ] Operator verifies Creator in /admin/verification.
+- [ ] Creator receives verification notification.
 - [ ] Restaurant signs up and completes Restaurant onboarding.
+- [ ] Operator verifies Restaurant in /admin/verification.
+- [ ] Restaurant receives verification notification.
 - [ ] Restaurant dashboard opens without cross-account data leakage.
 
 ## B. Normal MARKET transaction
@@ -103,15 +107,20 @@ Payment:
 - [ ] Payment becomes approved.
 - [ ] Creator Wallet shows approved amount.
 - [ ] Due date is created.
+- [ ] Opening an Operator review places unsettled payment on hold.
+- [ ] Resolving the review restores or cancels only an unpaid payment.
 
 ## G. Manual payout
 
 Admin:
+- [ ] Creator registers a private payout destination.
 - [ ] Approved payment appears in payout queue.
 - [ ] Mark scheduled.
 - [ ] Creator receives notification.
 - [ ] Make actual pilot transfer outside app.
-- [ ] Mark paid.
+- [ ] Enter a bank transfer reference.
+- [ ] Mark paid only after the transfer succeeds.
+- [ ] Paid transfer evidence becomes immutable.
 - [ ] Creator Wallet shows paid.
 
 ## H. FLASH
@@ -142,6 +151,8 @@ Creator:
 - [ ] Overdue deliverable appears.
 - [ ] Overdue payment appears.
 - [ ] No-show/dispute states appear.
+- [ ] Participant verification work appears.
+- [ ] Account closure request appears.
 - [ ] Resolved exception disappears from active queue.
 
 ## Exit criteria
