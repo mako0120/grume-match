@@ -1,6 +1,7 @@
 export const paymentStatusLabels: Record<string, string> = {
   pending: "確認待ち",
   approved: "支払承認済み",
+  on_hold: "運営確認中",
   scheduled: "振込予定",
   paid: "支払済み",
   failed: "要確認",
@@ -21,6 +22,7 @@ export const notificationTypeLabels: Record<string, string> = {
   visit_confirmed: "来店確認",
   booking_cancelled: "キャンセル",
   booking_no_show: "来店状況",
+  booking_dispute_opened: "運営確認",
   reschedule_requested: "日時変更",
   reschedule_approved: "日時変更",
   reschedule_rejected: "日時変更",
