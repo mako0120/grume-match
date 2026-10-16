@@ -6,14 +6,17 @@ import { diaryOwnerEmail, sendDiaryEmail } from "@/server/diary/email";
 export async function sendOperatorBookingNotification(inquiryId: string): Promise<boolean> {
   const admin = createAdminClient();
   const { data } = await admin.from("diary_pr_inquiries")
-    .select("id,restaurant_name,service,proposed_visit_at,agreed_fee_yen,operator_notify_state,operator_notify_attempts")
+    .select("id,restaurant_name,service,proposed_visit_at,agreed_fee_yen,operator_notify_state,operator_notify_attempts,operator_notify_claimed_at")
     .eq("id", inquiryId).eq("status", "booked").maybeSingle();
-  if (!data || !["pending", "failed"].includes(data.operator_notify_state) ||
-      data.operator_notify_attempts >= 5) return false;
+  if (!data || data.operator_notify_attempts >= 5) return false;
+  const stale = data.operator_notify_state === "processing" && !!data.operator_notify_claimed_at &&
+    new Date(data.operator_notify_claimed_at).getTime() < Date.now() - 10 * 60_000;
+  if (!["pending", "failed"].includes(data.operator_notify_state) && !stale) return false;
 
   const claim = await admin.from("diary_pr_inquiries").update({
     operator_notify_state: "processing",
     operator_notify_attempts: data.operator_notify_attempts + 1,
+    operator_notify_claimed_at: new Date().toISOString(),
   }).eq("id", inquiryId).eq("operator_notify_state", data.operator_notify_state)
     .eq("operator_notify_attempts", data.operator_notify_attempts)
     .select("id").maybeSingle();
@@ -35,12 +38,14 @@ export async function sendOperatorBookingNotification(inquiryId: string): Promis
     const update = await admin.from("diary_pr_inquiries").update({
       operator_notify_state: "sent",
       operator_notified_at: new Date().toISOString(),
+      operator_notify_claimed_at: null,
     }).eq("id", inquiryId).eq("operator_notify_state", "processing");
     if (update.error) throw new Error("Notification delivery was not saved");
     return true;
   } catch {
     await admin.from("diary_pr_inquiries").update({
       operator_notify_state: "failed",
+      operator_notify_claimed_at: null,
     }).eq("id", inquiryId).eq("operator_notify_state", "processing");
     return false;
   }
@@ -49,7 +54,7 @@ export async function sendOperatorBookingNotification(inquiryId: string): Promis
 export async function retryDiaryBookingNotifications(): Promise<{ sent: number; failed: number }> {
   const admin = createAdminClient();
   const { data, error } = await admin.from("diary_pr_inquiries")
-    .select("id").eq("status", "booked").in("operator_notify_state", ["pending", "failed"])
+    .select("id").eq("status", "booked").in("operator_notify_state", ["pending", "failed", "processing"])
     .lt("operator_notify_attempts", 5).limit(15);
   if (error) return { sent: 0, failed: 1 };
   let sent = 0;
