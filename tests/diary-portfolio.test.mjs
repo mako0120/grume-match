@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DIARY_PORTFOLIO } from "../lib/diary/portfolio.ts";
-import { priceForFollowers, pricingSnapshot, DIARY_PR_PRICE_TIERS } from "../lib/diary/pricing.ts";
+import { priceForFollowers, pricingSnapshot, DIARY_PR_PRICE_TIERS, videoIncludedPriceForFollowers, priceForDiaryService } from "../lib/diary/pricing.ts";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -69,4 +69,12 @@ test("app saves price and follower snapshot server-side on new inquiry", () => {
   assert.match(schema, /post_price_reference_yen integer/);
   assert.match(admin, /申込み時の基本料金/);
   assert.doesNotMatch(api, /payload\.post_price_reference_yen/);
+});
+
+test("photo and video package public price floors are respected", () => {
+  assert.equal(priceForDiaryService("instagram_feed", 5000), 8000);
+  assert.equal(priceForDiaryService("instagram_feed_video", 5000), 15000);
+  assert.equal(priceForDiaryService("instagram_feed_video", 7500), 17000);
+  assert.equal(videoIncludedPriceForFollowers(10000), 19000);
+  assert.equal(priceForDiaryService("instagram_reel", 5000), null);
 });
