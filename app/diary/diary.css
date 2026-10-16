@@ -428,3 +428,27 @@
  .diary-scope { padding: 75px 20px; }
  .diary-before-request { padding: 18px; }
 }
+
+/* What is delivered: a concrete example storyboard, not a claim about supplied posts */
+.diary-editorial-example { margin: 30px 0; padding: 42px 32px; border-radius: 16px; color: #f8f5e9; background: var(--diary-green); }
+.diary-editorial-top { display: grid; grid-template-columns: .6fr 1.3fr 1fr; align-items: end; gap: 20px; }
+.diary-editorial-top .diary-overline { color: #ead1b9; align-self: start; font-size: 10px; }
+.diary-editorial-top h3 { font-size: clamp(23px, 3vw, 36px); margin: 0; letter-spacing: -.05em; line-height: 1.5; }
+.diary-editorial-top p { color: #d2dcd0; font-size: 12px; line-height: 1.9; margin: 0; }
+.diary-editorial-steps { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; margin-top: 36px; }
+.diary-editorial-steps > div { background: #fffdf2; color: var(--diary-green); padding: 21px 15px; min-width: 0; min-height: 173px; border-radius: 8px; }
+.diary-editorial-steps span { display: block; color: var(--diary-orange); font-size: 9px; letter-spacing: .08em; font-weight: 850; margin-bottom: 20px; }
+.diary-editorial-steps strong { font-size: 16px; letter-spacing: -.025em; }
+.diary-editorial-steps p { margin: 11px 0 0; font-size: 11px; color: #69756c; line-height: 1.7; }
+.diary-editorial-caption { color: #d1e0d2; font-size: 11px; line-height: 1.9; margin: 22px 0 9px; }
+.diary-editorial-cta { font-size: 12px; color: #f6d8aa; font-weight: 850; }
+@media (max-width: 960px) {
+  .diary-editorial-top { grid-template-columns: 1fr; }
+  .diary-editorial-steps { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+@media (max-width: 700px) {
+  .diary-editorial-example { padding: 26px 20px; }
+  .diary-editorial-steps { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin-top: 27px; }
+  .diary-editorial-steps > div { padding: 16px 13px; min-height: 160px; }
+  .diary-editorial-steps strong { font-size: 14px; }
+}
