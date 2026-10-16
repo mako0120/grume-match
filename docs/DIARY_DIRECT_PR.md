@@ -33,7 +33,7 @@ Never automatically refresh them without verified first-party Insights data.
 
 ## Sales workflow
 
-Inquiry (new) → Contacted → Proposed → Booked or Closed.
+Inquiry (new) → human compliance review (approved/rejected) → Contacted → Proposed → Booked or Closed.\nThe DB CHECK prohibits proposed/booked unless compliance_status=approved. Rejection closes the inquiry. Operator review is required even when text pre-screen passes.
 No contract or payment is created from submitting the inquiry.
 Quotes are tailored; do not state guaranteed bookings, engagements or follower reach.
 For sponsored content explicitly disclose advertising relationships (PR/タイアップ).
@@ -46,3 +46,19 @@ For sponsored content explicitly disclose advertising relationships (PR/タイ�
 - Explicit privacy consent timestamp is stored.
 - Never paste production secrets into repository, browser env, PR comments or logs.
 - Implement a retention/deletion procedure with actual operator review before full commercial release.
+
+## Zero tolerance: no incentivized review-site deliverables
+
+Business rule: **グルメ日誌 never accepts requests to post Tabelog/Google Maps or other review-site reviews as a condition of payment, free meals, or other consideration.** Never bundle review posts with Instagram PR services, regardless of amount or advertising label. Never accept specified star ratings, concealed ads, fabricated testimonials or non-visited claims.
+
+Official references:
+- Tabelog review guideline 12 (no paid, free-invitation or PR review; even reviewing after personally paying at an already-promoted shop is discouraged): https://tabelog.com/help/review_guide/
+- Google Maps fake engagement and rating manipulation policy (no directly or in-kind paid/incentivized reviews): https://support.google.com/contributionpolicy/answer/7400114
+- Japan Consumer Affairs Agency Stealth Marketing Q&A (paid PR must be clearly recognized as ad when business-directed): https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/stealth_marketing
+
+1. The public intake page discloses forbidden work before submission. Policy confirmation is mandatory and timestamped.
+2. Server rejects review/rating/undisclosed-ad wording even if an API client bypasses the checkbox UI; tests cover the explicit cases. Heuristic detection is **not exhaustive** and may conservatively flag legitimate wording.
+3. Every submitted inquiry starts with compliance_status=pending. A human reads full terms and approves/rejects; do not auto-approve.
+4. Supabase enforces that no inquiry can become proposed/booked without compliance_status=approved and reviewed_at.
+5. Any prohibited requirements found during negotiation are refused or the deal is stopped, never shifted to marketplace automatically.
+6. Mark permitted sponsored Instagram posts clearly with PR/タイアップ disclosures. Preserve editorial integrity; the operator may write truthful first-hand opinions.
