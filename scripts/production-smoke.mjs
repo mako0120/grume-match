@@ -1,1 +1,82 @@
-#!/usr/bin/env node\n\nconst baseUrl = (process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "")\n  .replace(/\/$/, "");\n\nif (!baseUrl || !baseUrl.startsWith("https://")) {\n  console.error("SITE_URL or NEXT_PUBLIC_SITE_URL must be an HTTPS URL.");\n  process.exit(1);\n}\n\nasync function fetchJson(path) {\n  const response = await fetch(baseUrl + path, {\n    redirect: "manual",\n    headers: {\n      "user-agent": "gourmet-diary-production-smoke/1.0",\n    },\n  });\n\n  const text = await response.text();\n  let body = null;\n\n  try {\n    body = JSON.parse(text);\n  } catch {\n    body = text;\n  }\n\n  return {\n    path,\n    status: response.status,\n    location: response.headers.get("location"),\n    body,\n  };\n}\n\nconst paths = [\n  "/api/health",\n  "/api/readiness",\n  "/login",\n  "/signup",\n  "/forgot-password",\n  "/legal/terms",\n  "/legal/privacy",\n  "/legal/pr-guidelines",\n  "/support",\n];\n\nconst checks = [];\nfor (const path of paths) checks.push(await fetchJson(path));\n\nlet failed = false;\n\nfor (const check of checks) {\n  const isJsonEndpoint = check.path.startsWith("/api/");\n  const expected =\n    check.path === "/api/health"\n      ? check.status === 200 && check.body?.database === "ok"\n      : check.path === "/api/readiness"\n        ? [200, 503].includes(check.status) &&\n          typeof check.body === "object" &&\n          check.body !== null\n        : [200, 307, 308].includes(check.status);\n\n  if (!expected) failed = true;\n\n  console.log(\n    JSON.stringify({\n      path: check.path,\n      status: check.status,\n      ok: expected,\n      location: check.location,\n      summary: isJsonEndpoint ? check.body : undefined,\n    }),\n  );\n}\n\nif (failed) {\n  console.error("Production smoke test failed.");\n  process.exit(1);\n}\n\nconsole.log("Production smoke test passed.");
+#!/usr/bin/env node
+
+const baseUrl = (process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "")
+  .replace(/\/$/, "");
+
+if (!baseUrl || !baseUrl.startsWith("https://")) {
+  console.error("SITE_URL or NEXT_PUBLIC_SITE_URL must be an HTTPS URL.");
+  process.exit(1);
+}
+
+async function fetchJson(path) {
+  const response = await fetch(baseUrl + path, {
+    redirect: "manual",
+    headers: {
+      "user-agent": "gourmet-diary-production-smoke/1.0",
+    },
+  });
+
+  const text = await response.text();
+  let body = null;
+
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = text;
+  }
+
+  return {
+    path,
+    status: response.status,
+    location: response.headers.get("location"),
+    body,
+  };
+}
+
+const paths = [
+  "/api/health",
+  "/api/readiness",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/legal/terms",
+  "/legal/privacy",
+  "/legal/pr-guidelines",
+  "/support",
+];
+
+const checks = [];
+for (const path of paths) checks.push(await fetchJson(path));
+
+let failed = false;
+
+for (const check of checks) {
+  const isJsonEndpoint = check.path.startsWith("/api/");
+  const expected =
+    check.path === "/api/health"
+      ? check.status === 200 && check.body?.database === "ok"
+      : check.path === "/api/readiness"
+        ? [200, 503].includes(check.status) &&
+          typeof check.body === "object" &&
+          check.body !== null
+        : [200, 307, 308].includes(check.status);
+
+  if (!expected) failed = true;
+
+  console.log(
+    JSON.stringify({
+      path: check.path,
+      status: check.status,
+      ok: expected,
+      location: check.location,
+      summary: isJsonEndpoint ? check.body : undefined,
+    }),
+  );
+}
+
+if (failed) {
+  console.error("Production smoke test failed.");
+  process.exit(1);
+}
+
+console.log("Production smoke test passed.");
