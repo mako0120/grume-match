@@ -8,7 +8,7 @@ create table public.diary_pr_inquiries (
   phone text,
   instagram_url text,
   service text not null check (service in (
-    'instagram_feed', 'instagram_reel', 'instagram_stories',
+    'instagram_feed', 'instagram_feed_video', 'instagram_reel', 'instagram_stories',
     'photo_video', 'consultation'
   )),
   budget text not null check (budget in (
