@@ -35,6 +35,18 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        source: "/diary/confirm/:path*",
+        headers: [
+          ...privateHeaders,
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/diary/confirmed",
+        headers: privateHeaders,
+      },
       ...[
         "/creator/:path*",
         "/restaurant/:path*",
