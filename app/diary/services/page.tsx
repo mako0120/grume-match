@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
 import { CanvaPortfolio } from "../components/canva-portfolio";
-import { currentDiaryPricing, formatDiaryYen } from "@/lib/diary/pricing";
+import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 export const metadata = {
   title: "PRサービス・制作実例｜グルメ日誌｜大阪",
@@ -20,14 +20,14 @@ const services = [
     note: "掲載枚数、修正範囲、投稿時期はご相談時に決定します。",
   },
   {
-    id: "instagram_reel",
+    id: "instagram_feed_video",
     sectionId: "reel",
     no: "02",
     en: "SHORT FORM / REEL",
-    name: "体験を伝えるリール動画",
-    lead: "料理・調理・店内の様子を短い動画にまとめ、お店の雰囲気を届けます。",
-    tasks: ["来店・動画撮影", "シーンの構成・編集", "必要に応じたテロップ・紹介文", "Instagramリール投稿・公開URL共有"],
-    note: "動画時間・音声・ナレーション・追加撮影は個別に合意します。",
+    name: "フィード投稿＋ショート動画",
+    lead: "フィード投稿と組み合わせて、料理や店内の空気感を伝えるショート動画を制作。15,000円（税込）から相談できます。",
+    tasks: ["店舗訪問・写真と動画を撮影", "Instagramフィード投稿の制作", "ショート動画の編集・テロップ", "動画の掲載先・尺・投稿数は契約前に合意"],
+    note: "15,000円〜は動画を含めた基本制作の開始価格です。リール単体投稿・長尺編集・広告素材への二次利用等は別途お見積もりします。",
   },
   {
     id: "instagram_stories",
@@ -64,7 +64,7 @@ export default function DiaryServices() {
         <span className="diary-overline"><span className="diary-dot" /> OUR CREATIVE SERVICE</span>
         <h1>どんな投稿を<br />お願いできるのか。<br /><em>依頼前に、全部わかる。</em></h1>
         <p>グルメ日誌本人が、お店を訪問して撮影・編集・発信。投稿の雰囲気や制作の範囲をあらかじめご確認いただいたうえで、ご希望に合う形をご提案します。</p>
-        <p className="diary-price-teaser">現在のInstagramフィードPR：<strong>{formatDiaryYen(price.amountYen)}</strong>／1投稿（税込総額）<br />直接依頼料金はフォロワー増加に応じて今後改定予定です。</p>
+        <p className="diary-price-teaser">写真のフィードPR：<strong>{formatDiaryYen(price.amountYen)}</strong>／1投稿（税込総額）<br />動画込みPR：<strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong>（税込開始価格）<br />直接依頼料金はフォロワー増加に応じて今後改定予定です。</p>
         <a href="#work" className="diary-button diary-button-primary">実際の投稿を見る ↘</a>
       </section>
 
