@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { updateDiaryInquiryStatus, reviewDiaryInquiryCompliance } from "./actions";
+import { updateDiaryInquiryStatus, reviewDiaryInquiryCompliance, proposeDiaryVisit, markDiaryPostPublished, markDiaryPaymentReceived } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -29,7 +29,7 @@ export default async function DiaryInquiriesAdmin() {
   const admin = createAdminClient();
   const { data: inquiries, error } = await admin
     .from("diary_pr_inquiries")
-    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,post_price_reference_yen,followers_at_inquiry,follower_snapshot_verified_at,price_policy_version,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at")
+    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,post_price_reference_yen,followers_at_inquiry,follower_snapshot_verified_at,price_policy_version,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at,inquiry_kind,desired_coverage,featured_menu,requested_outcome,visit_preference,proposed_visit_at,proposed_visit_duration_minutes,proposed_deliverables,agreed_fee_yen,payment_terms,proposal_expires_at,proposal_email_state,confirmed_at,operator_notify_state,operator_notified_at,published_at,published_post_url,payment_due_at,payment_received_at")
     .order("created_at", { ascending: false }).limit(100);
 
   return (
@@ -75,6 +75,11 @@ export default async function DiaryInquiriesAdmin() {
                 </p>
               ) : <p><strong>基本料金：</strong>このサービスは個別見積もり</p>}
               {item.desired_period && <p><strong>希望時期：</strong>{item.desired_period}</p>}
+              <p><strong>受付区分：</strong>{item.inquiry_kind === "application" ? "プラン申込み（日程調整希望）" : "事前相談"}</p>
+              {item.desired_coverage && <p><strong>紹介希望内容：</strong>{item.desired_coverage}</p>}
+              {item.featured_menu && <p><strong>紹介希望メニュー：</strong>{item.featured_menu}</p>}
+              {item.requested_outcome && <p><strong>PRの目的：</strong>{item.requested_outcome}</p>}
+              {item.visit_preference && <p><strong>店舗の候補日時：</strong>{item.visit_preference}</p>}
               <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.message}</p>
               <section style={{ background: "#fff9e8", padding: 16, borderRadius: 12, marginTop: 16 }}>
                 <strong>契約前のコンプライアンス審査：{item.compliance_status === "approved" ? "承認済み" : item.compliance_status === "rejected" ? "お断り" : "未審査"}</strong>
@@ -97,16 +102,68 @@ export default async function DiaryInquiriesAdmin() {
                   </form>
                 )}
               </section>
-              <form action={updateDiaryInquiryStatus} style={{ display: "flex", gap: 8, marginTop: 18, flexWrap: "wrap" }}>
+              {item.inquiry_kind === "application" && item.compliance_status === "approved" && ["new", "contacted", "proposed"].includes(item.status) && (
+                <section className="section-card" style={{ padding: 18, marginTop: 20, background: "#eff7ee" }}>
+                  <h3>グルメ日誌から店舗へ日時を提案</h3>
+                  <p>企業へ日時・制作内容・税込報酬・支払条件をメールで送り、専用リンクから承諾してもらいます。承諾されるまでは案件は確定しません。</p>
+                  <form action={proposeDiaryVisit} style={{ display: "grid", gap: 12 }}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <label>訪問日時（日本時間）<input required type="datetime-local" name="visit_datetime" /></label>
+                    <label>撮影・滞在時間
+                      <select name="duration_minutes" defaultValue="120">
+                        <option value="60">60分</option><option value="90">90分</option>
+                        <option value="120">120分</option><option value="180">180分</option>
+                        <option value="240">240分</option>
+                      </select>
+                    </label>
+                    <label>提案報酬（税込・円）
+                      <input type="number" name="agreed_fee_yen" min={item.post_price_reference_yen ?? 8000} max="1000000" step="1" required defaultValue={item.agreed_fee_yen ?? item.post_price_reference_yen ?? 8000} />
+                    </label>
+                    <label>制作・投稿範囲（具体的に記入）
+                      <textarea name="deliverables" minLength={20} maxLength={2000} rows={4} required defaultValue={item.proposed_deliverables ?? ""} placeholder="Instagramフィード1投稿。撮影する料理、画像枚数、修正、PR表記、素材利用範囲など" />
+                    </label>
+                    <p>支払い：投稿公開後7日以内に全額（税込）。撮影日時・料金・制作範囲のすべてに同意後、案件確定。</p>
+                    <button type="submit" className="secondary-button">店舗に日時・条件を提案する</button>
+                    {item.proposal_email_state !== "none" && <small>前回送信：{item.proposal_email_state === "sent" ? "送信済み" : item.proposal_email_state === "failed" ? "送信失敗（再提案可能）" : "処理中"} {item.proposal_expires_at && "／ 有効期限 " + new Date(item.proposal_expires_at).toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })}</small>}
+                  </form>
+                </section>
+              )}
+              {item.status === "booked" && (
+                <section className="section-card" style={{ padding: 18, background: "#eef5ed", marginTop: 20 }}>
+                  <h3>確定済み案件</h3>
+                  <p><strong>訪問：</strong>{item.proposed_visit_at && new Date(item.proposed_visit_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}</p>
+                  <p><strong>報酬：</strong>{Number(item.agreed_fee_yen).toLocaleString("ja-JP")}円（税込）</p>
+                  <p><strong>制作範囲：</strong>{item.proposed_deliverables}</p>
+                  <p><strong>確定通知：</strong>{item.operator_notify_state === "sent" ? "メール送信済み" : "送信待ちまたは失敗（cronで再試行）"}</p>
+                  {!item.published_at ? (
+                    <form action={markDiaryPostPublished} style={{ display: "grid", gap: 10 }}>
+                      <input type="hidden" name="id" value={item.id} />
+                      <label>公開したInstagram投稿URL<input type="url" name="post_url" required placeholder="https://www.instagram.com/p/..." /></label>
+                      <button type="submit" className="secondary-button">投稿公開済みにする・支払期限を設定</button>
+                    </form>
+                  ) : (
+                    <>
+                      <p><strong>公開投稿：</strong><a href={item.published_post_url} target="_blank" rel="noopener noreferrer">{item.published_post_url}</a></p>
+                      <p><strong>支払期限：</strong>{item.payment_due_at && new Date(item.payment_due_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}</p>
+                      {item.payment_received_at ? <p><strong>入金確認済み：</strong>{new Date(item.payment_received_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}</p> :
+                      <form action={markDiaryPaymentReceived}>
+                        <input type="hidden" name="id" value={item.id} />
+                        <button type="submit" className="secondary-button">入金を確認した</button>
+                      </form>}
+                    </>
+                  )}
+                </section>
+              )}
+                            <form action={updateDiaryInquiryStatus} style={{ display: "flex", gap: 8, marginTop: 18, flexWrap: "wrap" }}>
                 <input type="hidden" name="id" value={item.id} />
                 <select name="status" aria-label={item.restaurant_name + "の対応状況"} defaultValue={item.status}>
                   <option value="new">未対応</option>
                   <option value="contacted">連絡済み</option>
-                  <option value="proposed" disabled={item.compliance_status !== "approved"}>提案済み（審査後）</option>
-                  <option value="booked" disabled={item.compliance_status !== "approved"}>成約（審査後）</option>
+                  <option value="proposed" disabled>提案中（日時提案フォームから）</option>
+                  <option value="booked" disabled>成約（企業確認リンクから）</option>
                   <option value="closed">終了</option>
                 </select>
-                <button className="secondary-button" type="submit" disabled={item.compliance_status !== "approved" && ["proposed", "booked"].includes(item.status)}>状態を保存</button>
+                <button className="secondary-button" type="submit" disabled={["proposed", "booked", "closed"].includes(item.status)}>状態を保存</button>
               </form>
             </article>
           ))}
