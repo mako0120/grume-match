@@ -3,8 +3,9 @@ import { DiaryInquiryForm } from "../components/inquiry-form";
 import { DIARY_SERVICES } from "@/lib/diary/inquiry";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
-export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
-  const { service } = await searchParams;
+export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string }> }) {
+  const { service, intent } = await searchParams;
+  const initialKind = intent === "application" ? "application" : "consultation";
   const price = currentDiaryPricing();
   const initialService = DIARY_SERVICES.find((option) => option === service) ?? "";
   const enabled = process.env.DIARY_INQUIRIES_ENABLED === "true" &&
@@ -32,7 +33,7 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
         <strong>{formatDiaryYen(price.amountYen)}</strong>
         <p>フィード1投稿・税込総額。動画込みPRは{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜（税込）。フォロワー約{price.followers.toLocaleString("ja-JP")}人の時点での参考料金です。ご相談時の参考料金を記録しますが、正式な依頼内容・お支払い金額は双方の合意で確定します。</p>
       </div>
-      <DiaryInquiryForm enabled={enabled} initialService={initialService} />
+      <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} />
       <p className="diary-form-aside">発信内容・制作費・日程は双方で合意してから決定します。送信だけで契約は成立しません。</p>
       <footer className="diary-footer diary-form-footer">
         <Link href="/diary">グルメ日誌｜大阪</Link>
