@@ -16,6 +16,7 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
       <div className="diary-form-head">
         <span className="diary-overline"><span className="diary-dot" /> PR INQUIRY</span>
         <h1>お店の魅力を、<br /><em>一緒に届けませんか。</em></h1>
+        <p><strong>「事前相談」と「お申し込み」から選べます。</strong>申込み後は内容と条件を確認し、グルメ日誌から日時をご提案。企業様の承諾で正式に案件が決定します。</p>
         <p>ご相談・お見積もりは無料です。お店のこと、伝えたいことをぜひ聞かせてください。</p>
       </div>
       <div className="diary-before-request">
