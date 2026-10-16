@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { DiaryInquiryForm } from "../components/inquiry-form";
+import { DIARY_SERVICES } from "@/lib/diary/inquiry";
 
-export default function DiaryRequestPage() {
+export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
+  const { service } = await searchParams;
+  const initialService = DIARY_SERVICES.find((option) => option === service) ?? "";
   const enabled = process.env.DIARY_INQUIRIES_ENABLED === "true" &&
     !!process.env.DIARY_TURNSTILE_SECRET_KEY &&
     !!process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
@@ -13,7 +16,15 @@ export default function DiaryRequestPage() {
         <h1>お店の魅力を、<br /><em>一緒に届けませんか。</em></h1>
         <p>ご相談・お見積もりは無料です。お店のこと、伝えたいことをぜひ聞かせてください。</p>
       </div>
-      <DiaryInquiryForm enabled={enabled} />
+      <div className="diary-before-request">
+        <span>BEFORE INQUIRY</span>
+        <div>
+          <strong>制作内容・投稿実例は確認済みですか？</strong>
+          <p>どんなPRを依頼できるか、実際の投稿とサービス内容を事前に確認できます。</p>
+        </div>
+        <Link href="/diary/services">実例とサービスを見る ↗</Link>
+      </div>
+      <DiaryInquiryForm enabled={enabled} initialService={initialService} />
       <p className="diary-form-aside">発信内容・制作費・日程は双方で合意してから決定します。送信だけで契約は成立しません。</p>
       <footer className="diary-footer diary-form-footer">
         <Link href="/diary">グルメ日誌｜大阪</Link>
