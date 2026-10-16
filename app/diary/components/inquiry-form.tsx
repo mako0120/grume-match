@@ -86,6 +86,7 @@ export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: bo
           <select name="service" defaultValue={initialService} required>
             <option value="" disabled>選択してください</option>
             <option value="instagram_feed">Instagramフィード投稿</option>
+            <option value="instagram_feed_video">フィード投稿＋ショート動画（15,000円〜）</option>
             <option value="instagram_reel">Instagramリール</option>
             <option value="instagram_stories">ストーリーズ</option>
             <option value="photo_video">写真・動画素材の撮影</option>
