@@ -37,6 +37,7 @@ export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
       desired_period: data.get("desired_period"),
       message: data.get("message"),
       consent: data.get("consent") === "on",
+      compliance_confirmed: data.get("compliance_confirmed") === "on",
       website: data.get("website"),
       turnstileToken: data.get("cf-turnstile-response"),
     };
@@ -107,6 +108,17 @@ export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
       <label>お店の魅力・ご相談内容 <em>必須</em>
         <textarea name="message" required minLength={10} maxLength={2000} rows={6} placeholder="お店の特徴、紹介してほしいメニュー、ご希望の投稿イメージなどを自由にお書きください。" />
       </label>
+      <section className="diary-compliance" aria-label="お受けできない案件">
+        <strong>安心してご依頼いただくために</strong>
+        <p>当アカウントでは、次のご依頼はお受けしておりません。</p>
+        <ul>
+          <li>食べログ・Googleマップ等への報酬や飲食提供を条件とする口コミ・評価投稿</li>
+          <li>星の数や高評価、好意的なレビューを条件とする依頼</li>
+          <li>広告・提供関係の非表示、事実と異なる内容の発信</li>
+        </ul>
+        <p>実体験に基づき、必要なPR表示をしたInstagram投稿などを制作いたします。</p>
+        <Link href="/diary/policy">案件受注ポリシーを確認する ↗</Link>
+      </section>
       <div className="diary-honeypot" aria-hidden="true">
         <label>Webサイト <input name="website" tabIndex={-1} autoComplete="off" /></label>
       </div>
@@ -114,6 +126,10 @@ export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
         <label className="diary-privacy-check">
           <input type="checkbox" name="consent" required />
           <span><Link href="/legal/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</Link>に同意して送信します。入力した情報はPR相談への対応に利用されます。</span>
+        </label>
+        <label className="diary-privacy-check">
+          <input type="checkbox" name="compliance_confirmed" required />
+          <span><Link href="/diary/policy" target="_blank" rel="noopener noreferrer">案件受注ポリシー</Link>を確認し、口コミサイトへの投稿・高評価指定・PR表記を隠す依頼を含まないことに同意します。</span>
         </label>
         <div className="cf-turnstile" data-sitekey={siteKey} />
       </div>
