@@ -22,6 +22,7 @@ export async function sendDiaryEmail(
     },
     body: JSON.stringify({
       from, to: [to], subject: "[グルメ日誌｜大阪] " + subject, text: body,
+      ...(diaryOwnerEmail() ? { reply_to: diaryOwnerEmail() } : {}),
     }),
     signal: AbortSignal.timeout(10000),
     cache: "no-store",
