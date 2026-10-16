@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/server/auth/require-role";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseVisitDate, makeBookingToken, bookingTokenHash, formatTokyoVisit, safeBookingSiteUrl, sevenDaysAfter } from "@/lib/diary/booking";
-import { sendDiaryEmail, diaryEmailConfigured } from "@/server/diary/email";
+import { sendDiaryEmail, diaryEmailConfigured, diaryOwnerEmail } from "@/server/diary/email";
 import { detectProhibitedPRRequest } from "@/lib/diary/inquiry";
 
 const idPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -53,7 +53,7 @@ export async function updateDiaryInquiryStatus(form: FormData) {
 
 export async function proposeDiaryVisit(form: FormData) {
   await requireRole(["admin"]);
-  if (!diaryEmailConfigured()) throw new Error("Email provider not configured");
+  if (!diaryEmailConfigured() || !diaryOwnerEmail()) throw new Error("Email provider and owner notification mailbox must be configured");
   const origin = safeBookingSiteUrl();
   const id = formId(form);
   const requestedDate = form.get("visit_datetime");
