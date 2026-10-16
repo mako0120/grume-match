@@ -1,0 +1,279 @@
+# Local / Supabase / Vercel Setup
+
+## 1. Local app
+
+Requirements:
+- Node.js 24
+- npm 11
+
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+Quality checks:
+
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+```
+
+## 2. Supabase project
+
+Create one Supabase project for the pilot.
+
+Required public values:
+
+```env
+NEXT_PUBLIC_SITE_URL=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+`NEXT_PUBLIC_SITE_URL` must be the canonical HTTPS URL used by password recovery and Auth redirects.
+
+Required server-only value (preferred):
+
+```env
+SUPABASE_SECRET_KEY=
+```
+
+Legacy fallback:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+Use the modern Supabase secret key for new deployments when available.
+Never expose either server secret to the browser or commit it to Git.
+
+Apply migrations in timestamp order from `supabase/migrations/`.
+
+With Supabase CLI:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase db push
+```
+
+Development seed:
+
+```bash
+npx supabase db reset
+```
+
+The seed contains demonstration restaurant/campaign data only. Do not put real Creator or restaurant personal information in `seed.sql`.
+
+## 3. Supabase Auth
+
+For the pilot:
+- Enable email/password auth.
+- Configure the deployed Site URL.
+- Add local redirect URL when developing locally.
+- Keep email confirmation enabled for external pilot users.
+- Use the SSR confirmation endpoint already implemented at `/auth/confirm`.
+- Add the production `/auth/confirm` URL to allowed Auth redirects.
+- Test signup confirmation and password recovery separately.
+
+For the **Confirm signup** email template, use a token-hash URL:
+
+```text
+{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+```
+
+This allows the server route to verify the OTP, set the auth cookie, and continue to onboarding.
+
+After the first operator account signs up, promote only that account to admin from a trusted SQL session:
+
+```sql
+update public.users
+set
+  role = 'admin',
+  onboarding_completed_at = now()
+where email = '<OPERATOR_EMAIL>';
+```
+
+Do not expose an in-app "make me admin" endpoint.
+
+## 4. Cron reminders
+
+Set a long random value:
+
+```env
+CRON_SECRET=
+```
+
+`vercel.json` invokes:
+
+```
+GET /api/cron/reminders
+```
+
+The route requires:
+
+```
+Authorization: Bearer <CRON_SECRET>
+```
+
+It currently creates in-app reminders for:
+- PR visit roughly 24 hours before
+- required post deadline within 24 hours
+
+Notifications use a dedupe key so an hourly cron does not create repeated copies of the same reminder.
+
+## 5. Vercel
+
+Import the GitHub repository and configure:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY` (preferred) or `SUPABASE_SERVICE_ROLE_KEY` (legacy fallback)
+- `CRON_SECRET`
+- `PRIVATE_ALPHA_ACCESS_CODE` while `PUBLIC_LAUNCH_ENABLED=false`
+- `NEXT_PUBLIC_OPERATOR_NAME`
+- `NEXT_PUBLIC_SUPPORT_EMAIL`
+
+Never configure a Supabase server secret with a `NEXT_PUBLIC_` prefix.
+
+Private Alpha registration is fail-closed: when `PUBLIC_LAUNCH_ENABLED` is not `true`, signup requires the server-side `PRIVATE_ALPHA_ACCESS_CODE`. Do not put that code in a `NEXT_PUBLIC_` variable.
+
+Human launch gates remain false until actually completed:
+
+- `LEGAL_REVIEW_COMPLETED`
+- `ACCOUNTING_REVIEW_COMPLETED`
+- `PAYOUT_SECURITY_REVIEW_COMPLETED`
+- `RLS_E2E_VERIFIED`
+- `PILOT_E2E_COMPLETED`
+
+Before enabling real restaurant onboarding, verify:
+- production Supabase URL
+- Auth Site URL / redirect URLs
+- RLS migrations
+- admin account
+- cron authorization
+- HTTPS production domain
+
+## 6. Current routes
+
+Creator:
+- `/creator/campaigns`
+- `/creator/flash`
+- `/creator/applications`
+- `/creator/bookings`
+- `/creator/wallet`
+- `/creator/profile`
+- `/creator/payout`
+
+Restaurant:
+- `/restaurant`
+- `/restaurant/settings`
+- `/restaurant/campaigns/new`
+- `/restaurant/offers/new`
+- `/restaurant/flash/new`
+- `/restaurant/bookings`
+- `/restaurant/reschedules`
+
+Operator:
+- `/admin`
+- `/admin/verification`
+- `/admin/payments`
+- `/admin/disputes`
+- `/admin/no-shows`
+- `/admin/accounts`
+- `/admin/readiness`
+- `/admin/audit`
+
+Shared:
+- `/login`
+- `/signup`
+- `/forgot-password`
+- `/update-password`
+- `/onboarding`
+- `/legal/accept`
+- `/legal/terms`
+- `/legal/privacy`
+- `/legal/pr-guidelines`
+- `/notifications`
+
+## 7. Money handling in SOLO MVP
+
+The app does **not** move money automatically.
+
+Current flow:
+
+```
+Creator submit
+→ Restaurant approve
+→ Payment approved
+→ Creator registers a private payout destination
+→ Operator may mark scheduled
+→ Operator transfers money outside the app
+→ Operator records a transfer reference and marks paid
+→ paid evidence becomes immutable
+→ Creator Wallet updates
+```
+
+Do not represent `approved` as already paid.
+
+Stripe Connect belongs to a later phase after business/legal/tax handling is confirmed.
+
+## 8. Content policy boundary for the product
+
+The standard paid deliverables are:
+- Instagram
+- TikTok
+- YouTube Shorts
+- UGC
+
+Do not make incentivized Google/Tabelog reviews a required paid deliverable.
+
+## 9. Pilot scope
+
+Start in Osaka.
+
+Recommended first controlled pilot:
+- 1 operator account
+- 1 Creator account (グルメ日誌)
+- 1 test restaurant account
+- 1 paid campaign
+- 1 booking
+- 1 deliverable
+- 1 manual payout
+
+Before either side can transact, the Operator verifies the Creator and Restaurant in `/admin/verification`.
+
+Only after the full transaction succeeds should external Creators/restaurants be invited. Keep `PUBLIC_LAUNCH_ENABLED=false` until every readiness gate is genuinely complete.
+
+
+## Cross-tenant RLS negative smoke
+
+After the dedicated Supabase project is migrated and test fixtures exist, run:
+
+```bash
+npm run smoke:rls
+```
+
+Required non-production test credentials:
+
+```env
+RLS_CREATOR_A_EMAIL=
+RLS_CREATOR_A_PASSWORD=
+RLS_CREATOR_B_EMAIL=
+RLS_CREATOR_B_PASSWORD=
+RLS_RESTAURANT_A_EMAIL=
+RLS_RESTAURANT_A_PASSWORD=
+RLS_RESTAURANT_B_EMAIL=
+RLS_RESTAURANT_B_PASSWORD=
+```
+
+Fixture requirements:
+- Creator B has a payout destination and at least one booking.
+- Restaurant B has at least one booking.
+- Use dedicated test accounts only.
+- Never place these passwords in GitHub.
+- Set `RLS_E2E_VERIFIED=true` only after this script passes against the deployed dedicated PR OS database.

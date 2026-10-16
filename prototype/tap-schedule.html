@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GOURMET DIARY — Tap Schedule Prototype</title>
+  <style>
+    :root{
+      --bg:#f6f6f3;
+      --surface:#ffffff;
+      --text:#151515;
+      --muted:#6f6f6a;
+      --line:#e8e7e1;
+      --accent:#151515;
+      --soft:#f0efe9;
+      --success:#eef7ef;
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",sans-serif;
+    }
+    .shell{
+      width:min(100%,520px);
+      margin:0 auto;
+      min-height:100vh;
+      background:var(--surface);
+      padding-bottom:118px;
+    }
+    header{
+      padding:18px 20px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .brand{font-weight:800;letter-spacing:.04em;font-size:13px}
+    .badge{
+      background:var(--soft);
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:12px;
+      font-weight:700;
+    }
+    main{padding:18px 18px 28px}
+    .hero{
+      border-radius:24px;
+      min-height:190px;
+      padding:22px;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72)),
+        radial-gradient(circle at 25% 20%,#9a5d3b,#25160f 70%);
+    }
+    .area{font-size:12px;opacity:.85;margin-bottom:6px}
+    h1{font-size:24px;line-height:1.25;margin:0 0 10px}
+    .reward{
+      display:inline-flex;
+      align-items:baseline;
+      gap:4px;
+      font-weight:800;
+      font-size:28px;
+    }
+    .reward small{font-size:13px;font-weight:600;opacity:.86}
+    .summary{
+      margin:14px 0 24px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .summary div{
+      background:var(--soft);
+      border-radius:16px;
+      padding:13px;
+    }
+    .label{font-size:11px;color:var(--muted);margin-bottom:4px}
+    .value{font-size:14px;font-weight:700}
+    h2{font-size:18px;margin:26px 0 7px}
+    .hint{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 16px}
+    .date-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:15px;
+      margin-bottom:12px;
+    }
+    .date-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .date-title{font-weight:800}
+    .remaining{font-size:11px;color:var(--muted)}
+    .slots{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+    button{
+      font:inherit;
+      cursor:pointer;
+    }
+    .slot{
+      min-height:46px;
+      border-radius:13px;
+      border:1px solid var(--line);
+      background:white;
+      color:var(--text);
+      font-size:13px;
+      font-weight:700;
+    }
+    .slot:hover{border-color:#b7b5ac}
+    .slot.selected{
+      background:var(--accent);
+      color:white;
+      border-color:var(--accent);
+    }
+    .slot.full{
+      background:#f7f7f5;
+      color:#b6b5af;
+      text-decoration:line-through;
+      cursor:not-allowed;
+    }
+    .flex{
+      grid-column:1/-1;
+      min-height:48px;
+      border-radius:13px;
+      border:1px dashed #b8b6ae;
+      background:var(--soft);
+      font-weight:750;
+    }
+    .flex.selected{
+      background:var(--success);
+      border-style:solid;
+      border-color:#9fbea2;
+    }
+    .party{
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+    }
+    .party button{
+      flex:1;
+      min-height:48px;
+      border-radius:14px;
+      background:white;
+      border:1px solid var(--line);
+      font-weight:750;
+    }
+    .party button.selected{
+      background:var(--accent);
+      color:white;
+      border-color:var(--accent);
+    }
+    .sticky{
+      position:fixed;
+      bottom:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(100%,520px);
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      border-top:1px solid var(--line);
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(18px);
+      display:flex;
+      gap:12px;
+      align-items:center;
+      z-index:20;
+    }
+    .selection{min-width:104px}
+    .selection b{display:block;font-size:15px}
+    .selection span{font-size:11px;color:var(--muted)}
+    .apply{
+      flex:1;
+      min-height:56px;
+      border:0;
+      border-radius:16px;
+      background:var(--accent);
+      color:white;
+      font-weight:800;
+      font-size:15px;
+    }
+    .apply:disabled{opacity:.35;cursor:not-allowed}
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:105px;
+      transform:translateX(-50%) translateY(20px);
+      width:min(calc(100% - 36px),484px);
+      padding:14px 16px;
+      background:#151515;
+      color:white;
+      border-radius:14px;
+      opacity:0;
+      pointer-events:none;
+      transition:.2s ease;
+      font-size:13px;
+      z-index:30;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">GOURMET DIARY</div>
+      <div class="badge">PR MARKET</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="area">大阪・心斎橋 ｜ 焼肉</div>
+        <h1>黒毛和牛コース<br>リールPR募集</h1>
+        <div class="reward">¥6,000 <small>現金報酬 + 2名食事提供</small></div>
+      </section>
+
+      <section class="summary">
+        <div><div class="label">必須投稿</div><div class="value">Instagram Reel</div></div>
+        <div><div class="label">募集人数</div><div class="value">3名</div></div>
+        <div><div class="label">来店期間</div><div class="value">10/8〜10/14</div></div>
+        <div><div class="label">同伴者</div><div class="value">1名までOK</div></div>
+      </section>
+
+      <h2>来店できる時間を選択</h2>
+      <p class="hint">候補は複数選べます。店舗は選択された候補の中から日時を確定します。文章での日程調整は不要です。</p>
+
+      <div class="date-card" data-date="10/8">
+        <div class="date-head">
+          <div class="date-title">10月8日（水）</div>
+          <div class="remaining">残り3枠</div>
+        </div>
+        <div class="slots">
+          <button class="slot" data-value="10/8 18:00">18:00</button>
+          <button class="slot" data-value="10/8 18:30">18:30</button>
+          <button class="slot" data-value="10/8 19:00">19:00</button>
+          <button class="slot" data-value="10/8 19:30">19:30</button>
+          <button class="slot full" disabled>20:00</button>
+          <button class="slot" data-value="10/8 20:30">20:30</button>
+          <button class="flex" data-value="10/8 19:00以降">19:00以降ならいつでも</button>
+        </div>
+      </div>
+
+      <div class="date-card" data-date="10/9">
+        <div class="date-head">
+          <div class="date-title">10月9日（木）</div>
+          <div class="remaining">残り4枠</div>
+        </div>
+        <div class="slots">
+          <button class="slot" data-value="10/9 18:00">18:00</button>
+          <button class="slot" data-value="10/9 18:30">18:30</button>
+          <button class="slot" data-value="10/9 19:00">19:00</button>
+          <button class="slot" data-value="10/9 19:30">19:30</button>
+          <button class="slot" data-value="10/9 20:00">20:00</button>
+          <button class="slot full" disabled>20:30</button>
+          <button class="flex" data-value="10/9 19:00以降">19:00以降ならいつでも</button>
+        </div>
+      </div>
+
+      <div class="date-card" data-date="10/11">
+        <div class="date-head">
+          <div class="date-title">10月11日（土）</div>
+          <div class="remaining">残り2枠</div>
+        </div>
+        <div class="slots">
+          <button class="slot" data-value="10/11 18:00">18:00</button>
+          <button class="slot" data-value="10/11 18:30">18:30</button>
+          <button class="slot" data-value="10/11 19:00">19:00</button>
+          <button class="slot full" disabled>19:30</button>
+          <button class="slot" data-value="10/11 20:00">20:00</button>
+          <button class="slot full" disabled>20:30</button>
+          <button class="flex" data-value="10/11 19:00以降">19:00以降ならいつでも</button>
+        </div>
+      </div>
+
+      <h2>来店人数</h2>
+      <div class="party">
+        <button data-party="1">1名</button>
+        <button data-party="2" class="selected">2名</button>
+      </div>
+    </main>
+  </div>
+
+  <div class="sticky">
+    <div class="selection">
+      <b id="selectionCount">0候補</b>
+      <span>選択中</span>
+    </div>
+    <button class="apply" id="applyButton" disabled>この候補で応募する</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const selected = new Set();
+    let partySize = 2;
+
+    const countEl = document.getElementById("selectionCount");
+    const applyButton = document.getElementById("applyButton");
+    const toast = document.getElementById("toast");
+
+    function sync() {
+      countEl.textContent = selected.size + "候補";
+      applyButton.disabled = selected.size === 0;
+    }
+
+    document.querySelectorAll(".slot:not(.full), .flex").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.value;
+        const card = button.closest(".date-card");
+        const isFlexible = button.classList.contains("flex");
+
+        if (isFlexible) {
+          const exactButtons = card.querySelectorAll(".slot.selected");
+          exactButtons.forEach((b) => {
+            selected.delete(b.dataset.value);
+            b.classList.remove("selected");
+          });
+        } else {
+          const flexible = card.querySelector(".flex.selected");
+          if (flexible) {
+            selected.delete(flexible.dataset.value);
+            flexible.classList.remove("selected");
+          }
+        }
+
+        if (selected.has(value)) {
+          selected.delete(value);
+          button.classList.remove("selected");
+        } else {
+          selected.add(value);
+          button.classList.add("selected");
+        }
+        sync();
+      });
+    });
+
+    document.querySelectorAll("[data-party]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-party]").forEach(b => b.classList.remove("selected"));
+        button.classList.add("selected");
+        partySize = Number(button.dataset.party);
+      });
+    });
+
+    applyButton.addEventListener("click", () => {
+      const list = [...selected].join(" / ");
+      toast.textContent = "応募候補: " + list + " ｜ " + partySize + "名で送信しました（prototype）";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3200);
+    });
+
+    sync();
+  </script>
+</body>
+</html>
