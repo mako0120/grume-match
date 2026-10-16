@@ -116,3 +116,25 @@ Operator action: check Instagram follower count in first-party Insights and upda
 
 
 Production rollout remains gated on dedicated DB, verified payment/legal disclosures, real test submission and viewer URL accessibility.
+
+
+## 2026-10-16: Consultation, application, enterprise visit confirmation, and payment due
+
+Owner requested two separately labeled entry points:
+1. `/diary/request?intent=consultation`: free, no obligation. Company selects interest and may share expected dishes, purpose and available dates.
+2. `/diary/request?service=instagram_feed&intent=application` or `instagram_feed_video`: company selects plan and must describe desired coverage; submits brand, menus, goals, visit preferences, contact, compliance consent. **This does not itself create an agreement or payment**.
+
+Workflow:
+- Private operator reads the request in `/admin/diary-inquiries`, rejects forbidden paid/review-site PR, and approves compliant application.
+- Operator chooses their proposed visit time in Asia/Tokyo, duration, itemized deliverables, and final VAT-inclusive fee. This must not fall below the current recorded price floor (¥8,000 for photo, ¥15,000+ for photo/video).
+- Verified Resend server email sends a 7-day expiry **single-use 256-bit confirmation token** to the restaurant email. Only its SHA-256 hash is stored in the DB.
+- Company reviews exact quote, terms, visit date and expected deliverables, affirmatively agrees and submits the confirmation. A conditional atomic DB update confirms exactly one booking, and a PostgreSQL exclusion constraint stops overlapping active bookings.
+- After confirmed status, notification to **DIARY_OPERATOR_NOTIFY_EMAIL** is sent via Resend; on failure the status remains failed and the existing mail cron retries up to 5 times, with a 10-minute stale-processing recovery window and idempotency key. Do not claim notifications are operational before real delivery test.
+- Operator records the actual published Instagram URL. The server records publication timestamp and due date 7 * 24 hours later. Operator marks the invoice paid ONLY after confirming funds.
+- There is NO automatic card collection, bank transfer reconciliation or contractual cancellation automation. Business-to-creator billing remains manual and must comply with consumer/commercial disclosure laws.
+
+**Payment decision:** The owner explicitly described payment within one week after completion. The current application implements **100% post-publication within 7 days** rather than the separately recommended 50% deposit / 50% post-publication. If the owner later explicitly elects a deposit requirement, both party-facing terms and the workflow need to change together. Dates/price changes must be agreed by both parties; do not falsely claim an initial inquiry itself locks a commercial contract.
+
+**Security:** no tenant clients access the private inquiry database. Admin actions independently enforce role. One-time public token endpoints do not disclose contact emails, use HTTPS only, and should have no analytics or third-party embeds. Ensure production site adds Referrer-Policy no-referrer for `/diary/confirm/*`, does not cache tokens, and removes them from logs. Operators should manually review cancellation terms, payment instructions, invoice/tax compliance before public launch.
+
+**Production configuration**: dedicated Supabase migrations `202610160002` then `202610160003`, Vercel deployment, valid `NEXT_PUBLIC_SITE_URL`, `DIARY_INQUIRIES_ENABLED=true` after E2E, `RESEND_API_KEY`, `EMAIL_FROM`, `DIARY_OPERATOR_NOTIFY_EMAIL`, `CRON_SECRET`. SMTP/domain and provider deliverability are not verified yet. The previous unrelated Supabase/Vercel projects MUST NOT be modified.
