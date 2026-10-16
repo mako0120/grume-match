@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PostShowcase } from "./components/post-showcase";
 import { CanvaPortfolio } from "./components/canva-portfolio";
+import { currentDiaryPricing, formatDiaryYen } from "@/lib/diary/pricing";
 
 const metrics = [
   { value: "17.6万", unit: "回", label: "コンテンツ再生数" },
@@ -15,6 +16,7 @@ const offerings = [
 ];
 
 export default function DiaryHomePage() {
+  const price = currentDiaryPricing();
   return (
     <>
       <header className="diary-nav">
@@ -40,6 +42,10 @@ export default function DiaryHomePage() {
             <div className="diary-actions">
               <Link className="diary-button diary-button-primary" href="/diary/request">お店のPRを相談する <span>↗</span></Link>
               <a className="diary-button diary-button-quiet" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る ↗</a>
+            </div>
+            <div className="diary-direct-offer">
+              <div><span>DIRECT PR / CURRENT PRICE</span><strong>{formatDiaryYen(price.amountYen)}</strong><small>Instagramフィード1投稿・税込総額</small></div>
+              <div><p>グルメ日誌本人への直接依頼だからこその価格。フォロワーの成長に合わせて、今後は新規依頼の料金を見直していく予定です。</p><Link href="/diary/services">料金と制作実例を確認する ↗</Link></div>
             </div>
             <span className="diary-hero-caption">PRのご相談・お見積もりは無料です。グルメ日誌本人が直接対応します。</span>
           </div>
