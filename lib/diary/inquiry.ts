@@ -19,6 +19,11 @@ export type DiaryService = (typeof DIARY_SERVICES)[number];
 export type DiaryBudget = (typeof DIARY_BUDGETS)[number];
 
 export type DiaryInquiry = {
+  inquiry_kind: "consultation" | "application";
+  desired_coverage: string | null;
+  featured_menu: string | null;
+  requested_outcome: string | null;
+  visit_preference: string | null;
   restaurant_name: string;
   contact_name: string;
   email: string;
@@ -70,6 +75,11 @@ export function validateDiaryInquiry(input: unknown):
   const desired_period = clean(body.desired_period, 120);
   const message = clean(body.message, 2000);
   const service = body.service;
+  const inquiry_kind = body.inquiry_kind;
+  const desired_coverage = clean(body.desired_coverage, 1200);
+  const featured_menu = clean(body.featured_menu, 500);
+  const requested_outcome = clean(body.requested_outcome, 500);
+  const visit_preference = clean(body.visit_preference, 600);
   const budget = body.budget;
 
   if (!restaurant_name || restaurant_name.length > 100 ||
@@ -79,6 +89,16 @@ export function validateDiaryInquiry(input: unknown):
       phone.length > 30 || desired_period.length > 120 ||
       message.length > 2000 || message.length < 10) {
     return { ok: false, error: "invalid_contact_details" };
+  }
+  if (inquiry_kind !== "consultation" && inquiry_kind !== "application") {
+    return { ok: false, error: "inquiry_kind_required" };
+  }
+  if (desired_coverage.length > 1200 || featured_menu.length > 500 ||
+      requested_outcome.length > 500 || visit_preference.length > 600) {
+    return { ok: false, error: "request_details_too_long" };
+  }
+  if (inquiry_kind === "application" && !desired_coverage) {
+    return { ok: false, error: "desired_coverage_required" };
   }
   if (!DIARY_SERVICES.some((option) => option === service) ||
       !DIARY_BUDGETS.some((option) => option === budget)) {
@@ -102,11 +122,16 @@ export function validateDiaryInquiry(input: unknown):
   if (body.compliance_confirmed !== true) {
     return { ok: false, error: "compliance_acknowledgement_required" };
   }
-  const prohibited = detectProhibitedPRRequest([restaurant_name, desired_period, message].join(" "));
+  const prohibited = detectProhibitedPRRequest([restaurant_name, desired_period, message, desired_coverage, featured_menu, requested_outcome, visit_preference].join(" "));
   if (prohibited) return { ok: false, error: prohibited };
   return {
     ok: true,
     data: {
+      inquiry_kind,
+      desired_coverage: desired_coverage || null,
+      featured_menu: featured_menu || null,
+      requested_outcome: requested_outcome || null,
+      visit_preference: visit_preference || null,
       restaurant_name,
       contact_name,
       email,
