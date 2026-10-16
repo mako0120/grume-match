@@ -522,3 +522,65 @@
   .diary-price-tier strong { font-size: 29px; }
   .diary-work-after .diary-button { max-width: 100%; }
 }
+
+/* Transparent first-party 8,000-yen PR price, follower-based future revision */
+.diary-direct-offer {
+  max-width: 560px;
+  display: grid;
+  grid-template-columns: .8fr 1.2fr;
+  gap: 18px;
+  align-items: center;
+  margin-top: 29px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  border: 1px solid #dde1d4;
+  background: #f0f1e9;
+}
+.diary-direct-offer > div:first-child { border-right: 1px solid #c8d0c4; padding-right: 10px; }
+.diary-direct-offer span { display: block; font-size: 9px; letter-spacing: .08em; color: #758378; font-weight: 900; }
+.diary-direct-offer strong { display: block; font-size: clamp(34px,4vw,50px); font-weight: 900; color: var(--diary-orange); white-space: nowrap; letter-spacing: -.07em; line-height: 1.6; }
+.diary-direct-offer small { display: block; color: #66746a; font-size: 10px; line-height: 1.6; }
+.diary-direct-offer p { color: #53685a; font-size: 12px; line-height: 1.9; margin: 0 0 8px; }
+.diary-direct-offer a { font-size: 11px; font-weight: 900; color: var(--diary-orange); }
+.diary-price-teaser { background: #fff5ea; border-left: 3px solid var(--diary-orange); border-radius: 6px; padding: 17px 20px; }
+.diary-price-teaser strong { color: var(--diary-orange); font-size: 23px; }
+.diary-current-price {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 25px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d9ddd3;
+  border-radius: 14px;
+  margin-top: 28px;
+  padding: 23px 27px;
+}
+.diary-current-price-main { border-right: 1px solid #e2e6df; padding-right: 18px; }
+.diary-current-price-main > span { display: block; font-size: 10px; letter-spacing: .08em; font-weight: 800; color: #758b7c; }
+.diary-current-price-main strong { display: block; font-size: clamp(39px,5vw,62px); font-weight: 900; color: var(--diary-orange); letter-spacing: -.07em; white-space: nowrap; margin-top: 8px; }
+.diary-current-price-main p { font-size: 11px; color: var(--diary-muted); }
+.diary-current-price-details strong { font-size: 16px; }
+.diary-current-price-details p { font-size: 12px; line-height: 1.9; color: var(--diary-muted); margin: 9px 0 0; }
+.diary-growth-price { padding: 23px 28px; border-radius: 13px; border: 1px solid #c7d2c2; background: #e1e9df; margin-top: 16px; }
+.diary-growth-price span { display: block; font-size: 10px; font-weight: 850; letter-spacing: .1em; color: #4c6b54; }
+.diary-growth-price strong { font-size: 20px; display: block; margin: 13px 0 4px; }
+.diary-growth-price p { font-size: 13px; line-height: 1.85; color: #385d40; }
+.diary-growth-price small { font-size: 11px; line-height: 1.85; color: #64776a; display: block; }
+.diary-request-price { padding: 22px 26px; margin-bottom: 20px; background: #f0f1e8; border-radius: 14px; }
+.diary-request-price > span { display: block; color: var(--diary-muted); font-weight: 800; font-size: 12px; }
+.diary-request-price > strong { display: block; color: var(--diary-orange); font-size: clamp(34px,6vw,47px); letter-spacing: -.07em; margin: 7px 0; }
+.diary-request-price > p { margin: 0; font-size: 12px; color: #657269; line-height: 1.85; }
+@media (max-width: 980px) {
+ .diary-direct-offer { grid-template-columns: 1fr; }
+ .diary-direct-offer > div:first-child { border-right: none; border-bottom: 1px solid #c8d0c4; padding: 0 0 10px; }
+ .diary-portfolio-price-head { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+ .diary-direct-offer { max-width: 100%; padding: 19px 20px; }
+ .diary-current-price { grid-template-columns: 1fr; padding: 20px; gap: 12px; }
+ .diary-current-price-main { border-right: 0; border-bottom: 1px solid #e2e6df; padding: 0 0 16px; }
+ .diary-current-price-main strong { font-size: 50px; }
+ .diary-growth-price { padding: 20px; }
+ .diary-growth-price strong { font-size: 18px; }
+ .diary-request-price { padding: 18px; }
+}
