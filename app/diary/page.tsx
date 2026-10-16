@@ -96,7 +96,7 @@ export default function DiaryHomePage() {
               </article>
             ))}
           </div>
-          <p className="diary-disclosure-note">※PR投稿には広告・提供関係が分かる適切な表記を行います。投稿形式・費用・納期は個別にお見積もりいたします。</p>
+          <p className="diary-disclosure-note">※PR投稿には広告・提供関係が分かる適切な表記を行います。食べログ・Googleマップ等への対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。<Link href="/diary/policy">案件受注ポリシー ↗</Link></p>
         </section>
 
         <section className="diary-reassurance">
