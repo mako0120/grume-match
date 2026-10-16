@@ -41,7 +41,7 @@ function clean(value: unknown, maximum: number): string {
  * reviews/rating requests) rather than risk accepting incentivized reviews.
  */
 export function detectProhibitedPRRequest(text: string): string | null {
-  const normalized = text.normalize("NFKC").toLowerCase().replace(/[\\s　]+/g, "");
+  const normalized = text.normalize("NFKC").toLowerCase().replace(/[\s　]+/g, "");
   if (/(食べログ|たべろぐ|tabelog|googleマップ|googlemaps?|グーグルマップ|ぐーぐるまっぷ|口コミ|クチコミ|くちこみ|レビュー|review|rating|評点|星[1-5]|★[1-5]|高評価)/i.test(normalized)) {
     return "口コミサイトへの投稿・評価指定を含むご依頼はお受けできません。Instagram等の適切なPRのみご相談ください。";
   }
