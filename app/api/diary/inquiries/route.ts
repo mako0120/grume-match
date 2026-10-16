@@ -81,6 +81,8 @@ export async function POST(request: NextRequest) {
     // Compute server-side, never trust prices or follower counts from the client.
     const pricing = currentDiaryPricing();
     const priceReference = priceForDiaryService(checked.data.service, pricing.followers);
+    // A consultation never becomes a contract or consumes a calendar slot.
+    // Only approved applications can progress to a proposed visit.
     const { error } = await admin.from("diary_pr_inquiries").insert({
       ...details,
       post_price_reference_yen: priceReference,
