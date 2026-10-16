@@ -1,1 +1,64 @@
--- Post-restore diagnostics for GOURMET DIARY PR OS.\n-- Run against an isolated restored environment.\n\nselect 'core_tables' as check_name,\n       count(*) as found,\n       8 as expected\nfrom information_schema.tables\nwhere table_schema = 'public'\n  and table_name in (\n    'campaigns',\n    'applications',\n    'bookings',\n    'deliverables',\n    'payments',\n    'booking_disputes',\n    'creator_payout_profiles',\n    'user_policy_acceptances'\n  );\n\nselect 'rls_enabled' as check_name,\n       count(*) as protected_tables\nfrom pg_class c\njoin pg_namespace n on n.oid = c.relnamespace\nwhere n.nspname = 'public'\n  and c.relname in (\n    'campaigns',\n    'applications',\n    'bookings',\n    'deliverables',\n    'payments',\n    'booking_disputes',\n    'creator_payout_profiles',\n    'user_policy_acceptances'\n  )\n  and c.relrowsecurity = true;\n\nselect 'overbooked_slots' as check_name, count(*) as violations\nfrom public.campaign_slots\nwhere reserved_count > capacity;\n\nselect 'paid_without_transfer_reference' as check_name, count(*) as violations\nfrom public.payments\nwhere status = 'paid'\n  and nullif(trim(coalesce(transfer_reference, '')), '') is null;\n\nselect 'scheduled_or_paid_without_payout_profile' as check_name, count(*) as violations\nfrom public.payments p\nwhere p.status in ('scheduled', 'paid')\n  and not exists (\n    select 1\n    from public.creator_payout_profiles cpp\n    where cpp.creator_id = p.creator_id\n  );\n\nselect 'open_dispute_with_moving_payout' as check_name, count(*) as violations\nfrom public.booking_disputes bd\njoin public.payments p on p.booking_id = bd.booking_id\nwhere bd.status = 'open'\n  and p.status not in ('on_hold', 'paid', 'cancelled');\n\nselect 'approved_deliverable_without_url' as check_name, count(*) as violations\nfrom public.deliverables\nwhere verification_status = 'approved'\n  and nullif(trim(coalesce(submitted_url, '')), '') is null;
+-- Post-restore diagnostics for GOURMET DIARY PR OS.
+-- Run against an isolated restored environment.
+
+select 'core_tables' as check_name,
+       count(*) as found,
+       8 as expected
+from information_schema.tables
+where table_schema = 'public'
+  and table_name in (
+    'campaigns',
+    'applications',
+    'bookings',
+    'deliverables',
+    'payments',
+    'booking_disputes',
+    'creator_payout_profiles',
+    'user_policy_acceptances'
+  );
+
+select 'rls_enabled' as check_name,
+       count(*) as protected_tables
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relname in (
+    'campaigns',
+    'applications',
+    'bookings',
+    'deliverables',
+    'payments',
+    'booking_disputes',
+    'creator_payout_profiles',
+    'user_policy_acceptances'
+  )
+  and c.relrowsecurity = true;
+
+select 'overbooked_slots' as check_name, count(*) as violations
+from public.campaign_slots
+where reserved_count > capacity;
+
+select 'paid_without_transfer_reference' as check_name, count(*) as violations
+from public.payments
+where status = 'paid'
+  and nullif(trim(coalesce(transfer_reference, '')), '') is null;
+
+select 'scheduled_or_paid_without_payout_profile' as check_name, count(*) as violations
+from public.payments p
+where p.status in ('scheduled', 'paid')
+  and not exists (
+    select 1
+    from public.creator_payout_profiles cpp
+    where cpp.creator_id = p.creator_id
+  );
+
+select 'open_dispute_with_moving_payout' as check_name, count(*) as violations
+from public.booking_disputes bd
+join public.payments p on p.booking_id = bd.booking_id
+where bd.status = 'open'
+  and p.status not in ('on_hold', 'paid', 'cancelled');
+
+select 'approved_deliverable_without_url' as check_name, count(*) as violations
+from public.deliverables
+where verification_status = 'approved'
+  and nullif(trim(coalesce(submitted_url, '')), '') is null;
