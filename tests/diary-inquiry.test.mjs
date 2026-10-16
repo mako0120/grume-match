@@ -3,6 +3,11 @@ import assert from "node:assert/strict";
 import { validateDiaryInquiry, detectProhibitedPRRequest } from "../lib/diary/inquiry.ts";
 
 const base = {
+  inquiry_kind: "consultation",
+  desired_coverage: "",
+  featured_menu: "",
+  requested_outcome: "",
+  visit_preference: "",
   restaurant_name: "大阪食堂",
   contact_name: "山田",
   email: "HELLO@example.com",
@@ -73,4 +78,31 @@ test("accepts disclosed Instagram promotion with a first-hand genuine descriptio
     message: "来店して実際に食べた感想を、PR表記付きのInstagramリールとして投稿してほしいです。",
   });
   assert.equal(result.ok, true);
+});
+
+test("two inquiry paths: consultation accepts a draft, application requires a meaningful brief", () => {
+  assert.equal(validateDiaryInquiry({ ...base, inquiry_kind: "consultation" }).ok, true);
+  assert.equal(validateDiaryInquiry({ ...base, inquiry_kind: "application" }).ok, false);
+  assert.equal(validateDiaryInquiry({
+    ...base,
+    inquiry_kind: "application",
+    desired_coverage: "お店の自家製メニューと店内を紹介したいです。",
+    featured_menu: "看板のオムライス",
+    requested_outcome: "大阪周辺の方にお店を知ってほしい",
+    visit_preference: "平日18:00以降",
+  }).ok, true);
+  assert.equal(validateDiaryInquiry({ ...base, inquiry_kind: "unknown" }).ok, false);
+});
+
+test("video-included PR is eligible with legal first-party content", () => {
+  assert.equal(validateDiaryInquiry({
+    ...base, inquiry_kind: "application",
+    service: "instagram_feed_video",
+    desired_coverage: "写真とショート動画で新メニューをご紹介ください。",
+    message: "Instagramで新メニューを紹介してほしいです。",
+  }).ok, true);
+  assert.equal(validateDiaryInquiry({
+    ...base, inquiry_kind: "application",
+    service: "instagram_feed_video", desired_coverage: "食べログも投稿してください",
+  }).ok, false);
 });
