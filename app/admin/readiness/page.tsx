@@ -1,12 +1,21 @@
 import Link from "next/link";
+import { getCommercialIntegrity } from "@/server/queries/commercial-integrity";
 import { getLaunchReadiness } from "@/server/queries/launch-readiness";
 
 export default async function AdminReadinessPage() {
-  const readiness = await getLaunchReadiness();
+  const [readiness, integrity] = await Promise.all([
+    getLaunchReadiness(),
+    getCommercialIntegrity(),
+  ]);
 
   const rows = [
     ...readiness.checks,
     ...readiness.approvalChecks,
+    {
+      key: "commercial_integrity",
+      label: "商用データ整合性",
+      ok: integrity.available && integrity.ready,
+    },
     {
       key: "database_schema",
       label: "PR OSデータベース構成",
@@ -37,7 +46,11 @@ export default async function AdminReadinessPage() {
 
       <section className="admin-count">
         <span>状態</span>
-        <strong>{readiness.ready ? "READY" : "NOT READY"}</strong>
+        <strong>
+          {readiness.ready && integrity.available && integrity.ready
+            ? "READY"
+            : "NOT READY"}
+        </strong>
       </section>
 
       <section className="campaign-list">
@@ -51,6 +64,30 @@ export default async function AdminReadinessPage() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="section-card">
+        <strong>商用データ整合性</strong>
+        {!integrity.available ? (
+          <p>診断RPCを実行できません。最新migrationとAdmin権限を確認してください。</p>
+        ) : integrity.items.every((item) => item.ok) ? (
+          <p>現在検出されている商用データ不整合はありません。</p>
+        ) : (
+          <div className="campaign-list">
+            {integrity.items
+              .filter((item) => !item.ok)
+              .map((item) => (
+                <article className="booking-card" key={item.key}>
+                  <div>
+                    <span className="status-chip status-rejected">
+                      {item.violations}件
+                    </span>
+                    <h2>{item.label}</h2>
+                  </div>
+                </article>
+              ))}
+          </div>
+        )}
       </section>
 
       <section className="section-card">
