@@ -16,6 +16,16 @@ create table public.diary_pr_inquiries (
     '30000_50000', 'over_50000'
   )),
   desired_period text,
+  -- Save current published reference at time of submission; never rewrite
+  -- earlier leads when follower milestones change.
+  post_price_reference_yen integer check (
+    post_price_reference_yen is null or post_price_reference_yen >= 0
+  ),
+  followers_at_inquiry integer check (
+    followers_at_inquiry is null or followers_at_inquiry >= 0
+  ),
+  follower_snapshot_verified_at date,
+  price_policy_version text,
   message text not null check (char_length(message) between 10 and 2000),
   privacy_consented_at timestamptz not null,
   compliance_confirmed_at timestamptz not null,
