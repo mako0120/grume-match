@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   // Same-origin and bot validation are defense-in-depth, not an RLS substitute.
   const origin = request.headers.get("origin");
-  if (!origin || new URL(origin).origin !== request.nextUrl.origin) {
+  if (!origin || origin !== request.nextUrl.origin) {
     return json({ error: "invalid_origin" }, 403);
   }
   const length = Number(request.headers.get("content-length") || "0");
@@ -74,9 +74,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const admin = createAdminClient();
+    const { consent: _consent, ...details } = checked.data;
+    void _consent;
     const { error } = await admin.from("diary_pr_inquiries").insert({
-      ...checked.data,
-      consent: undefined,
+      ...details,
       privacy_consented_at: new Date().toISOString(),
     });
     if (error) return json({ error: "ただいま送信できません。時間をおいてお試しください。" }, 503);
