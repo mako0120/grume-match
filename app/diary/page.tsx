@@ -40,7 +40,8 @@ export default function DiaryHomePage() {
             <h1>まだ知らない<br /><em>「おいしい」</em>に、<br />出会うきっかけを。</h1>
             <p>おいしいご飯が好きだから。まだ知られていないお店の魅力を、もっと多くの人へ。大阪のグルメ日誌が、あなたのお店と次のお客様の出会いをつくります。</p>
             <div className="diary-actions">
-              <Link className="diary-button diary-button-primary" href="/diary/request">お店のPRを相談する <span>↗</span></Link>
+              <Link className="diary-button diary-button-primary" href="/diary/request?intent=consultation">まずは無料で相談する <span>↗</span></Link>
+              <Link className="diary-button diary-button-quiet" href="/diary/request?service=instagram_feed&intent=application">プランを申し込む ↗</Link>
               <a className="diary-button diary-button-quiet" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る ↗</a>
             </div>
             <div className="diary-direct-offer">
