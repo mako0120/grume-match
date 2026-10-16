@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: boolean; initialService?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">("consultation");
   const [error, setError] = useState("");
   const siteKey = process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   if (!enabled || !siteKey) {
@@ -27,6 +28,11 @@ export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: bo
     const form = event.currentTarget;
     const data = new FormData(form);
     const body = {
+      inquiry_kind: data.get("inquiry_kind"),
+      desired_coverage: data.get("desired_coverage"),
+      featured_menu: data.get("featured_menu"),
+      requested_outcome: data.get("requested_outcome"),
+      visit_preference: data.get("visit_preference"),
       restaurant_name: data.get("restaurant_name"),
       contact_name: data.get("contact_name"),
       email: data.get("email"),
@@ -61,6 +67,19 @@ export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: bo
   }
   return (
     <form className="diary-inquiry-form" onSubmit={submit}>
+      <fieldset className="diary-inquiry-choice">
+        <legend>まずはご相談ですか？ 具体的なPRのお申し込みですか？</legend>
+        <div>
+          <label className={inquiryKind === "consultation" ? "selected" : ""}>
+            <input type="radio" name="inquiry_kind" value="consultation" checked={inquiryKind === "consultation"} onChange={() => setInquiryKind("consultation")} />
+            <strong>まずは事前相談</strong><small>内容やお見積もりから確認したい</small>
+          </label>
+          <label className={inquiryKind === "application" ? "selected" : ""}>
+            <input type="radio" name="inquiry_kind" value="application" checked={inquiryKind === "application"} onChange={() => setInquiryKind("application")} />
+            <strong>プランを申し込む</strong><small>希望内容を送って日程の提案を受けたい</small>
+          </label>
+        </div>
+      </fieldset>
       <div className="diary-form-section-title"><span>01</span><h2>お店・ご担当者様の情報</h2></div>
       <div className="diary-input-grid">
         <label>店舗・企業名 <em>必須</em>
@@ -104,6 +123,21 @@ export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: bo
           </select>
         </label>
       </div>
+      <fieldset className="diary-request-brief">
+        <legend>お店のPRで伝えてほしいこと</legend>
+        <label>紹介してほしい内容 {inquiryKind === "application" ? <em>必須</em> : <span>任意</span>}
+          <textarea name="desired_coverage" rows={4} maxLength={1200} required={inquiryKind === "application"} placeholder="例：看板料理や店内のこだわり、家族連れにも利用しやすいポイントなど" />
+        </label>
+        <label>特に紹介してほしいメニュー <span>任意</span>
+          <input name="featured_menu" maxLength={500} placeholder="例：季節限定コース、新作のランチ" />
+        </label>
+        <label>届けたい相手・PRの目的 <span>任意</span>
+          <textarea name="requested_outcome" rows={3} maxLength={500} placeholder="例：大阪の20〜30代に新メニューを知ってほしい" />
+        </label>
+        <label>店舗様が対応可能な日時（候補） <span>任意</span>
+          <textarea name="visit_preference" rows={3} maxLength={600} placeholder="例：11/4(水)・11/6(金) 18:00〜20:00。まだ未定でも構いません。" />
+        </label>
+      </fieldset>
       <label>ご希望の時期 <span>任意</span>
         <input name="desired_period" maxLength={120} placeholder="例：11月中、日程は相談" />
       </label>
@@ -138,7 +172,7 @@ export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: bo
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" />
       {error ? <p role="alert" className="diary-error">{error}</p> : null}
       <button className="diary-button diary-button-primary diary-submit" type="submit" disabled={pending}>{pending ? "送信中..." : "無料でPRを相談する"} <span>↗</span></button>
-      <p className="diary-submit-foot">送信後に自動的な課金・契約は発生しません。</p>
+      <p className="diary-submit-foot">{inquiryKind === "consultation" ? "事前相談は無料です。": "お申し込み後、内容確認と日程提案を行います。"} 日程確認・報酬・制作範囲の合意まで契約は確定しません。支払いは投稿公開後7日以内を基本とし、合意した条件を優先します。</p>
     </form>
   );
 }
