@@ -74,11 +74,13 @@ export async function POST(request: NextRequest) {
 
   try {
     const admin = createAdminClient();
-    const { consent: _consent, ...details } = checked.data;
+    const { consent: _consent, compliance_confirmed: _confirmed, ...details } = checked.data;
     void _consent;
+    void _confirmed;
     const { error } = await admin.from("diary_pr_inquiries").insert({
       ...details,
       privacy_consented_at: new Date().toISOString(),
+      compliance_confirmed_at: new Date().toISOString(),
     });
     if (error) return json({ error: "ただいま送信できません。時間をおいてお試しください。" }, 503);
     return json({ ok: true }, 201);
