@@ -5,7 +5,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
+export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: boolean; initialService?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -80,9 +80,10 @@ export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
         <input name="instagram_url" type="url" maxLength={250} placeholder="https://www.instagram.com/..." />
       </label>
       <div className="diary-form-section-title"><span>02</span><h2>PRについてのご希望</h2></div>
+      <p className="diary-brief-help">グルメ日誌本人へのご依頼です。<Link href="/diary/services">制作内容と実際の投稿例はこちら ↗</Link></p>
       <div className="diary-input-grid">
         <label>ご希望の内容 <em>必須</em>
-          <select name="service" defaultValue="" required>
+          <select name="service" defaultValue={initialService} required>
             <option value="" disabled>選択してください</option>
             <option value="instagram_feed">Instagramフィード投稿</option>
             <option value="instagram_reel">Instagramリール</option>
