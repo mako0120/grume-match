@@ -95,11 +95,24 @@ The user provided three Canva shortlinks. Resolved and read using the connected 
 
 The content includes cover hooks, restaurant access, dish highlights, first-hand impressions and many original layouts. Do **not** copy the user's original edit-token share URLs into public pages. These are actual designed works, not automatically verified **paid sponsored** work or verified Instagram engagement. The site displays typographic illustration cards (NOT exact thumbnails) plus verified view-only links. Check public viewer access for each link before external publication.
 
-Price tier proposal, *not an agreed contract or market guarantee*:
-- Up to 10-page Instagram carousel: ¥18,000 incl. tax reference.
-- 11–16 pages: ¥22,000–25,000 incl. tax.
-- 17–20 pages: ¥25,000–30,000 incl. tax.
+## Current owner-approved fee and forward-looking milestones (2026-10-16)
 
-Creative shoot, editing, copy and publication are assumed. Food provision, travel, extra footage, secondary use rights and revision cycles negotiated separately. This is a differentiated price proposal based on work volume, not metrics per post (only rolling-30-day audience data currently available).
+**Owner decision overrides the earlier proposed 18,000–30,000 yen page-count tiers.** Those tiers were removed from the live PR site.
+
+Current direct **Instagram feed 1 post: ¥8,000 inclusive of tax**, at the owner-reported approximately 5,000 followers. This base scope is an on-site visit, photo capture, editing, written caption and correctly labeled Instagram feed post. Exact number of slides, shooting time, travel expenses, meals, revision cycles and secondary material rights must be agreed BEFORE contracts; 10/16/20-page Canva works are examples, not unlimited deliverables promised at ¥8,000.
+
+A **proposed** automatic price mapping when the operator confirms the actual number of followers is now implemented in `lib/diary/pricing.ts`:
+- 0–7,499: ¥8,000
+- 7,500–9,999: ¥10,000
+- 10,000–14,999: ¥12,000
+- 15,000–19,999: ¥16,000
+- 20,000 and above: ¥20,000 (then manual revision)
+
+Operator action: check Instagram follower count in first-party Insights and update `DIARY_VERIFIED_FOLLOWERS` plus `DIARY_FOLLOWERS_VERIFIED_AT` in deployment environment; redeploy to refresh the public price. There is **no automatic Instagram follower API integration** and no continuous background monitoring. Do not advertise an unverified live follower value or an exact future price-increase date. Current fallback 5,000 / 2026-10-16 is the dated user-supplied approximate figure; replace with verified numbers before public launch.
+
+**Pricing mechanics:** future prices change only for newly submitted inquiries after verified count changes. The server computes and stores the published reference fee, follower count, snapshot date, and pricing-policy version in `public.diary_pr_inquiries`. The client cannot override the reference price. A customer inquiry does NOT constitute a contract or lock a binding quote; the operator must agree the final deliverables and fee in writing. Already agreed contracts MUST NOT be repriced unilaterally.
+
+**Marketing compliance:** avoid unverifiable `業界最安値`, `日本一安い`, made-up deadlines, invented discount comparisons and guaranteed price rises by calendar date. Use first-party claims such as `グルメ日誌本人に直接依頼できる、現在1投稿8,000円`. Pricing must be transparent, covering whether meal/transport/material reusage are additional. Consumer Affairs Agency official comparison / price display guidance: https://www.caa.go.jp/policies/policy/representation/fair_labeling/representation_regulation/comparative_advertising
+
 
 Production rollout remains gated on dedicated DB, verified payment/legal disclosures, real test submission and viewer URL accessibility.
