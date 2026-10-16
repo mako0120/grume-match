@@ -7,6 +7,7 @@ export const revalidate = 0;
 
 const serviceLabels: Record<string, string> = {
   instagram_feed: "フィード投稿",
+  instagram_feed_video: "フィード＋ショート動画",
   instagram_reel: "リール",
   instagram_stories: "ストーリーズ",
   photo_video: "写真・動画素材",
