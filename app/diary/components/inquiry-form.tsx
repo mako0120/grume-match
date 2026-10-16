@@ -5,10 +5,10 @@ import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export function DiaryInquiryForm({ enabled, initialService = "" }: { enabled: boolean; initialService?: string }) {
+export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "consultation" }: { enabled: boolean; initialService?: string; initialKind?: "consultation" | "application" }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
-  const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">("consultation");
+  const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">(initialKind);
   const [error, setError] = useState("");
   const siteKey = process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   if (!enabled || !siteKey) {
