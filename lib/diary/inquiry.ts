@@ -1,5 +1,6 @@
 export const DIARY_SERVICES = [
   "instagram_feed",
+  "instagram_feed_video",
   "instagram_reel",
   "instagram_stories",
   "photo_video",
