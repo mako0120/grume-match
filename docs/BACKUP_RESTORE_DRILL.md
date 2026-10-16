@@ -1,1 +1,63 @@
-# Backup / Restore Drill\n\nThis runbook is required before general public launch. It is intentionally separate from routine backups: a backup is not considered usable until one restore drill has succeeded.\n\n## Scope\n\nThe drill must cover:\n- database schema and migration history,\n- RLS policies and security-definer RPCs,\n- Auth configuration notes,\n- representative Creator / Restaurant / Admin transaction data,\n- payment reconciliation metadata,\n- dispute and audit records.\n\nDo not copy real bank account numbers or unnecessary personal data into a shared test environment.\n\n## Before the drill\n\n1. Confirm the dedicated production Supabase project and its current backup/restore capability.\n2. Record the production project ref, latest applied migration, drill date, and person running the drill.\n3. Use a non-production target for the restore.\n4. Keep PUBLIC_LAUNCH_ENABLED=false during the exercise.\n\n## Restore procedure\n\n1. Create or select an isolated non-production Supabase target.\n2. Restore from the selected production backup using the Supabase-supported restore path for the active plan.\n3. Verify that all repository migrations are represented in the restored schema.\n4. Run the checks in `supabase/diagnostics/post_restore_checks.sql`.\n5. Sign in with dedicated test accounts for Creator, Restaurant and Admin.\n6. Verify cross-tenant isolation:\n   - Creator A cannot read Creator B private transaction data.\n   - Restaurant A cannot read Restaurant B applications, bookings or payments.\n   - Restaurant cannot read Creator payout destination data.\n   - Creator cannot mutate Restaurant-only states.\n   - non-Admin cannot execute Admin payout/dispute functions.\n7. Run one representative restored transaction: campaign, application, booking, deliverable, payment.\n8. Confirm `/api/health` reports `database=ok` when the app is pointed at the restored environment.\n9. Destroy or lock the restore target after evidence is captured.\n\n## Pass criteria\n\nThe drill passes only when:\n- every diagnostic violation count is zero unless explicitly explained,\n- all required tables/RPCs/policies exist,\n- cross-tenant negative tests pass,\n- representative transaction relationships are intact,\n- no production secrets were copied into documentation or GitHub.\n\n## Evidence to record\n\n| Date | Source backup | Restore target | Result | Notes |\n| --- | --- | --- | --- | --- |\n| Not run | — | — | PENDING | Dedicated production project not created yet |\n\n## Failure handling\n\nIf restore or isolation checks fail:\n1. keep general launch disabled,\n2. preserve the failing environment for diagnosis,\n3. fix migrations or restore procedure,\n4. repeat the drill from a fresh restore,\n5. do not mark the backup/recovery gate complete until the rerun passes.
+# Backup / Restore Drill
+
+This runbook is required before general public launch. It is intentionally separate from routine backups: a backup is not considered usable until one restore drill has succeeded.
+
+## Scope
+
+The drill must cover:
+- database schema and migration history,
+- RLS policies and security-definer RPCs,
+- Auth configuration notes,
+- representative Creator / Restaurant / Admin transaction data,
+- payment reconciliation metadata,
+- dispute and audit records.
+
+Do not copy real bank account numbers or unnecessary personal data into a shared test environment.
+
+## Before the drill
+
+1. Confirm the dedicated production Supabase project and its current backup/restore capability.
+2. Record the production project ref, latest applied migration, drill date, and person running the drill.
+3. Use a non-production target for the restore.
+4. Keep PUBLIC_LAUNCH_ENABLED=false during the exercise.
+
+## Restore procedure
+
+1. Create or select an isolated non-production Supabase target.
+2. Restore from the selected production backup using the Supabase-supported restore path for the active plan.
+3. Verify that all repository migrations are represented in the restored schema.
+4. Run the checks in `supabase/diagnostics/post_restore_checks.sql`.
+5. Sign in with dedicated test accounts for Creator, Restaurant and Admin.
+6. Verify cross-tenant isolation:
+   - Creator A cannot read Creator B private transaction data.
+   - Restaurant A cannot read Restaurant B applications, bookings or payments.
+   - Restaurant cannot read Creator payout destination data.
+   - Creator cannot mutate Restaurant-only states.
+   - non-Admin cannot execute Admin payout/dispute functions.
+7. Run one representative restored transaction: campaign, application, booking, deliverable, payment.
+8. Confirm `/api/health` reports `database=ok` when the app is pointed at the restored environment.
+9. Destroy or lock the restore target after evidence is captured.
+
+## Pass criteria
+
+The drill passes only when:
+- every diagnostic violation count is zero unless explicitly explained,
+- all required tables/RPCs/policies exist,
+- cross-tenant negative tests pass,
+- representative transaction relationships are intact,
+- no production secrets were copied into documentation or GitHub.
+
+## Evidence to record
+
+| Date | Source backup | Restore target | Result | Notes |
+| --- | --- | --- | --- | --- |
+| Not run | — | — | PENDING | Dedicated production project not created yet |
+
+## Failure handling
+
+If restore or isolation checks fail:
+1. keep general launch disabled,
+2. preserve the failing environment for diagnosis,
+3. fix migrations or restore procedure,
+4. repeat the drill from a fresh restore,
+5. do not mark the backup/recovery gate complete until the rerun passes.
