@@ -24,6 +24,7 @@ alter table public.diary_pr_inquiries
  add column operator_notify_attempts integer not null default 0,
  add column operator_notified_at timestamptz,
  add column published_at timestamptz,
+ add column published_post_url text,
  add column payment_due_at timestamptz,
  add column payment_received_at timestamptz,
  add constraint diary_booked_requires_confirmed_proposal check (
