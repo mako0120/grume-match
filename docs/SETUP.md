@@ -248,3 +248,32 @@ Recommended first controlled pilot:
 Before either side can transact, the Operator verifies the Creator and Restaurant in `/admin/verification`.
 
 Only after the full transaction succeeds should external Creators/restaurants be invited. Keep `PUBLIC_LAUNCH_ENABLED=false` until every readiness gate is genuinely complete.
+
+
+## Cross-tenant RLS negative smoke
+
+After the dedicated Supabase project is migrated and test fixtures exist, run:
+
+```bash
+npm run smoke:rls
+```
+
+Required non-production test credentials:
+
+```env
+RLS_CREATOR_A_EMAIL=
+RLS_CREATOR_A_PASSWORD=
+RLS_CREATOR_B_EMAIL=
+RLS_CREATOR_B_PASSWORD=
+RLS_RESTAURANT_A_EMAIL=
+RLS_RESTAURANT_A_PASSWORD=
+RLS_RESTAURANT_B_EMAIL=
+RLS_RESTAURANT_B_PASSWORD=
+```
+
+Fixture requirements:
+- Creator B has a payout destination and at least one booking.
+- Restaurant B has at least one booking.
+- Use dedicated test accounts only.
+- Never place these passwords in GitHub.
+- Set `RLS_E2E_VERIFIED=true` only after this script passes against the deployed dedicated PR OS database.
