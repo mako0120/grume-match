@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Script from "next/script";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
@@ -112,7 +113,7 @@ export function DiaryInquiryForm({ enabled }: { enabled: boolean }) {
       <div className="diary-privacy-box">
         <label className="diary-privacy-check">
           <input type="checkbox" name="consent" required />
-          <span><a href="/legal/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a>に同意して送信します。入力した情報はPR相談への対応に利用されます。</span>
+          <span><Link href="/legal/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</Link>に同意して送信します。入力した情報はPR相談への対応に利用されます。</span>
         </label>
         <div className="cf-turnstile" data-sitekey={siteKey} />
       </div>
