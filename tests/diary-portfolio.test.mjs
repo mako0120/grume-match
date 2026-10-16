@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { DIARY_CAROUSEL_PRICE_GUIDE, DIARY_PORTFOLIO } from "../lib/diary/portfolio.ts";
+import { DIARY_PORTFOLIO } from "../lib/diary/portfolio.ts";
+import { priceForFollowers, pricingSnapshot, DIARY_PR_PRICE_TIERS } from "../lib/diary/pricing.ts";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -31,6 +32,41 @@ test("editorial portfolio and price guide are visible before the direct inquiry"
   assert.match(home, /<CanvaPortfolio \/>/);
   assert.match(services, /<CanvaPortfolio pricing \/>/);
   assert.match(services, /\/diary\/request/);
-  assert.deepEqual(DIARY_CAROUSEL_PRICE_GUIDE.map((tier) => tier.max), [18000, 25000, 30000]);
-  assert.ok(DIARY_CAROUSEL_PRICE_GUIDE.every((tier) => tier.min >= 18000 && tier.max >= tier.min));
+  const component = read("app/diary/components/canva-portfolio.tsx");
+  assert.match(component, /formatDiaryYen\(price\.amountYen\)/);
+  assert.match(component, /DIRECT PR PRICE/);
+  assert.doesNotMatch(component, /DIARY_CAROUSEL_PRICE_GUIDE/);
+  assert.equal(priceForFollowers(5000), 8000);
+});
+
+test("future prices increase only at verified follower thresholds", () => {
+  assert.deepEqual(DIARY_PR_PRICE_TIERS.map(({ minFollowers, amountYen }) => [minFollowers, amountYen]), [
+    [0, 8000], [7500, 10000], [10000, 12000], [15000, 16000], [20000, 20000]
+  ]);
+  for (const [followers, expected] of [
+    [0, 8000], [5000, 8000], [7499, 8000], [7500, 10000],
+    [9999, 10000], [10000, 12000], [15000, 16000], [20000, 20000], [40000, 20000],
+  ]) assert.equal(priceForFollowers(followers), expected, String(followers));
+  assert.throws(() => priceForFollowers(-1));
+  assert.throws(() => priceForFollowers(5000.5));
+});
+
+test("snapshot contains price and upcoming follower milestone", () => {
+  assert.deepEqual(pricingSnapshot(5000, "2026-10-16"), {
+    followers: 5000, amountYen: 8000, nextMilestone: 7500,
+    nextAmountYen: 10000, asOf: "2026-10-16",
+  });
+  assert.equal(pricingSnapshot(20000, "2026-10-16").nextMilestone, null);
+});
+
+test("app saves price and follower snapshot server-side on new inquiry", () => {
+  const api = read("app/api/diary/inquiries/route.ts");
+  const schema = read("supabase/migrations/202610160002_diary_direct_inquiries.sql");
+  const admin = read("app/admin/diary-inquiries/page.tsx");
+  assert.match(api, /const pricing = currentDiaryPricing\(\)/);
+  assert.match(api, /post_price_reference_yen/);
+  assert.match(api, /followers_at_inquiry/);
+  assert.match(schema, /post_price_reference_yen integer/);
+  assert.match(admin, /申込み時の基本料金/);
+  assert.doesNotMatch(api, /payload\.post_price_reference_yen/);
 });
