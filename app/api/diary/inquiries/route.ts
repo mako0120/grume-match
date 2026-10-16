@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validateDiaryInquiry } from "@/lib/diary/inquiry";
+import { currentDiaryPricing } from "@/lib/diary/pricing";
 
 export const runtime = "nodejs";
 
@@ -77,8 +78,14 @@ export async function POST(request: NextRequest) {
     const { consent: _consent, compliance_confirmed: _confirmed, ...details } = checked.data;
     void _consent;
     void _confirmed;
+    // Compute server-side, never trust prices or follower counts from the client.
+    const pricing = currentDiaryPricing();
     const { error } = await admin.from("diary_pr_inquiries").insert({
       ...details,
+      post_price_reference_yen: checked.data.service === "instagram_feed" ? pricing.amountYen : null,
+      followers_at_inquiry: checked.data.service === "instagram_feed" ? pricing.followers : null,
+      follower_snapshot_verified_at: checked.data.service === "instagram_feed" ? pricing.asOf : null,
+      price_policy_version: checked.data.service === "instagram_feed" ? "2026-10-16-follower-tiers-v1" : null,
       privacy_consented_at: new Date().toISOString(),
       compliance_confirmed_at: new Date().toISOString(),
     });
