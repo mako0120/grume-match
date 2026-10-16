@@ -14,6 +14,23 @@ export const DIARY_PR_PRICE_TIERS = [
   { minFollowers: 20000, amountYen: 20000 },
 ] as const;
 
+/** Photo feed + short-form video/reel production. Floor is 15,000 yen. */
+export const DIARY_VIDEO_PACKAGE_START_YEN = 15000;
+
+export function videoIncludedPriceForFollowers(followers: number): number {
+  // Use the same follower milestone uplift as the current 8,000-yen feed.
+  // Indicative "from" price: filming/production scope is confirmed at quote.
+  return Math.max(DIARY_VIDEO_PACKAGE_START_YEN, priceForFollowers(followers) + 7000);
+}
+
+export function priceForDiaryService(service: string, followers: number): number | null {
+  if (service === "instagram_feed") return priceForFollowers(followers);
+  if (service === "instagram_feed_video" || service === "instagram_reel") {
+    return videoIncludedPriceForFollowers(followers);
+  }
+  return null;
+}
+
 export const DIARY_BASE_POST_DESCRIPTION =
   "Instagramフィード投稿1件（店舗訪問、撮影、画像編集、紹介文、適切なPR表記・投稿）";
 
