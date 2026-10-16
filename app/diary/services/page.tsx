@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
+import { CanvaPortfolio } from "../components/canva-portfolio";
 
 export const metadata = {
   title: "PRサービス・制作実例｜グルメ日誌｜大阪",
@@ -106,6 +107,15 @@ export default function DiaryServices() {
           <strong>料金は個別にご案内します。</strong>
           <p>撮影場所・制作内容・媒体・投稿回数・二次利用の有無などにより異なります。お問い合わせ・お見積もりは無料です。費用・制作範囲・納期は必ずご依頼前に確認し、双方合意のうえ進めます。</p>
         </div>
+      </section>
+
+      <section className="diary-canva-samples" id="carousel-portfolio">
+        <div className="diary-section-top"><span>CANVA WORKS</span><span>10–20 PAGE CAROUSEL</span></div>
+        <div className="diary-work-intro">
+          <h2>10枚・16枚・20枚。<br /><em>実際の作品と、料金目安。</em></h2>
+          <p>北浜 焼とりporc・銀蔵 小野原本店・煮炊き焼き鳥 御尽の制作物を確認できます。</p>
+        </div>
+        <CanvaPortfolio pricing />
       </section>
 
       <section className="diary-work" id="work">
