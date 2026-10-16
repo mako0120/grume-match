@@ -42,7 +42,6 @@ alter table public.diary_pr_inquiries
 
 -- Stop the same single creator being double booked in a 2-hour time slot.
 -- Explicit human rescheduling is required to avoid overlapping bookings.
-create extension if not exists btree_gist;
 alter table public.diary_pr_inquiries add constraint diary_no_overlapping_confirmed_visits
  exclude using gist (
    tstzrange(proposed_visit_at, proposed_visit_at + make_interval(mins => proposed_visit_duration_minutes), '[)') with &&
