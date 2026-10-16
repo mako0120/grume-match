@@ -25,7 +25,7 @@ export function videoIncludedPriceForFollowers(followers: number): number {
 
 export function priceForDiaryService(service: string, followers: number): number | null {
   if (service === "instagram_feed") return priceForFollowers(followers);
-  if (service === "instagram_feed_video" || service === "instagram_reel") {
+  if (service === "instagram_feed_video") {
     return videoIncludedPriceForFollowers(followers);
   }
   return null;
