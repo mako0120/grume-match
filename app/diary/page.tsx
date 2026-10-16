@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PostShowcase } from "./components/post-showcase";
 import { CanvaPortfolio } from "./components/canva-portfolio";
-import { currentDiaryPricing, formatDiaryYen } from "@/lib/diary/pricing";
+import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 const metrics = [
   { value: "17.6万", unit: "回", label: "コンテンツ再生数" },
@@ -11,7 +11,7 @@ const metrics = [
 
 const offerings = [
   { number: "01", title: "Instagramフィード投稿", desc: "お料理やお店の雰囲気を、写真と言葉で丁寧に紹介。気になった方が後から見返せる投稿を制作します。", tag: "写真で魅力を伝える" },
-  { number: "02", title: "リール・ショート動画", desc: "調理風景や盛り付け、店内の空気感をテンポよく編集。来店前のワクワクを動画で届けます。", tag: "動画で体験を届ける" },
+  { number: "02", title: "動画込みPR・リール", desc: "写真で伝えるフィード投稿に短い動画制作を組み合わせるプランは15,000円〜。動画の尺や投稿形態はご相談のうえ決定します。", tag: "動画込み15,000円〜" },
   { number: "03", title: "ストーリーズ・撮影素材", desc: "イベントのお知らせや新メニュー紹介、店舗で活用する写真・動画素材もご相談いただけます。", tag: "用途に合わせて相談" },
 ];
 
@@ -45,9 +45,9 @@ export default function DiaryHomePage() {
             </div>
             <div className="diary-direct-offer">
               <div><span>DIRECT PR / CURRENT PRICE</span><strong>{formatDiaryYen(price.amountYen)}</strong><small>Instagramフィード1投稿・税込総額</small></div>
-              <div><p>グルメ日誌本人への直接依頼だからこその価格。フォロワーの成長に合わせて、今後は新規依頼の料金を見直していく予定です。</p><Link href="/diary/services">料金と制作実例を確認する ↗</Link></div>
+              <div><p>写真投稿は8,000円。動画を組み合わせたPRは{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜。グルメ日誌本人への直接依頼だからこその価格です。</p><Link href="/diary/services">料金と制作実例を確認する ↗</Link></div>
             </div>
-            <span className="diary-hero-caption">PRのご相談・お見積もりは無料です。グルメ日誌本人が直接対応します。</span>
+            <span className="diary-hero-caption">PRのご相談・お見積もりは無料です。グルメ日誌本人が直接対応します。 動画込みは15,000円〜（税込）。</span>
           </div>
           <div className="diary-hero-art" aria-hidden="true">
             <span className="diary-art-circle one" />
