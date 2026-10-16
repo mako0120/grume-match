@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { DIARY_CAROUSEL_PRICE_GUIDE, DIARY_PORTFOLIO } from "@/lib/diary/portfolio";
+import { DIARY_PORTFOLIO } from "@/lib/diary/portfolio";
+import { currentDiaryPricing, formatDiaryYen, DIARY_BASE_POST_DESCRIPTION } from "@/lib/diary/pricing";
 
 export function CanvaPortfolio({ pricing = false }: { pricing?: boolean }) {
+  const price = currentDiaryPricing();
   return (
     <div className="diary-portfolio">
       <div className="diary-portfolio-grid">
@@ -27,22 +29,34 @@ export function CanvaPortfolio({ pricing = false }: { pricing?: boolean }) {
       </div>
       <p className="diary-portfolio-note">掲載内容はグルメ日誌の実際のCanva制作例です。表紙部分はサイト用の文字プレビューで、Canva原本の画像を複製したものではありません。上のリンクから全ページを確認できます。すべてを有償PR実績とするものではありません。リンク先は閲覧権限によって表示できない場合があります。</p>
       {pricing && (
-        <section className="diary-portfolio-price" aria-label="フィード投稿参考料金">
+        <section className="diary-portfolio-price" aria-label="グルメ日誌PR基本料金">
           <div className="diary-portfolio-price-head">
-            <div><span className="diary-overline">FEE GUIDELINE</span><h3>制作枚数から選べる、<br />フィードPRの料金目安。</h3></div>
-            <p>一律料金ではなく、紹介する料理の種類と制作枚数に合わせてお見積もりします。</p>
+            <div><span className="diary-overline">DIRECT PR PRICE</span><h3>グルメ日誌本人への依頼なら、<br />今は1投稿 {formatDiaryYen(price.amountYen)}。</h3></div>
+            <p>仲介会社を挟まない、グルメ日誌本人への直接依頼料金です。フォロワー増加とともに新規ご相談時の料金を改定する予定です。</p>
           </div>
-          <div className="diary-portfolio-price-grid">
-            {DIARY_CAROUSEL_PRICE_GUIDE.map((tier) => (
-              <div key={tier.label} className="diary-price-tier">
-                <span>{tier.label} / {tier.pages}</span>
-                <strong>{tier.min === tier.max ? tier.min.toLocaleString("ja-JP") : tier.min.toLocaleString("ja-JP") + "〜" + tier.max.toLocaleString("ja-JP")}<small>円（税込目安）</small></strong>
-                <p>{tier.note}</p>
-              </div>
-            ))}
+          <div className="diary-current-price">
+            <div className="diary-current-price-main">
+              <span>INSTAGRAM FEED / 1 POST</span>
+              <strong>{formatDiaryYen(price.amountYen)}</strong>
+              <p>現在の基本料金・税込総額</p>
+            </div>
+            <div className="diary-current-price-details">
+              <strong>基本サービス</strong>
+              <p>{DIARY_BASE_POST_DESCRIPTION}</p>
+              <p>投稿内の写真枚数・料理紹介の構成・撮影内容・修正範囲は事前に相談して決定します。</p>
+            </div>
           </div>
-          <p className="diary-price-conditions">食事提供は制作報酬とは別条件です。交通費、素材の別途納品、広告転用・二次利用、追加修正等は個別に確認します。掲載価格は参考であり、正式なお見積もりで確定します。再生数・保存数・来店数の保証はありません。</p>
-          <Link href="/diary/request?service=instagram_feed" className="diary-button diary-button-primary">フィード投稿のPRを相談する <span>↗</span></Link>
+          <div className="diary-growth-price">
+            <span>FOLLOWER MILESTONE</span>
+            <strong>現在の実績：約{price.followers.toLocaleString("ja-JP")}フォロワー</strong>
+            <p>{price.nextMilestone
+              ? `次の料金見直し目安：${price.nextMilestone.toLocaleString("ja-JP")}フォロワー到達時（新規依頼から ${formatDiaryYen(price.nextAmountYen ?? price.amountYen)} を予定）`
+              : "今後の料金は発信実績や制作工数を踏まえ、事前にご案内します。"}
+            </p>
+            <small>フォロワー数の確認日：{price.asOf}。将来の値上げ日・到達時期は確定していません。既に合意した案件の料金が後から変わることはありません。</small>
+          </div>
+          <p className="diary-price-conditions">基本料金以外に交通費・食事提供条件・撮影範囲・追加素材納品・二次利用等がある場合は、ご契約前に内容と金額を明示して合意します。リール・ストーリーズ単体や素材制作は個別お見積もりです。再生・来店・売上を保証するものではありません。</p>
+          <Link href="/diary/request?service=instagram_feed" className="diary-button diary-button-primary">今の料金でフィードPRを相談する <span>↗</span></Link>
         </section>
       )}
     </div>
