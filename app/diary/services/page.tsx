@@ -86,6 +86,22 @@ export default function DiaryServices() {
             </article>
           ))}
         </div>
+        <section className="diary-editorial-example">
+          <div className="diary-editorial-top">
+            <span className="diary-overline">A TYPICAL FEED STORY</span>
+            <h3>フィード投稿は、<br />こんな流れで紹介します。</h3>
+            <p>お店の魅力を伝えるための構成例です。投稿の枚数や順序は、店舗・撮影内容に合わせて決定します。</p>
+          </div>
+          <div className="diary-editorial-steps">
+            <div><span>01 / COVER</span><strong>目を引く表紙</strong><p>お店や料理の魅力が一目で伝わる写真とコピー。</p></div>
+            <div><span>02 / PLACE</span><strong>店舗・アクセス</strong><p>店名やエリア、アクセスを分かりやすく紹介。</p></div>
+            <div><span>03 / FOOD</span><strong>料理の魅力</strong><p>写真を中心に、実際にいただいた料理の特徴を紹介。</p></div>
+            <div><span>04 / MOOD</span><strong>店内・雰囲気</strong><p>席や空間、過ごし方が伝わる写真と言葉。</p></div>
+            <div><span>05 / SAVE</span><strong>まとめ・保存導線</strong><p>「行ってみたい」と思ったときに振り返れる情報。</p></div>
+          </div>
+          <p className="diary-editorial-caption">投稿本文（キャプション）も制作対象です。所在地・営業時間等は最新情報を確認し、広告関係は明確に表示します。完成済みの3投稿は下の「実際の投稿を見る」から確認できます。</p>
+          <a href="#work" className="diary-editorial-cta">実際の3投稿を見る ↓</a>
+        </section>
         <div className="diary-price-note">
           <strong>料金は個別にご案内します。</strong>
           <p>撮影場所・制作内容・媒体・投稿回数・二次利用の有無などにより異なります。お問い合わせ・お見積もりは無料です。費用・制作範囲・納期は必ずご依頼前に確認し、双方合意のうえ進めます。</p>
