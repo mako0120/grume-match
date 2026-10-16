@@ -43,8 +43,5 @@ export const DIARY_PORTFOLIO = [
   },
 ] as const;
 
-export const DIARY_CAROUSEL_PRICE_GUIDE = [
-  { label: "ライト", pages: "〜10枚", min: 18000, max: 18000, note: "訪問撮影・編集・紹介文・フィード投稿" },
-  { label: "スタンダード", pages: "11〜16枚", min: 22000, max: 25000, note: "料理ごとの見せ方を充実させた構成" },
-  { label: "プレミアム", pages: "17〜20枚", min: 25000, max: 30000, note: "複数の料理・店内紹介まで丁寧に構成" },
-] as const;
+// Prices are now based on operator-verified followers, not the page count.
+// See pricing.ts. All three Canva designs are creative portfolio samples.
