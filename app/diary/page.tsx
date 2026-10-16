@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PostShowcase } from "./components/post-showcase";
 
 const metrics = [
   { value: "17.6万", unit: "回", label: "コンテンツ再生数" },
@@ -21,8 +22,9 @@ export default function DiaryHomePage() {
           <span>グルメ日誌 <small>OSAKA</small></span>
         </Link>
         <nav aria-label="ページ内メニュー">
-          <a href="#philosophy">想い</a>
+          <a href="#work">投稿実例</a>
           <a href="#services">サービス</a>
+          <a href="#philosophy">想い</a>
           <a href="#results">実績</a>
           <Link className="diary-nav-contact" href="/diary/request">PRの相談 <span aria-hidden="true">↗</span></Link>
         </nav>
@@ -38,7 +40,7 @@ export default function DiaryHomePage() {
               <Link className="diary-button diary-button-primary" href="/diary/request">お店のPRを相談する <span>↗</span></Link>
               <a className="diary-button diary-button-quiet" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る ↗</a>
             </div>
-            <span className="diary-hero-caption">PRのご相談・お見積もりは無料です</span>
+            <span className="diary-hero-caption">PRのご相談・お見積もりは無料です。グルメ日誌本人が直接対応します。</span>
           </div>
           <div className="diary-hero-art" aria-hidden="true">
             <span className="diary-art-circle one" />
@@ -70,6 +72,15 @@ export default function DiaryHomePage() {
           </div>
         </section>
 
+        <section className="diary-work" id="work">
+          <div className="diary-section-top"><span>RECENT POSTS</span><span>@gurunavi_diary</span></div>
+          <div className="diary-work-intro">
+            <h2>どんな投稿が届くのか、<br /><em>まず実例をご覧ください。</em></h2>
+            <p>グルメ日誌の最近のInstagram投稿3件を掲載しています。依頼する前に、写真の見せ方や文章の雰囲気をご確認ください。</p>
+          </div>
+          <PostShowcase />
+        </section>
+
         <section className="diary-philosophy" id="philosophy">
           <div className="diary-section-top"><span>OUR STORY</span><span>食べることが、好きだから。</span></div>
           <div className="diary-story-grid">
@@ -96,6 +107,10 @@ export default function DiaryHomePage() {
               </article>
             ))}
           </div>
+          <div className="diary-more-service">
+            <div><strong>PRでどんなことをしてもらえる？</strong><p>フィード・リール・ストーリーズ・撮影素材について、制作内容、投稿方法、依頼の流れを事前にご覧いただけます。</p></div>
+            <Link className="diary-button diary-button-primary" href="/diary/services">サービス内容を詳しく見る <span>↗</span></Link>
+          </div>
           <p className="diary-disclosure-note">※PR投稿には広告・提供関係が分かる適切な表記を行います。食べログ・Googleマップ等への対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。<Link href="/diary/policy">案件受注ポリシー ↗</Link></p>
         </section>
 
@@ -103,7 +118,7 @@ export default function DiaryHomePage() {
           <div><span className="diary-kicker">WHY GOURMET DIARY?</span><h2>誰に頼むか迷ったら、<br /><em>まず実績を見てください。</em></h2></div>
           <div className="diary-reassurance-items">
             <p><b>01</b> インサイトを公開しているから、依頼前に発信規模を確認できる。</p>
-            <p><b>02</b> 窓口も撮影・制作も本人。誰が投稿するか明確。</p>
+            <p><b>02</b> グルメ日誌本人への直接依頼。第三者への案件紹介はしません。</p>
             <p><b>03</b> 依頼内容・納品物・費用を事前に相談し、認識のずれを減らす。</p>
           </div>
         </section>
