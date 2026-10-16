@@ -1,0 +1,39 @@
+-- Independent first-party PR intake for グルメ日誌｜大阪.
+-- Never join these contact details into the marketplace tenant tables.
+create table public.diary_pr_inquiries (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_name text not null check (char_length(restaurant_name) between 1 and 100),
+  contact_name text not null check (char_length(contact_name) between 1 and 80),
+  email text not null check (char_length(email) between 3 and 254),
+  phone text,
+  instagram_url text,
+  service text not null check (service in (
+    'instagram_feed', 'instagram_reel', 'instagram_stories',
+    'photo_video', 'consultation'
+  )),
+  budget text not null check (budget in (
+    'undecided', 'under_10000', '10000_30000',
+    '30000_50000', 'over_50000'
+  )),
+  desired_period text,
+  message text not null check (char_length(message) between 10 and 2000),
+  privacy_consented_at timestamptz not null,
+  status text not null default 'new' check (status in (
+    'new', 'contacted', 'proposed', 'booked', 'closed'
+  )),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index diary_pr_inquiries_status_created_idx
+  on public.diary_pr_inquiries (status, created_at desc);
+create trigger diary_pr_inquiries_set_updated_at
+  before update on public.diary_pr_inquiries
+  for each row execute function public.set_updated_at();
+
+-- No anon/authenticated SELECT, INSERT, UPDATE or DELETE policies:
+-- only the server-side Supabase service role may access this table.
+alter table public.diary_pr_inquiries enable row level security;
+revoke all on table public.diary_pr_inquiries from anon, authenticated;
+grant all on table public.diary_pr_inquiries to service_role;
+comment on table public.diary_pr_inquiries is
+  'First-party inbound leads to @gurunavi_diary; private operator-only contact data.';
