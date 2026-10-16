@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
 import { CanvaPortfolio } from "../components/canva-portfolio";
+import { currentDiaryPricing, formatDiaryYen } from "@/lib/diary/pricing";
 
 export const metadata = {
   title: "PRサービス・制作実例｜グルメ日誌｜大阪",
@@ -51,6 +52,7 @@ const services = [
 ] as const;
 
 export default function DiaryServices() {
+  const price = currentDiaryPricing();
   return (
     <main className="diary-services-page">
       <header className="diary-service-nav">
@@ -62,6 +64,7 @@ export default function DiaryServices() {
         <span className="diary-overline"><span className="diary-dot" /> OUR CREATIVE SERVICE</span>
         <h1>どんな投稿を<br />お願いできるのか。<br /><em>依頼前に、全部わかる。</em></h1>
         <p>グルメ日誌本人が、お店を訪問して撮影・編集・発信。投稿の雰囲気や制作の範囲をあらかじめご確認いただいたうえで、ご希望に合う形をご提案します。</p>
+        <p className="diary-price-teaser">現在のInstagramフィードPR：<strong>{formatDiaryYen(price.amountYen)}</strong>／1投稿（税込総額）<br />直接依頼料金はフォロワー増加に応じて今後改定予定です。</p>
         <a href="#work" className="diary-button diary-button-primary">実際の投稿を見る ↘</a>
       </section>
 
