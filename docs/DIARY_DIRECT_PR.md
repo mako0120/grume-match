@@ -84,3 +84,22 @@ Scope:
 - Avoid promising bookings, guaranteed reach, engagement, public rankings or fake recommendations. Dated insights only.
 - Always disclose PR/sponsor/compensation relations per platform rules. No paid review-site deliverables.
 - Instagram embed is third-party content: an iframe is created only when explicitly requested (privacy-conscious click-to-load), and may fail because of platform availability. A clickable direct original is always present.
+
+
+## 2026-10-16: Verified operator Canva work / PR pricing reference
+
+The user provided three Canva shortlinks. Resolved and read using the connected Canva service (not scraped).
+- `https://canva.link/npriuj056xwfe89` -> design `DAHX3RmQv9A`: **北浜 焼とりporc｜グルメ日誌 大阪**, 20 pages, 1080x1350. Read-only view URL from Canva API: `https://www.canva.com/d/ZEZQi8CDw9j20b1`.
+- `https://canva.link/s64qvg0rdx301z1` -> design `DAHWjXqkIUg`: **銀蔵 小野原本店｜銀蔵特選海鮮定食**, 16 pages, 1080x1350. Read-only view URL: `https://www.canva.com/d/1FAjRigIi5A1R15`.
+- `https://canva.link/69kj5suzejtnk50` -> design `DAHVJGkwLVk`: **煮炊き焼き鳥 御尽｜Bコース**, 10 pages, 1080x1350. Read-only view URL: `https://www.canva.com/d/w2WQ2iTGl7CCtqz`.
+
+The content includes cover hooks, restaurant access, dish highlights, first-hand impressions and many original layouts. Do **not** copy the user's original edit-token share URLs into public pages. These are actual designed works, not automatically verified **paid sponsored** work or verified Instagram engagement. The site displays typographic illustration cards (NOT exact thumbnails) plus verified view-only links. Check public viewer access for each link before external publication.
+
+Price tier proposal, *not an agreed contract or market guarantee*:
+- Up to 10-page Instagram carousel: ¥18,000 incl. tax reference.
+- 11–16 pages: ¥22,000–25,000 incl. tax.
+- 17–20 pages: ¥25,000–30,000 incl. tax.
+
+Creative shoot, editing, copy and publication are assumed. Food provision, travel, extra footage, secondary use rights and revision cycles negotiated separately. This is a differentiated price proposal based on work volume, not metrics per post (only rolling-30-day audience data currently available).
+
+Production rollout remains gated on dedicated DB, verified payment/legal disclosures, real test submission and viewer URL accessibility.
