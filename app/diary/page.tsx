@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PostShowcase } from "./components/post-showcase";
+import { CanvaPortfolio } from "./components/canva-portfolio";
 
 const metrics = [
   { value: "17.6万", unit: "回", label: "コンテンツ再生数" },
@@ -22,7 +23,7 @@ export default function DiaryHomePage() {
           <span>グルメ日誌 <small>OSAKA</small></span>
         </Link>
         <nav aria-label="ページ内メニュー">
-          <a href="#work">投稿実例</a>
+          <a href="#canva-work">制作実績</a>
           <a href="#services">サービス</a>
           <a href="#philosophy">想い</a>
           <a href="#results">実績</a>
@@ -70,6 +71,16 @@ export default function DiaryHomePage() {
             <span>Instagramインサイトに基づく直近30日間の実績（2026年10月16日時点）</span>
             <span>※再生数は延べ回数です。PR成果や来店を保証する数値ではありません。</span>
           </div>
+        </section>
+
+        <section className="diary-canva-samples" id="canva-work">
+          <div className="diary-section-top"><span>DESIGN PORTFOLIO</span><span>CANVA / CAROUSEL</span></div>
+          <div className="diary-work-intro">
+            <h2>実際に制作した、<br /><em>10〜20枚の投稿例。</em></h2>
+            <p>飲食店の魅力を、表紙から料理紹介まで丁寧に構成。作例3件はCanvaの閲覧用リンクから全ページをご覧いただけます。</p>
+          </div>
+          <CanvaPortfolio />
+          <div className="diary-work-after"><Link className="diary-button diary-button-primary" href="/diary/services">制作枚数・料金目安を確認する <span>↗</span></Link></div>
         </section>
 
         <section className="diary-work" id="work">
