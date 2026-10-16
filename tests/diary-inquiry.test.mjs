@@ -68,11 +68,9 @@ test("rejects paid or incentivized review-site request terms", () => {
 });
 
 test("accepts disclosed Instagram promotion with a first-hand genuine description", () => {
-  assert.equal(
-    validateDiaryInquiry({
-      ...base,
-      message: "来店して実際に食べた感想を、PR表記付きのInstagramリールとして投稿してほしいです。",
-    }),
-    { ok: true }.ok,
-  );
+  const result = validateDiaryInquiry({
+    ...base,
+    message: "来店して実際に食べた感想を、PR表記付きのInstagramリールとして投稿してほしいです。",
+  });
+  assert.equal(result.ok, true);
 });
