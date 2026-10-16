@@ -62,3 +62,25 @@ Official references:
 4. Supabase enforces that no inquiry can become proposed/booked without compliance_status=approved and reviewed_at.
 5. Any prohibited requirements found during negotiation are refused or the deal is stopped, never shifted to marketplace automatically.
 6. Mark permitted sponsored Instagram posts clearly with PR/タイアップ disclosures. Preserve editorial integrity; the operator may write truthful first-hand opinions.
+
+
+## 2026-10-16: Operator's three actual post examples and service explanation
+
+Operator supplied three permalink examples:
+- https://www.instagram.com/p/DeBsEOaD1C6/
+- https://www.instagram.com/p/Deglh2WD0XG/
+- https://www.instagram.com/p/Dd8icENj2aw/
+
+IMPORTANT: The external Instagram page content was **not accessible to the assistant** during development. Never invent the shops, menu names, media type (carousel vs single photo), captions, PR status, reach or impressions for these IDs. The product displays these as "最近の投稿例" (not proven paid-campaign case studies). Use Instagram's embedded public post only after visitors explicitly click to load external content. Always show a direct permalink fallback because embedded Instagram can be unavailable or login-restricted.
+
+Site pages:
+- `/diary`: public, branded first-party landing with recent post gallery and service link
+- `/diary/services`: four clearly scoped services (feed, reel, stories, photo/video material), outputs, limitations, individual quotations and the same three real example posts
+- `/diary/request?service=<supported service>`: pre-select the requested service on the inquiry form and allow users to review examples before sending.
+- All PRs are delivered by the operator account itself, not routed to third-party creators or the wider matching network. Do not leak marketplace content, creator comparisons or automatic placement in this flow.
+
+Scope:
+- Creative deliverables such as number of photos or clips, video duration, corrections, delivery date, rights to reuse images, caption check, reporting, compensation, travel and transport are decided **by mutual agreement before contract**.
+- Avoid promising bookings, guaranteed reach, engagement, public rankings or fake recommendations. Dated insights only.
+- Always disclose PR/sponsor/compensation relations per platform rules. No paid review-site deliverables.
+- Instagram embed is third-party content: an iframe is created only when explicitly requested (privacy-conscious click-to-load), and may fail because of platform availability. A clickable direct original is always present.
