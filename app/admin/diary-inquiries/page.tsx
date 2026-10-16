@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { updateDiaryInquiryStatus } from "./actions";
+import { updateDiaryInquiryStatus, reviewDiaryInquiryCompliance } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,7 +28,7 @@ export default async function DiaryInquiriesAdmin() {
   const admin = createAdminClient();
   const { data: inquiries, error } = await admin
     .from("diary_pr_inquiries")
-    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,message,status,created_at")
+    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at")
     .order("created_at", { ascending: false }).limit(100);
 
   return (
@@ -69,16 +69,37 @@ export default async function DiaryInquiriesAdmin() {
               <p><strong>予算目安：</strong>{budgetLabels[item.budget] ?? item.budget}</p>
               {item.desired_period && <p><strong>希望時期：</strong>{item.desired_period}</p>}
               <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.message}</p>
+              <section style={{ background: "#fff9e8", padding: 16, borderRadius: 12, marginTop: 16 }}>
+                <strong>契約前のコンプライアンス審査：{item.compliance_status === "approved" ? "承認済み" : item.compliance_status === "rejected" ? "お断り" : "未審査"}</strong>
+                {item.compliance_reviewed_at ? (
+                  <p>審査日：{new Date(item.compliance_reviewed_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}</p>
+                ) : null}
+                <p>食べログ・Googleマップ等の口コミ依頼なし／高評価指定なし／適切なPR表示あり／事実と体験に基づく内容かを確認してください。</p>
+                <p><Link href="/diary/policy" target="_blank">受注ポリシーを確認 ↗</Link></p>
+                {item.compliance_status === "pending" && (
+                  <form action={reviewDiaryInquiryCompliance}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                      <input type="checkbox" name="review_confirmed" required />
+                      <span>禁止事項と依頼内容を確認しました</span>
+                    </label>
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      <button type="submit" name="decision" value="approved" className="secondary-button">審査に承認</button>
+                      <button type="submit" name="decision" value="rejected" className="secondary-button">お断り・終了</button>
+                    </div>
+                  </form>
+                )}
+              </section>
               <form action={updateDiaryInquiryStatus} style={{ display: "flex", gap: 8, marginTop: 18, flexWrap: "wrap" }}>
                 <input type="hidden" name="id" value={item.id} />
                 <select name="status" aria-label={item.restaurant_name + "の対応状況"} defaultValue={item.status}>
                   <option value="new">未対応</option>
                   <option value="contacted">連絡済み</option>
-                  <option value="proposed">提案済み</option>
-                  <option value="booked">成約</option>
+                  <option value="proposed" disabled={item.compliance_status !== "approved"}>提案済み（審査後）</option>
+                  <option value="booked" disabled={item.compliance_status !== "approved"}>成約（審査後）</option>
                   <option value="closed">終了</option>
                 </select>
-                <button className="secondary-button" type="submit">状態を保存</button>
+                <button className="secondary-button" type="submit" disabled={item.compliance_status !== "approved" && ["proposed", "booked"].includes(item.status)}>状態を保存</button>
               </form>
             </article>
           ))}
