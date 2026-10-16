@@ -18,9 +18,15 @@ create table public.diary_pr_inquiries (
   desired_period text,
   message text not null check (char_length(message) between 10 and 2000),
   privacy_consented_at timestamptz not null,
+  compliance_confirmed_at timestamptz not null,
+  compliance_policy_version text not null default '2026-10-16',
+  compliance_status text not null default 'pending' check (compliance_status in ('pending', 'approved', 'rejected')),
+  compliance_reviewed_at timestamptz,
+  check (compliance_status <> 'approved' or compliance_reviewed_at is not null),
   status text not null default 'new' check (status in (
     'new', 'contacted', 'proposed', 'booked', 'closed'
   )),
+  check (status not in ('proposed', 'booked') or compliance_status = 'approved'),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
