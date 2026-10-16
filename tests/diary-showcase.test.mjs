@@ -28,7 +28,7 @@ test("service details are direct operator work and link to preselected contact f
   const home = read("app/diary/page.tsx");
   const request = read("app/diary/request/page.tsx");
   const form = read("app/diary/components/inquiry-form.tsx");
-  assert.match(service, /本人への直接依頼/);
+  assert.match(service, /グルメ日誌への直接依頼/);
   assert.match(service, /食べログやGoogleマップ/);
   assert.match(service, /個別にご案内/);
   assert.match(service, /\/diary\/request\?service=/);
