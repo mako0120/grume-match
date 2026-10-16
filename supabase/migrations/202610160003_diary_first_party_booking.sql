@@ -22,6 +22,7 @@ alter table public.diary_pr_inquiries
  add column operator_notify_state text not null default 'none'
   check (operator_notify_state in ('none','pending','processing','sent','failed')),
  add column operator_notify_attempts integer not null default 0,
+ add column operator_notify_claimed_at timestamptz,
  add column operator_notified_at timestamptz,
  add column published_at timestamptz,
  add column published_post_url text,
