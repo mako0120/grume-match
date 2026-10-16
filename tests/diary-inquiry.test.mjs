@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateDiaryInquiry } from "../lib/diary/inquiry.ts";
+import { validateDiaryInquiry, detectProhibitedPRRequest } from "../lib/diary/inquiry.ts";
 
 const base = {
   restaurant_name: "大阪食堂",
@@ -13,6 +13,7 @@ const base = {
   desired_period: "",
   message: "お店の魅力を紹介してください。",
   consent: true,
+  compliance_confirmed: true,
 };
 
 test("accepts a valid first-party PR inquiry and normalizes email", () => {
@@ -42,4 +43,36 @@ test("allows Instagram HTTPS profiles only", () => {
 test("rejects invalid payloads", () => {
   assert.equal(validateDiaryInquiry(null).ok, false);
   assert.equal(validateDiaryInquiry([]).ok, false);
+});
+
+test("rejects absent PR-policy acknowledgement", () => {
+  const result = validateDiaryInquiry({ ...base, compliance_confirmed: false });
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "compliance_acknowledgement_required");
+});
+
+test("rejects paid or incentivized review-site request terms", () => {
+  for (const bad of [
+    "食べログの口コミも必ず投稿してください",
+    "Googleマップにレビューをお願いします",
+    "Google Maps reviews as well please",
+    "星5の高評価をお願いしたいです",
+    "お店のクチコミ投稿が必須です",
+    "PR表記なしで投稿してください",
+    "ステマとして投稿をお願いします",
+    "食べずに感想を書いてください",
+  ]) {
+    assert.notEqual(detectProhibitedPRRequest(bad), null, bad);
+    assert.equal(validateDiaryInquiry({ ...base, message: bad }).ok, false, bad);
+  }
+});
+
+test("accepts disclosed Instagram promotion with a first-hand genuine description", () => {
+  assert.equal(
+    validateDiaryInquiry({
+      ...base,
+      message: "来店して実際に食べた感想を、PR表記付きのInstagramリールとして投稿してほしいです。",
+    }),
+    { ok: true }.ok,
+  );
 });
