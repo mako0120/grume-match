@@ -48,7 +48,7 @@ export function CanvaPortfolio({ pricing = false }: { pricing?: boolean }) {
           </div>
           <div className="diary-video-price">
             <div><span>PHOTO + SHORT VIDEO</span><strong>動画込みPR：{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong><p>写真のフィード投稿＋短い動画の制作。動画の尺、投稿形態、納品点数はお見積もり時に決定します。</p></div>
-            <Link href="/diary/request?service=instagram_feed_video" className="diary-button diary-button-primary">動画込みプランを相談する ↗</Link>
+            <Link href="/diary/request?service=instagram_feed_video&intent=application" className="diary-button diary-button-primary">動画込みプランを相談する ↗</Link>
           </div>
           <div className="diary-growth-price">
             <span>FOLLOWER MILESTONE</span>
@@ -60,7 +60,7 @@ export function CanvaPortfolio({ pricing = false }: { pricing?: boolean }) {
             <small>フォロワー数の確認日：{price.asOf}。将来の値上げ日・到達時期は確定していません。既に合意した案件の料金が後から変わることはありません。</small>
           </div>
           <p className="diary-price-conditions">基本料金以外に交通費・食事提供条件・撮影範囲・追加素材納品・二次利用等がある場合は、ご契約前に内容と金額を明示して合意します。動画込みPRは15,000円〜。リール単体・ストーリーズ単体や素材制作は個別お見積もりです。再生・来店・売上を保証するものではありません。</p>
-          <Link href="/diary/request?service=instagram_feed" className="diary-button diary-button-primary">今の料金でフィードPRを相談する <span>↗</span></Link>
+          <Link href="/diary/request?service=instagram_feed&intent=application" className="diary-button diary-button-primary">今の料金でフィードPRを相談する <span>↗</span></Link>
         </section>
       )}
     </div>
