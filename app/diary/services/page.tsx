@@ -84,7 +84,7 @@ export default function DiaryServices() {
                 <ul>{service.tasks.map((task) => <li key={task}>{task}</li>)}</ul>
                 <p>{service.note}</p>
               </div>
-              <Link className="diary-service-request-link" href={`/diary/request?service=${service.id}`}>
+              <Link className="diary-service-request-link" href={`/diary/request?service=${service.id}&intent=application`}>
                 この内容で相談する ↗
               </Link>
             </article>
