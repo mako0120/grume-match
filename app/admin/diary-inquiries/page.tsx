@@ -28,7 +28,7 @@ export default async function DiaryInquiriesAdmin() {
   const admin = createAdminClient();
   const { data: inquiries, error } = await admin
     .from("diary_pr_inquiries")
-    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at")
+    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,post_price_reference_yen,followers_at_inquiry,follower_snapshot_verified_at,price_policy_version,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at")
     .order("created_at", { ascending: false }).limit(100);
 
   return (
@@ -67,6 +67,12 @@ export default async function DiaryInquiriesAdmin() {
               {item.instagram_url && <p><strong>Instagram：</strong><a href={item.instagram_url} rel="noreferrer noopener" target="_blank">店舗アカウントを開く ↗</a></p>}
               <p><strong>依頼内容：</strong>{serviceLabels[item.service] ?? item.service}</p>
               <p><strong>予算目安：</strong>{budgetLabels[item.budget] ?? item.budget}</p>
+              {item.post_price_reference_yen != null ? (
+                <p><strong>申込み時の基本料金：</strong>{item.post_price_reference_yen.toLocaleString("ja-JP")}円（税込総額・参考）
+                  {" ／ "}フォロワー {item.followers_at_inquiry?.toLocaleString("ja-JP") ?? "未記録"}人
+                  {" ／ "}確認日 {item.follower_snapshot_verified_at || "不明"}
+                </p>
+              ) : <p><strong>基本料金：</strong>このサービスは個別見積もり</p>}
               {item.desired_period && <p><strong>希望時期：</strong>{item.desired_period}</p>}
               <p style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.message}</p>
               <section style={{ background: "#fff9e8", padding: 16, borderRadius: 12, marginTop: 16 }}>
