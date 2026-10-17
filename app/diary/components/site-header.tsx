@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { currentDiaryPricing, formatDiaryYen } from "@/lib/diary/pricing";
 
 export function DiaryHeader({ active = "home" }: { active?: "home" | "services" | "request" }) {
   return (
@@ -25,9 +26,10 @@ export function DiaryHeader({ active = "home" }: { active?: "home" | "services" 
 }
 
 export function DiaryMobileCTA() {
+  const price = currentDiaryPricing();
   return (
     <aside className="diary-v2-mobile-cta" aria-label="PRのご相談">
-      <span><strong>フィード1投稿 8,000円〜</strong><small>相談・見積もり無料</small></span>
+      <span><strong>フィード1投稿 {formatDiaryYen(price.amountYen)}</strong><small>相談・見積もり無料</small></span>
       <Link href="/diary/request?intent=consultation">相談する <span aria-hidden="true">↗</span></Link>
     </aside>
   );
