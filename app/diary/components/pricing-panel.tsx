@@ -6,8 +6,8 @@ import {
   videoIncludedPriceForFollowers,
 } from "@/lib/diary/pricing";
 
-// The public site only links to Instagram. Do not embed Canva templates,
-// internal creative files, unpublished designs or viewer links here.
+// Public-facing source must not link to editing tools, unpublished designs,
+// internal creative assets, or external editable portfolio documents.
 export function DiaryPricingPanel() {
   const price = currentDiaryPricing();
   return (
