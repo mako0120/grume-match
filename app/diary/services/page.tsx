@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
-import { CanvaPortfolio } from "../components/canva-portfolio";
+import { DiaryPricingPanel } from "../components/pricing-panel";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 export const metadata = {
@@ -112,13 +112,13 @@ export default function DiaryServices() {
         </div>
       </section>
 
-      <section className="diary-canva-samples" id="carousel-portfolio">
-        <div className="diary-section-top"><span>CANVA WORKS</span><span>10–20 PAGE CAROUSEL</span></div>
+      <section className="diary-pricing-section" id="pricing">
+        <div className="diary-section-top"><span>PR PRICING</span><span>お見積もりの前に</span></div>
         <div className="diary-work-intro">
-          <h2>10枚・16枚・20枚。<br /><em>実際の作品と、料金目安。</em></h2>
-          <p>北浜 焼とりporc・銀蔵 小野原本店・煮炊き焼き鳥 御尽の制作物を確認できます。</p>
+          <h2>制作内容と料金を、<br /><em>分かりやすく。</em></h2>
+          <p>完成済みの投稿例はInstagramでご確認いただけます。制作途中の素材や編集データは公開しません。</p>
         </div>
-        <CanvaPortfolio pricing />
+        <DiaryPricingPanel />
       </section>
 
       <section className="diary-work" id="work">
