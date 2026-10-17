@@ -154,3 +154,9 @@ Workflow:
 - For reliability, the DB + cron drive invoice retries. Webhook endpoint still requires production endpoint registration, strict event types, live signature secret, and full payment E2E testing.
 - On failures, admin inbox shows `failed`; owner must review and resolve before closing invoices. Never tell a client an invoice was sent until Stripe confirms open/sent.
 - Confirm correct email provider and mailbox are configured for enterprise date offers and confirmations.
+
+## 2026-10-17 — Owner selected EXISTING shared Stripe account
+
+Owner has expressly selected using one Stripe account for two businesses: existing BASE/eBay subscription and グルメ日誌 direct PR. Connected live account verified as `acct_1ULfr6B2xz6AKQNb` (named `base ebay sync`). This supersedes the previous dedicated-account-only proposal. Use service-specific `metadata[diary_source]=gurume_diary_direct`, `metadata[diary_inquiry_id]`, and a separate private Supabase table. NEVER copy or repurpose BASE/eBay products, prices, subscriptions or customers into Diary invoices. Stripe Dashboard totals/payouts are shared, though metadata can segregate reports; invoice branding/issuer details are account-wide unless supported customizations are configured and tested.
+
+**Safety/activation:** A Stripe live product creation action was denied by the platform/user in this turn. Do not retry that write. NO live product, Stripe invoice, or charge has been created. Configuration still defaults to `DIARY_STRIPE_ENABLED=false`. No account key should be checked into GitHub. The Stripe API key must be added securely to deployment secrets by the owner/operator, and account identity verified server-side. Complete Stripe business identity, Japanese invoice/tax settings, sender domain, webhook and sandbox E2E before enabling new invoicing. The code's domain/account gate prevents mistakenly using a different account.
