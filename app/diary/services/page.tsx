@@ -93,7 +93,7 @@ export default function DiaryServices() {
               ))}
             </div>
             <p className="diary-v2-service-disclaimer">グルメ日誌への直接依頼として、写真フィードの基本料金は投稿1件の制作・公開を対象とします。来店日時・紹介希望メニュー・追加媒体・交通費・素材の二次利用等は個別にご案内し、契約前に合意します。食べログやGoogleマップへの対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。</p>
-            <aside className="diary-v2-photo-privacy" aria-label="店内撮影で大切にしていること"><span aria-hidden="true">✳</span><div><strong>お食事中のお客様への配慮を徹底します。</strong><p>料理や店内の雰囲気を中心に撮影します。お客様やスタッフが特定される顔・声・個人情報は、許可なく投稿しません。写り込みがある場合は撮り直し・切り取り・ぼかし等で対応し、適切に処理できない素材は掲載しません。</p><Link href="/diary/policy">撮影・PRの方針を見る ↗</Link></div></aside>
+            <aside className="diary-v2-photo-privacy" aria-label="店内撮影で大切にしていること"><span aria-hidden="true">✳</span><div><strong>お食事中のお客様への配慮を徹底します。</strong><p>料理や店内の雰囲気を中心に撮影します。お客様やスタッフが特定される顔・声・個人情報は、必要な許可なく投稿しません。写り込みがある場合は撮り直し・切り取り・ぼかし等で対応し、適切に処理できない素材は掲載しません。</p><Link href="/diary/policy">撮影・PRの方針を見る ↗</Link></div></aside>
           </div>
         </section>
 
