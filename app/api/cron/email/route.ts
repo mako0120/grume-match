@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { retryDiaryBookingNotifications } from "@/server/diary/notification";
+import { reconcileDiaryInvoices } from "@/server/diary/invoicing";
 
 function isAuthorized(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -55,6 +57,10 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // Reconcile one-time booking notifications in addition to the standard outbox.
+  // Failed confirmations stay in the private DB and are retried by this CRON.
+  const diaryBookingNotifications = await retryDiaryBookingNotifications();
+  const diaryStripeInvoices = await reconcileDiaryInvoices();
   const supabase = createAdminClient();
   const now = new Date().toISOString();
 
@@ -190,5 +196,7 @@ export async function GET(request: NextRequest) {
     sent,
     failed,
     skipped,
+    diaryBookingNotifications,
+    diaryStripeInvoices,
   });
 }

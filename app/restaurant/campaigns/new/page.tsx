@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { createCampaign } from "@/server/actions/campaigns";
 
@@ -165,6 +166,16 @@ export default async function NewCampaignPage({
           <p className="field-help">
             来店候補は30分刻み・滞在2時間・1枠1組で自動生成します。応募締切も自動です。
           </p>
+        </section>
+
+        <section className="form-section">
+          <span className="eyebrow">04 COMPLIANCE</span>
+          <h2>安心できるPRのために</h2>
+          <p>食べログ・Googleマップ等への対価付き口コミ、高評価の強制、PR表記を隠す依頼は受け付けません。募集内容には含めないでください。</p>
+          <label style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <input type="checkbox" name="prPolicyConfirmed" required style={{ marginTop: 5 }} />
+            <span><Link href="/legal/pr-guidelines" target="_blank" rel="noopener noreferrer">PRガイドライン</Link>を確認し、禁止事項を含まない案件として登録することに同意します。</span>
+          </label>
         </section>
 
         <PendingSubmitButton

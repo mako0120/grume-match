@@ -29,11 +29,29 @@ const privateHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    // Only for the separate Netlify diary production site, never for the PR OS.
+    return process.env.DIARY_SITE_MODE === "true"
+      ? [{ source: "/", destination: "/diary", permanent: false }]
+      : [];
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        source: "/diary/confirm/:path*",
+        headers: [
+          ...privateHeaders,
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/diary/confirmed",
+        headers: privateHeaders,
       },
       ...[
         "/creator/:path*",
