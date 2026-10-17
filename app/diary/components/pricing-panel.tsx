@@ -28,7 +28,7 @@ export function DiaryPricingPanel() {
         <div className="diary-current-price-details">
           <strong>制作内容</strong>
           <p>{DIARY_BASE_POST_DESCRIPTION}</p>
-          <p>画像枚数による追加料金はありません。料理紹介、撮影内容、修正や二次利用の範囲は契約前に合意します。</p>
+          <p>普段のInstagram投稿と同じスタイルで、料理・店内を撮影して制作します。画像枚数で料金は変わりません。追加の投稿・素材二次利用などは事前にご相談します。</p>
         </div>
       </div>
       <div className="diary-video-price">
