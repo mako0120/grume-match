@@ -1,153 +1,122 @@
 import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
 import { DiaryPricingPanel } from "../components/pricing-panel";
+import { DiaryHeader, DiaryMobileCTA } from "../components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 export const metadata = {
-  title: "PRサービス・制作実例｜グルメ日誌｜大阪",
-  description: "大阪のグルメ日誌本人に依頼できるInstagram投稿・撮影の内容、実際の投稿例、進行フローをご確認いただけます。",
+  title: "PRプラン・料金｜グルメ日誌｜大阪",
+  description: "Instagramフィード1投稿の基本料金と、動画込みPRなどの制作内容。実際に公開されたInstagram投稿もご覧いただけます。",
 };
 
-const services = [
+const offerings = [
   {
     id: "instagram_feed",
-    sectionId: "feed",
-    no: "01",
-    en: "EDITORIAL / FEED",
-    name: "写真で伝えるフィード投稿",
-    lead: "複数の写真と短い言葉で、料理の魅力とお店の空気感を伝えます。",
-    tasks: ["店舗を訪問し撮影", "画像の選定・構成・編集", "紹介文・店舗情報の作成", "Instagram投稿・公開URL共有"],
-    note: "掲載枚数、修正範囲、投稿時期はご相談時に決定します。",
+    number: "01",
+    category: "INSTAGRAM FEED",
+    title: "写真フィードPR",
+    description: "訪問・撮影・編集・キャプション作成から、Instagramフィード1投稿の公開まで。",
+    includes: ["店舗を訪問して撮影", "写真の選定・編集", "キャプション・PR表記", "Instagramへのフィード投稿1件"],
+    note: "投稿内の写真枚数に応じた料金設定はありません。紹介内容は事前に合意します。",
   },
   {
     id: "instagram_feed_video",
-    sectionId: "reel",
-    no: "02",
-    en: "SHORT FORM / REEL",
-    name: "フィード投稿＋ショート動画",
-    lead: "フィード投稿と組み合わせて、料理や店内の空気感を伝えるショート動画を制作。15,000円（税込）から相談できます。",
-    tasks: ["店舗訪問・写真と動画を撮影", "Instagramフィード投稿の制作", "ショート動画の編集・テロップ", "動画の掲載先・尺・投稿数は契約前に合意"],
-    note: "15,000円〜は動画を含めた基本制作の開始価格です。リール単体投稿・長尺編集・広告素材への二次利用等は別途お見積もりします。",
+    number: "02",
+    category: "PHOTO + SHORT VIDEO",
+    title: "写真＋ショート動画",
+    description: "Instagramフィード1投稿に、短い動画制作を組み合わせるプラン。",
+    includes: ["訪問・写真と動画の撮影", "フィード投稿の編集・制作", "ショート動画制作", "公開先・尺・納品内容の相談"],
+    note: "動画の投稿形態・制作尺・本数はご契約前に確認します。",
+  },
+  {
+    id: "instagram_reel",
+    number: "03",
+    category: "INSTAGRAM REEL",
+    title: "リール動画",
+    description: "お店のライブ感や料理の臨場感を、ショート動画で表現します。",
+    includes: ["撮影", "動画構成・編集", "テロップ・キャプション", "投稿内容の確認"],
+    note: "単体のリールPRは内容に応じて個別にお見積もりします。",
   },
   {
     id: "instagram_stories",
-    sectionId: "stories",
-    no: "03",
-    en: "UPDATE / STORIES",
-    name: "ストーリーズで紹介",
-    lead: "新メニューやイベント、店舗へのアクセスなどを簡潔に紹介します。",
-    tasks: ["紹介内容の確認", "写真・短い動画の編集", "Instagramストーリーズ投稿", "投稿実施のご報告"],
-    note: "掲載期間や投稿回数、リンク設置の可否などは事前確認します。",
-  },
-  {
-    id: "photo_video",
-    sectionId: "material",
-    no: "04",
-    en: "VISUAL / CONTENT",
-    name: "写真・動画素材の制作",
-    lead: "店舗自身のSNSや案内用に使う撮影素材の制作も相談できます。",
-    tasks: ["撮影対象と使用目的の確認", "店舗での撮影", "合意した素材の納品", "使用範囲・期間の取り決め"],
-    note: "納品データの形式、点数、二次利用・広告転用の権利は個別見積もりです。",
+    number: "04",
+    category: "STORIES & MATERIALS",
+    title: "ストーリーズ・撮影素材",
+    description: "イベント告知、期間限定メニュー紹介、店舗用の素材制作にも対応。",
+    includes: ["ご希望の掲載内容の確認", "撮影・編集", "納品物と用途の合意", "必要なPR表記"],
+    note: "素材の二次利用・納品形式などは別途取り決めます。",
   },
 ] as const;
 
 export default function DiaryServices() {
   const price = currentDiaryPricing();
   return (
-    <main className="diary-services-page">
-      <header className="diary-service-nav">
-        <Link href="/diary" className="diary-back">← グルメ日誌｜大阪へ戻る</Link>
-        <Link href="/diary/request" className="diary-service-nav-button">PRを相談する ↗</Link>
-      </header>
-
-      <section className="diary-services-hero">
-        <span className="diary-overline"><span className="diary-dot" /> OUR CREATIVE SERVICE</span>
-        <h1>どんな投稿を<br />お願いできるのか。<br /><em>依頼前に、全部わかる。</em></h1>
-        <p>グルメ日誌本人が、お店を訪問して撮影・編集・発信。投稿の雰囲気や制作の範囲をあらかじめご確認いただいたうえで、ご希望に合う形をご提案します。</p>
-        <p className="diary-price-teaser">写真のフィードPR：<strong>{formatDiaryYen(price.amountYen)}</strong>／1投稿（税込総額）<br />動画込みPR：<strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong>（税込開始価格）<br />直接依頼料金はフォロワー増加に応じて今後改定予定です。</p>
-        <a href="#work" className="diary-button diary-button-primary">実際の投稿を見る ↘</a>
-      </section>
-
-      <section className="diary-services-layout" id="contents">
-        <div className="diary-section-top"><span>WHAT IS INCLUDED</span><span>ご依頼の内容</span></div>
-        <h2>届け方は、お店に合わせて。</h2>
-        <div className="diary-service-grid">
-          {services.map((service) => (
-            <article id={service.sectionId} className="diary-service-detail" key={service.id}>
-              <div className="diary-service-detail-head">
-                <span>{service.no} / {service.en}</span>
-                <h3>{service.name}</h3>
-                <p>{service.lead}</p>
-              </div>
-              <div className="diary-service-inclusions">
-                <strong>ご相談できる制作内容</strong>
-                <ul>{service.tasks.map((task) => <li key={task}>{task}</li>)}</ul>
-                <p>{service.note}</p>
-              </div>
-              <Link className="diary-service-request-link" href={`/diary/request?service=${service.id}&intent=application`}>
-                この内容で相談する ↗
-              </Link>
-            </article>
-          ))}
-        </div>
-        <section className="diary-editorial-example">
-          <div className="diary-editorial-top">
-            <span className="diary-overline">A TYPICAL FEED STORY</span>
-            <h3>フィード投稿は、<br />こんな流れで紹介します。</h3>
-            <p>お店の魅力を伝えるための構成例です。投稿の枚数や順序は、店舗・撮影内容に合わせて決定します。</p>
+    <div className="diary-v2">
+      <DiaryHeader active="services" />
+      <main id="diary-main" className="diary-services-page">
+        <section className="diary-services-hero">
+          <span className="diary-v2-eyebrow"><span className="diary-v2-spark" aria-hidden="true" /> SERVICES & PRICING</span>
+          <h1>届けたいのは、<br />枚数じゃない。<br /><em>一投稿の価値。</em></h1>
+          <p>グルメ日誌本人が、お店を訪問し、撮影から投稿まで対応。基本料金はInstagramの<strong>フィード投稿1件</strong>あたり。画像の枚数で値段が変わる仕組みではありません。</p>
+          <p className="diary-price-teaser">写真フィード1投稿 <strong>{formatDiaryYen(price.amountYen)}</strong>（税込）<br />動画込みPR <strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong>（税込）</p>
+          <div className="diary-v2-hero-actions">
+            <a href="#pricing" className="diary-v2-button diary-v2-button-accent">料金を見る ↘</a>
+            <a href="#work" className="diary-v2-text-link">Instagram投稿を見る ↘</a>
           </div>
-          <div className="diary-editorial-steps">
-            <div><span>01 / COVER</span><strong>目を引く表紙</strong><p>お店や料理の魅力が一目で伝わる写真とコピー。</p></div>
-            <div><span>02 / PLACE</span><strong>店舗・アクセス</strong><p>店名やエリア、アクセスを分かりやすく紹介。</p></div>
-            <div><span>03 / FOOD</span><strong>料理の魅力</strong><p>写真を中心に、実際にいただいた料理の特徴を紹介。</p></div>
-            <div><span>04 / MOOD</span><strong>店内・雰囲気</strong><p>席や空間、過ごし方が伝わる写真と言葉。</p></div>
-            <div><span>05 / SAVE</span><strong>まとめ・保存導線</strong><p>「行ってみたい」と思ったときに振り返れる情報。</p></div>
-          </div>
-          <p className="diary-editorial-caption">投稿本文（キャプション）も制作対象です。所在地・営業時間等は最新情報を確認し、広告関係は明確に表示します。完成済みの3投稿は下の「実際の投稿を見る」から確認できます。</p>
-          <a href="#work" className="diary-editorial-cta">実際の3投稿を見る ↓</a>
         </section>
-        <div className="diary-price-note">
-          <strong>料金は個別にご案内します。</strong>
-          <p>撮影場所・制作内容・媒体・投稿回数・二次利用の有無などにより異なります。お問い合わせ・お見積もりは無料です。費用・制作範囲・納期は必ずご依頼前に確認し、双方合意のうえ進めます。</p>
-        </div>
-      </section>
 
-      <section className="diary-pricing-section" id="pricing">
-        <div className="diary-section-top"><span>PR PRICING</span><span>お見積もりの前に</span></div>
-        <div className="diary-work-intro">
-          <h2>制作内容と料金を、<br /><em>分かりやすく。</em></h2>
-          <p>完成済みの投稿例はInstagramでご確認いただけます。制作途中の素材や編集データは公開しません。</p>
-        </div>
-        <DiaryPricingPanel />
-      </section>
+        <section className="diary-pricing-section diary-v2-pricing-section" id="pricing">
+          <div className="diary-v2-container">
+            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">01 / CLEAR PRICING</span><h2>わかりやすい、<br /><em>投稿単位の料金。</em></h2></div><p>一投稿に込める内容を大切に。画像枚数で区切るのではなく、何を伝えるかを相談して決めます。</p></div>
+            <DiaryPricingPanel />
+          </div>
+        </section>
 
-      <section className="diary-work" id="work">
-        <div className="diary-section-top"><span>SELECTED POSTS</span><span>@gurunavi_diary</span></div>
-        <div className="diary-work-intro">
-          <h2>言葉で説明するより、<br /><em>まず投稿を。</em></h2>
-          <p>グルメ日誌がどんな雰囲気でお店を紹介しているか、実際のInstagram投稿でお確かめください。</p>
-        </div>
-        <PostShowcase />
-      </section>
+        <section className="diary-services-layout diary-v2-service-details" id="details">
+          <div className="diary-v2-container">
+            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">02 / WHAT'S INCLUDED</span><h2>依頼したいことに、<br /><em>合わせて選べる。</em></h2></div><p>写真投稿を軸に、動画やストーリーズなども選択できます。最終的な納品内容と料金は双方で合意して決定します。</p></div>
+            <div className="diary-service-grid">
+              {offerings.map((service) => (
+                <article id={service.id} className="diary-service-detail" key={service.id}>
+                  <div className="diary-service-detail-head">
+                    <span>{service.number} / {service.category}</span>
+                    <h3>{service.title}</h3>
+                    <p>{service.description}</p>
+                  </div>
+                  <div className="diary-service-inclusions">
+                    <strong>制作・対応内容</strong>
+                    <ul>{service.includes.map((task) => <li key={task}>{task}</li>)}</ul>
+                    <p>{service.note}</p>
+                  </div>
+                  <Link className="diary-service-request-link" href={`/diary/request?service=${service.id}&intent=application`}>このプランについて相談する ↗</Link>
+                </article>
+              ))}
+            </div>
+            <p className="diary-v2-service-disclaimer">※写真フィードの基本料金は投稿1件の制作・公開を対象とします。撮影条件、素材の二次利用、追加の投稿・媒体、交通費や食事提供条件等は事前に明示して合意します。</p>
+          </div>
+        </section>
 
-      <section className="diary-scope">
-        <div className="diary-section-top"><span>BEFORE BOOKING</span><span>安心してご依頼いただくために</span></div>
-        <h2>ご相談の前に、<em>お約束します。</em></h2>
-        <div className="diary-scope-grid">
-          <article><b>01</b><h3>担当はグルメ日誌本人</h3><p>第三者のインフルエンサーを紹介するサービスではありません。お店への訪問から制作・発信まで、グルメ日誌への直接依頼です。</p></article>
-          <article><b>02</b><h3>発信内容は実体験から</h3><p>実際に見て、食べて、感じたことを大切にします。高評価や肯定的な感想を保証する案件はお受けしません。</p></article>
-          <article><b>03</b><h3>PR表記とルールを守る</h3><p>広告・提供関係は明瞭に表示します。食べログやGoogleマップ等への対価付き口コミをセットで求める案件は受け付けません。</p></article>
-          <article><b>04</b><h3>成果は保証ではなく検証</h3><p>フォロワー増加や来店・売上を保証するものではありません。投稿の公開URLをご案内し、レポートの範囲は事前にご相談します。</p></article>
-        </div>
-        <p><Link href="/diary/policy">案件受注ポリシーを読む ↗</Link></p>
-      </section>
+        <section className="diary-v2-section diary-v2-instagram" id="work">
+          <div className="diary-v2-container">
+            <div className="diary-v2-section-head diary-v2-section-head-light"><div><span className="diary-v2-section-label">03 / LIVE ON INSTAGRAM</span><h2>制作の雰囲気は、<br /><em>公開済みの投稿から。</em></h2></div><p>制作途中のファイルや内部デザインは公開していません。実際にInstagramで公開された投稿をご覧いただけます。</p></div>
+            <PostShowcase />
+          </div>
+        </section>
 
-      <section className="diary-final-cta">
-        <span>LET US TELL YOUR STORY.</span>
-        <h2>お店だけの「おいしい」を、<br /><em>まだ知らない誰かへ。</em></h2>
-        <p>まずはお店のことを聞かせてください。お見積もり・ご相談は無料です。</p>
-        <Link href="/diary/request" className="diary-button diary-button-light">グルメ日誌へPRを相談する <span>↗</span></Link>
-      </section>
-    </main>
+        <section className="diary-v2-section diary-v2-faq" id="questions">
+          <div className="diary-v2-container diary-v2-faq-grid">
+            <div><span className="diary-v2-section-label">04 / YOUR QUESTIONS</span><h2>依頼前に、<br /><em>確認したいこと。</em></h2></div>
+            <div className="diary-v2-questions">
+              <details><summary>フィード投稿の画像枚数で料金は変わりますか？<span aria-hidden="true">＋</span></summary><p>変わりません。料金単位は公開するInstagramフィード投稿1件です。使用する画像や紹介内容は事前にご相談いただきます。</p></details>
+              <details><summary>動画制作も依頼できますか？<span aria-hidden="true">＋</span></summary><p>はい。写真フィード投稿に動画を加えるプランは15,000円（税込）からです。尺、制作物、投稿形態などは見積もり時に確認します。</p></details>
+              <details><summary>申込み後すぐに料金が発生しますか？<span aria-hidden="true">＋</span></summary><p>フォームの送信だけでは契約は成立しません。提案された日時・制作内容・料金に双方が合意したあと確定します。お支払いは投稿公開後7日以内の後払いを基本としています。</p></details>
+            </div>
+          </div>
+        </section>
+
+        <section className="diary-v2-end"><div className="diary-v2-container diary-v2-end-inner"><span className="diary-v2-section-label">READY TO START?</span><h2>一投稿から、<br />新しい出会いを。</h2><p>ご相談とお見積もりは無料です。</p><div className="diary-v2-end-actions"><Link className="diary-v2-button diary-v2-button-accent" href="/diary/request?intent=consultation">無料で相談する ↗</Link><Link className="diary-v2-text-link" href="/diary">トップへ戻る ↗</Link></div></div></section>
+      </main>
+      <DiaryMobileCTA />
+    </div>
   );
 }
