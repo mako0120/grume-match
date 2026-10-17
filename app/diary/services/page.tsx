@@ -92,7 +92,7 @@ export default function DiaryServices() {
                 </article>
               ))}
             </div>
-            <p className="diary-v2-service-disclaimer">※写真フィードの基本料金は投稿1件の制作・公開を対象とします。撮影条件、素材の二次利用、追加の投稿・媒体、交通費や食事提供条件等は事前に明示して合意します。</p>
+            <p className="diary-v2-service-disclaimer">グルメ日誌への直接依頼として、写真フィードの基本料金は投稿1件の制作・公開を対象とします。追加媒体・交通費・素材の二次利用等は個別にご案内し、契約前に合意します。食べログやGoogleマップへの対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。</p>
           </div>
         </section>
 
