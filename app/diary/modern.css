@@ -272,3 +272,48 @@
 @media (prefers-reduced-motion: reduce) {
   .diary-v2 *, .diary-v2 *::before, .diary-v2 *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+
+/* Conversion-focused inquiry experience */
+.diary-v2-request-intro { padding-top: 9px; margin-bottom: 34px; }
+.diary-v2-request-intro h1 { font-size: clamp(43px,5.4vw,66px); line-height: 1.37; letter-spacing: -.06em; }
+.diary-v2-request-intro > p { color: #68756b; font-size: 14px; line-height: 2.1; max-width: 660px; margin-top: 23px; }
+.diary-v2-request-summary { display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 15px; padding: 24px; background: #e4ebdf; border: 1px solid #cfdccf; border-radius: 18px; margin-bottom: 23px; }
+.diary-v2-request-summary > div { min-width: 0; }
+.diary-v2-request-summary span { display: block; color: #566d5e; font-size: 11px; font-weight: 800; }
+.diary-v2-request-summary strong { display: block; color: #1b3528; font-size: clamp(18px,2.4vw,28px); font-weight: 900; letter-spacing: -.04em; margin-top: 7px; }
+.diary-v2-request-summary small { display: block; color: #69816d; font-size: 10px; margin-top: 7px; line-height: 1.5; }
+.diary-v2-request-summary a { color: #a46143; text-decoration: underline; text-underline-offset: 6px; font-size: 11px; font-weight: 900; white-space: nowrap; }
+.diary-v2-request-note { background: #faf2e8; border-left: 3px solid #cd8d65; padding: 16px 20px; margin: 0 0 24px; font-size: 12px; color: #746555; line-height: 1.8; }
+.diary-v2-request-note span { color: #b66949; margin-right: 9px; }
+.diary-v2 .diary-inquiry-form label { color: #304c39; }
+.diary-v2 .diary-inquiry-form input:not([type="checkbox"]):focus,
+.diary-v2 .diary-inquiry-form select:focus,
+.diary-v2 .diary-inquiry-form textarea:focus { border-color: #be7b52; background: #fff; outline: 3px solid #f3d4c33b; outline-offset: 1px; }
+.diary-v2 .diary-inquiry-form .diary-submit { background: #1c3929; border-radius: 11px; min-height: 60px; font-size: 15px; }
+.diary-v2 .diary-inquiry-form .diary-submit:hover { background: #305641; }
+.diary-v2 .diary-inquiry-form .diary-inquiry-choice label { transition: border-color .17s, background .17s; }
+.diary-v2 .diary-inquiry-form .diary-inquiry-choice label:hover { border-color: #b7c5b8; }
+.diary-v2 .diary-form-aside { margin: 22px auto 34px; }
+.diary-v2 .diary-form-aside a { font-weight: 750; color: #a76b4d; text-decoration: underline; text-underline-offset: 3px; }
+/* Per-post pricing layout consistency on /services */
+.diary-v2 .diary-pricing-section { max-width: none; margin: 0; background: #f8f7f2; }
+.diary-v2 .diary-pricing-section .diary-portfolio-price { margin: 0; }
+.diary-v2 .diary-services-layout { padding: 100px 0; }
+.diary-v2 .diary-service-grid { gap: 19px; }
+.diary-v2 .diary-service-detail { padding: 33px; }
+.diary-v2-service-disclaimer { font-size: 12px; line-height: 1.9; color: #717f73; margin-top: 30px !important; }
+.diary-v2 .diary-portfolio-price .diary-button-primary { background: #1c3929; color: #fff; }
+.diary-v2 .diary-portfolio-price .diary-button-primary:hover { background: #305641; }
+/* Anchors stay visible below the sticky header. */
+.diary-v2 :is(#work,#results,#services,#philosophy,#flow,#pricing,#details,#faq) { scroll-margin-top: 84px; }
+@media (max-width: 700px) {
+  .diary-v2-request-intro h1 { font-size: clamp(37px,9vw,50px); }
+  .diary-v2-request-summary { grid-template-columns: 1fr; padding: 21px; gap: 20px; }
+  .diary-v2-request-summary > div + div { padding-top: 17px; border-top: 1px solid #c6d1c3; }
+  .diary-v2-request-summary a { justify-self: start; }
+  .diary-v2 .diary-services-layout { padding: 72px 0; }
+  .diary-v2 .diary-service-detail { padding: 24px; }
+  .diary-v2 .diary-portfolio-price { padding: 23px 17px; }
+  .diary-v2 :is(#work,#results,#services,#philosophy,#flow,#pricing,#details,#faq) { scroll-margin-top: 68px; }
+}
