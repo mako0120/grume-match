@@ -35,7 +35,7 @@ test("one Instagram post is the unit, not the number of photos in a carousel", (
   assert.match(home, /1投稿/);
   assert.match(home, /画像枚数で料金は変わりません/);
   assert.match(services, /フィード投稿1件/);
-  assert.match(pricing, /画像枚数による追加料金はありません/);
+  assert.match(pricing, /画像枚数で料金は変わりません/);
   assert.match(request, /1投稿/);
   assert.match(logic, /Instagramフィード投稿1件/);
   assert.doesNotMatch(logic, /pricePerPage|pricePerSlide|image_count/);
