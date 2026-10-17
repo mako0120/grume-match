@@ -82,7 +82,7 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
       </fieldset>
       <div className="diary-conversion-intro">
         <span>ご相談に必要な内容だけで大丈夫です</span>
-        <p>{inquiryKind === "consultation" ? "まずは店舗名・連絡先・相談したいことだけ。詳細はあとから相談できます。" : "正式な申込みに向けて、希望する投稿内容と日時をお聞かせください。"}</p>
+        <p>{inquiryKind === "consultation" ? "まずは店舗名・連絡先・相談したいことだけ。撮影方法の細かい指定は不要です。" : "普段のInstagram投稿として制作します。伝えてほしい料理・ポイントと来店可能な日時を教えてください。"}</p>
       </div>
       <div className="diary-form-section-title"><span>01</span><h2>お店・ご担当者様</h2></div>
       <div className="diary-input-grid">
@@ -184,6 +184,7 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
         <p>実体験に基づき、必要なPR表示をしたInstagram投稿などを制作いたします。</p>
         <Link href="/diary/policy">案件受注ポリシーを確認する ↗</Link>
       </details>
+      <p className="diary-photo-privacy-note">撮影ではお食事中のお客様への配慮を徹底します。一般のお客様やスタッフの顔・声・個人情報が、必要な許可なく投稿に掲載されないよう、写り込みを確認して編集・除外します。<Link href="/diary/policy">撮影ポリシーを確認する ↗</Link></p>
       <div className="diary-honeypot" aria-hidden="true">
         <label>Webサイト <input name="website" tabIndex={-1} autoComplete="off" /></label>
       </div>
