@@ -29,7 +29,7 @@ export default function DiaryHomePage() {
               <span className="diary-v2-eyebrow"><span aria-hidden="true" className="diary-v2-spark" /> OSAKA × GOURMET × STORYTELLING</span>
               <p className="diary-v2-hero-kicker">おいしい、を届ける仕事。</p>
               <h1 id="diary-v2-hero-heading">まだ知らない<br /><span>「おいしい」</span>を、<br />次の出会いへ。</h1>
-              <p className="diary-v2-hero-lead">大阪の飲食店向けInstagram PR。グルメ日誌本人が来店し、撮影・編集・投稿まで対応します。写真フィードは1投稿8,000円（税込）から。新メニューも、お店ならではの魅力も、丁寧に届けます。</p>
+              <p className="diary-v2-hero-lead">大阪の飲食店向けInstagram PR。グルメ日誌本人が来店し、撮影・編集・投稿まで対応します。写真フィードは1投稿{formatDiaryYen(price.amountYen)}（税込）から。新メニューも、お店ならではの魅力も、丁寧に届けます。</p>
               <div className="diary-v2-hero-actions">
                 <Link className="diary-v2-button diary-v2-button-accent" href="/diary/request?intent=consultation">無料でPR相談する <span aria-hidden="true">↗</span></Link>
                 <a className="diary-v2-text-link" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る <span aria-hidden="true">↗</span></a>
