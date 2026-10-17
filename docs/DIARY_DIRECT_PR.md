@@ -138,3 +138,19 @@ Workflow:
 **Security:** no tenant clients access the private inquiry database. Admin actions independently enforce role. One-time public token endpoints do not disclose contact emails, use HTTPS only, and should have no analytics or third-party embeds. Ensure production site adds Referrer-Policy no-referrer for `/diary/confirm/*`, does not cache tokens, and removes them from logs. Operators should manually review cancellation terms, payment instructions, invoice/tax compliance before public launch.
 
 **Production configuration**: dedicated Supabase migrations `202610160002` then `202610160003`, Vercel deployment, valid `NEXT_PUBLIC_SITE_URL`, `DIARY_INQUIRIES_ENABLED=true` after E2E, `RESEND_API_KEY`, `EMAIL_FROM`, `DIARY_OPERATOR_NOTIFY_EMAIL`, `CRON_SECRET`. SMTP/domain and provider deliverability are not verified yet. The previous unrelated Supabase/Vercel projects MUST NOT be modified.
+
+## 2026-10-17 — Stripe invoicing: confirmed contract → draft, post publication → sent
+
+**Approved user workflow:** businesses share "especially emphasize" points (具体的に押してほしいポイント), menu/course, audience, dates, details. Human PR review remains mandatory. Full payment is POSTPAID, **within 7 days after the Instagram PR is published**.
+
+- On business confirmation via /diary/confirm token, status transitions to booked and `createDiaryDraftInvoice` creates a **Stripe draft invoice** automatically (if dedicated account keys configured). At draft stage it is NOT mailed/finalized/charged; Stripe PDF or hosted payment link may not yet exist.
+- On publication, operator saves an actual Instagram post URL from /admin/diary-inquiries. The invoice is finalized and sent using Stripe Invoicing `send_invoice`, `days_until_due=7`, and `auto_advance=false`; customer can pay on the Stripe-hosted invoice page. Company is only billed after publication.
+- Dedicated cron worker reconciles failed/pending draft and send operations with Stripe idempotency keys. STRIPE webhook `POST /api/diary/stripe/webhook` checks HMAC timestamp/signature and linked invoice ID, exact fee/currency and scope before recording `invoice.paid`, `invoice.voided`, `invoice.marked_uncollectible`.
+- All invoice metadata remains in private service-role-only `diary_pr_inquiries`. No payment card data is stored in the app.
+- Required additional migration: `202610170001_diary_stripe_invoices.sql` (AFTER earlier migrations).
+- Environment: `DIARY_STRIPE_ENABLED=false` by default; `DIARY_STRIPE_SECRET_KEY`, `DIARY_STRIPE_ACCOUNT_ID`, `DIARY_STRIPE_WEBHOOK_SECRET`. Provider keys must be injected as Vercel environment secrets ONLY, not in GitHub.
+- **Critical account isolation:** the only linked Stripe account when this work started was the unrelated existing live **base ebay sync** account. DO NOT use its credentials for グルメ日誌. Create and verify dedicated Stripe account for the creator business, then check API key matches configured Stripe account ID. No Stripe live customer, draft invoice or payment was created during coding.
+- Complete company details and tax/invoice business presentation in Stripe before launch: legally correct seller name, address, contact, registration/invoice tax settings, brand image, cancellation policy, whether the business is registered under Japan's 適格請求書発行事業者制度. Stripe's PDF is not automatically a Japanese compliant invoice without appropriate tax and seller details. Validate with a qualified professional if needed.
+- For reliability, the DB + cron drive invoice retries. Webhook endpoint still requires production endpoint registration, strict event types, live signature secret, and full payment E2E testing.
+- On failures, admin inbox shows `failed`; owner must review and resolve before closing invoices. Never tell a client an invoice was sent until Stripe confirms open/sent.
+- Confirm correct email provider and mailbox are configured for enterprise date offers and confirmations.
