@@ -29,6 +29,12 @@ const privateHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    // Only for the separate Netlify diary production site, never for the PR OS.
+    return process.env.DIARY_SITE_MODE === "true"
+      ? [{ source: "/", destination: "/diary", permanent: false }]
+      : [];
+  },
   async headers() {
     return [
       {
