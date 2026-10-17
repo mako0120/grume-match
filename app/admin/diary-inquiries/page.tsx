@@ -29,7 +29,7 @@ export default async function DiaryInquiriesAdmin() {
   const admin = createAdminClient();
   const { data: inquiries, error } = await admin
     .from("diary_pr_inquiries")
-    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,post_price_reference_yen,followers_at_inquiry,follower_snapshot_verified_at,price_policy_version,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at,inquiry_kind,desired_coverage,featured_menu,requested_outcome,visit_preference,proposed_visit_at,proposed_visit_duration_minutes,proposed_deliverables,agreed_fee_yen,payment_terms,proposal_expires_at,proposal_email_state,confirmed_at,operator_notify_state,operator_notified_at,published_at,published_post_url,payment_due_at,payment_received_at")
+    .select("id,restaurant_name,contact_name,email,phone,instagram_url,service,budget,desired_period,post_price_reference_yen,followers_at_inquiry,follower_snapshot_verified_at,price_policy_version,message,status,compliance_status,compliance_reviewed_at,compliance_policy_version,created_at,inquiry_kind,desired_coverage,featured_menu,requested_outcome,visit_preference,proposed_visit_at,proposed_visit_duration_minutes,proposed_deliverables,agreed_fee_yen,payment_terms,proposal_expires_at,proposal_email_state,confirmed_at,operator_notify_state,operator_notified_at,published_at,published_post_url,payment_due_at,payment_received_at,stripe_invoice_id,stripe_invoice_status,stripe_hosted_invoice_url,stripe_invoice_pdf,invoice_issued_at,invoice_sent_at")
     .order("created_at", { ascending: false }).limit(100);
 
   return (
@@ -134,6 +134,9 @@ export default async function DiaryInquiriesAdmin() {
                   <p><strong>訪問：</strong>{item.proposed_visit_at && new Date(item.proposed_visit_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}</p>
                   <p><strong>報酬：</strong>{Number(item.agreed_fee_yen).toLocaleString("ja-JP")}円（税込）</p>
                   <p><strong>制作範囲：</strong>{item.proposed_deliverables}</p>
+                  <p><strong>Stripe請求書：</strong>{item.stripe_invoice_status === "not_created" ? "作成待ち" : item.stripe_invoice_status === "draft" ? "下書き作成済み・未送付" : item.stripe_invoice_status === "open" ? "送付済み・支払待ち" : item.stripe_invoice_status === "paid" ? "支払済み" : item.stripe_invoice_status === "failed" ? "再試行待ち" : item.stripe_invoice_status}</p>
+                  {item.stripe_hosted_invoice_url && <p><a href={item.stripe_hosted_invoice_url} target="_blank" rel="noopener noreferrer">Stripeの支払ページ ↗</a></p>}
+                  {item.stripe_invoice_pdf && <p><a href={item.stripe_invoice_pdf} target="_blank" rel="noopener noreferrer">Stripe請求書PDF ↗</a></p>}
                   <p><strong>確定通知：</strong>{item.operator_notify_state === "sent" ? "メール送信済み" : "送信待ちまたは失敗（cronで再試行）"}</p>
                   {!item.published_at ? (
                     <form action={markDiaryPostPublished} style={{ display: "grid", gap: 10 }}>
