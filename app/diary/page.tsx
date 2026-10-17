@@ -12,7 +12,7 @@ const metrics = [
 const process = [
   { number: "01", title: "相談・ご依頼", description: "お店の特徴や伝えたい魅力をフォームから送信。ご相談だけでも歓迎です。" },
   { number: "02", title: "内容と日程の合意", description: "紹介内容、投稿件数、料金、訪問日時を提案し、双方の確認後に確定します。" },
-  { number: "03", title: "訪問・制作", description: "店舗での撮影から編集、キャプション制作まで本人が対応します。" },
+  { number: "03", title: "訪問・制作", description: "普段のInstagram投稿と同じ流れで撮影・編集。お客様など周囲の方のプライバシーにも配慮します。" },
   { number: "04", title: "Instagram公開・お支払い", description: "PR表記を付けて投稿。公開後7日以内の後払いでご案内します。" },
 ];
 
@@ -35,7 +35,7 @@ export default function DiaryHomePage() {
                 <a className="diary-v2-text-link" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る <span aria-hidden="true">↗</span></a>
               </div>
               <div className="diary-v2-hero-promise"><span aria-hidden="true">✳</span> グルメ日誌本人が直接対応 <span aria-hidden="true">·</span> 相談・見積もり無料</div>
-              <div className="diary-hero-trust" aria-label="ご依頼前の安心ポイント"><span>投稿前に内容・費用を確認</span><span>実際のInstagram投稿を公開</span><span>公開後の後払い</span></div>
+              <div className="diary-hero-trust" aria-label="ご依頼前の安心ポイント"><span>内容・費用は事前に合意</span><span>お客様のプライバシーに配慮</span><span>公開後の後払い</span></div>
             </div>
             <div className="diary-v2-poster" aria-label="グルメ日誌 大阪のブランドビジュアル">
               <span className="diary-v2-poster-top">A GOOD MEAL, A GOOD STORY. <span>001 / OSAKA</span></span>
@@ -106,7 +106,7 @@ export default function DiaryHomePage() {
                 <h3>写真フィード投稿</h3>
                 <p>料理やお店の魅力を、写真とキャプションで紹介。</p>
                 <div className="diary-v2-plan-price"><strong>{formatDiaryYen(price.amountYen)}</strong><span>/ Instagram投稿1件・税込</span></div>
-                <p className="diary-v2-plan-rule">画像枚数による追加料金なし。投稿に使用する写真や内容は事前相談で決定。</p>
+                <p className="diary-v2-plan-rule">普段のInstagram投稿と同じスタイルで制作。写真枚数による追加料金はありません。</p>
                 <Link className="diary-v2-plan-cta" href="/diary/request?service=instagram_feed&intent=application">このプランを申し込む <span aria-hidden="true">↗</span></Link>
               </article>
               <article className="diary-v2-plan">
@@ -125,7 +125,7 @@ export default function DiaryHomePage() {
         <section className="diary-v2-section diary-v2-story" id="philosophy">
           <div className="diary-v2-container diary-v2-story-grid">
             <div className="diary-v2-story-visual" aria-hidden="true"><span>食べることが、<br />好きだから。</span><b>食</b><small>MADE WITH CURIOSITY / OSAKA</small></div>
-            <div className="diary-v2-story-copy"><span className="diary-v2-section-label">04 / OUR PHILOSOPHY</span><h2>一皿の魅力を、<br /><em>きちんと伝える。</em></h2><p>「こんなお店があったんだ」。そんな小さな発見が、誰かの次の食事のきっかけになる。グルメ日誌は、実際に見て、食べて、感じたことを大切に制作しています。</p><p>表現の自由とお店への敬意を両立し、広告・提供関係は明確にお伝えします。</p><Link href="/diary/policy" className="diary-v2-inline-arrow">PR制作のポリシー ↗</Link></div>
+            <div className="diary-v2-story-copy"><span className="diary-v2-section-label">04 / OUR PHILOSOPHY</span><h2>一皿の魅力を、<br /><em>きちんと伝える。</em></h2><p>「こんなお店があったんだ」。そんな小さな発見が、誰かの次の食事のきっかけになる。グルメ日誌は、実際に見て、食べて、感じたことを大切に制作しています。</p><p>表現の自由とお店への敬意を両立し、広告・提供関係は明確にお伝えします。一般のお客様が特定される姿や会話などを無断で掲載しないよう、撮影から公開まで配慮します。</p><Link href="/diary/policy" className="diary-v2-inline-arrow">PR制作のポリシー ↗</Link></div>
           </div>
         </section>
 
@@ -143,6 +143,7 @@ export default function DiaryHomePage() {
               <details><summary>写真の枚数によって料金は変わりますか？<span aria-hidden="true">＋</span></summary><p>いいえ。基本料金はInstagramのフィード投稿1件あたりです。写真の枚数に応じた料金表ではありません。制作内容は事前に相談して決定します。</p></details>
               <details><summary>相談したら必ず依頼する必要がありますか？<span aria-hidden="true">＋</span></summary><p>ありません。ご相談・お見積もりは無料です。制作内容・料金・訪問日時を確認し、ご納得いただいてから正式なご依頼になります。</p></details>
               <details><summary>お支払いはいつですか？<span aria-hidden="true">＋</span></summary><p>Instagramへの投稿公開後、7日以内に全額お支払いいただく後払い方式を予定しています。契約時に支払い条件を確認します。</p></details>
+              <details><summary>店内にいるお客様の顔は映りますか？<span aria-hidden="true">＋</span></summary><p>料理や店内を中心に撮影し、一般のお客様やスタッフが識別できる映像は、必要な許可なく公開しません。写り込みがある場合は撮り直し・トリミング・ぼかし等で対応し、十分に配慮できない素材は掲載しません。</p></details>
               <details><summary>PR表記は入りますか？<span aria-hidden="true">＋</span></summary><p>はい。広告・提供関係が分かる適切な表記を行います。高評価の保証や口コミサイトへの対価付き投稿などはお受けしていません。</p></details>
             </div>
           </div>
