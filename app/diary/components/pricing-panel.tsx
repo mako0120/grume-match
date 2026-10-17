@@ -15,27 +15,27 @@ export function DiaryPricingPanel() {
       <div className="diary-portfolio-price-head">
         <div>
           <span className="diary-overline">DIRECT PR PRICE</span>
-          <h3>グルメ日誌本人へのご依頼。<br />フィード投稿は {formatDiaryYen(price.amountYen)} から。</h3>
+          <h3>1投稿から、<br />お店の魅力を届ける。</h3>
         </div>
-        <p>仲介を挟まず直接ご相談いただけます。撮影内容・投稿範囲・修正回数は契約前にご確認いただきます。</p>
+        <p>制作費はInstagram投稿1件が基準です。画像の枚数別に値段は設定していません。</p>
       </div>
       <div className="diary-current-price">
         <div className="diary-current-price-main">
           <span>INSTAGRAM FEED / 1 POST</span>
           <strong>{formatDiaryYen(price.amountYen)}</strong>
-          <p>写真フィード投稿の基本料金（税込）</p>
+          <p>Instagramフィード投稿1件の基本料金（税込）</p>
         </div>
         <div className="diary-current-price-details">
           <strong>制作内容</strong>
           <p>{DIARY_BASE_POST_DESCRIPTION}</p>
-          <p>写真枚数、料理紹介、撮影時間、修正・二次利用の範囲はご契約前に合意します。</p>
+          <p>画像枚数による追加料金はありません。料理紹介、撮影内容、修正や二次利用の範囲は契約前に合意します。</p>
         </div>
       </div>
       <div className="diary-video-price">
         <div>
           <span>PHOTO + SHORT VIDEO</span>
           <strong>動画込みPR：{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong>
-          <p>動画の長さ、掲載先、制作点数は別途お見積もりします。</p>
+          <p>動画の尺、投稿先、納品内容は契約前に相談して決定します。</p>
         </div>
         <Link className="diary-button diary-button-primary" href="/diary/request?service=instagram_feed_video&intent=application">
           動画込みプランを相談する ↗
