@@ -1,0 +1,274 @@
+/* 2026 diary design system: editorial, conversion focused, Instagram only.
+ * Scoped to diary-v2 so the unrelated PR marketplace is unaffected.
+ */
+.diary-v2 {
+  --v2-ink: #16221d;
+  --v2-dark: #142620;
+  --v2-deep: #0d1a16;
+  --v2-muted: #69726b;
+  --v2-paper: #f8f7f2;
+  --v2-cream: #f0eee6;
+  --v2-accent: #eead7f;
+  --v2-line: #dcdfd6;
+  color: var(--v2-ink);
+  background: var(--v2-paper);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+}
+.diary-v2, .diary-v2 * { box-sizing: border-box; }
+.diary-v2 h1, .diary-v2 h2, .diary-v2 h3, .diary-v2 p { margin: 0; }
+.diary-v2 h1, .diary-v2 h2, .diary-v2 h3 { letter-spacing: -.055em; }
+.diary-v2 h2 { font-size: clamp(37px,4.8vw,68px); line-height: 1.32; font-weight: 850; }
+.diary-v2 em { font-style: normal; color: #ad603f; }
+.diary-v2 :is(a,button,summary,input,textarea,select):focus-visible {
+  outline: 3px solid #d78351; outline-offset: 4px;
+}
+.diary-v2 a { text-decoration: none; }
+.diary-v2-container { width: min(1200px, calc(100% - 56px)); margin-inline: auto; }
+.diary-v2-skip { position: fixed; z-index: 100; top: -80px; left: 20px; background: #fff; color: var(--v2-ink); padding: 12px 18px; border-radius: 7px; }
+.diary-v2-skip:focus { top: 12px; }
+.diary-v2-header { position: sticky; top: 0; z-index: 45; border-bottom: 1px solid #e6e5de; background: rgba(250,249,245,.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.diary-v2-header-inner { width: min(1340px, calc(100% - 56px)); min-height: 85px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+.diary-v2-brand { display: inline-flex; align-items: center; gap: 13px; flex-shrink: 0; color: var(--v2-ink); font-size: 19px; font-weight: 900; line-height: 1.12; letter-spacing: -.07em; }
+.diary-v2-brand small { display: block; font-size: 8px; margin-top: 5px; letter-spacing: .16em; color: #69756b; font-weight: 800; }
+.diary-v2-brand-symbol { width: 43px; height: 43px; background: var(--v2-dark); border-radius: 50%; color: #f9f2e9; display: grid; place-items: center; font-family: serif; font-size: 23px; letter-spacing: 0; }
+.diary-v2-nav { display: flex; gap: clamp(14px,2.3vw,36px); align-items: center; }
+.diary-v2-nav a { color: #405147; font-size: 12px; font-weight: 800; white-space: nowrap; transition: color .2s; }
+.diary-v2-nav a:hover, .diary-v2-nav a[aria-current=page] { color: #bf633e; }
+.diary-v2-header-cta { display: inline-flex; align-items: center; gap: 23px; padding: 14px 20px; border-radius: 999px; color: #fff; background: var(--v2-dark); white-space: nowrap; font-weight: 800; font-size: 12px; transition: transform .2s, background .2s; }
+.diary-v2-header-cta:hover { background: #284637; transform: translateY(-2px); }
+.diary-v2-header-cta span { font-size: 17px; }
+.diary-v2-hero { background: var(--v2-deep); color: #f9f5ed; position: relative; isolation: isolate; overflow: hidden; }
+.diary-v2-hero::before { content: ""; position: absolute; inset: -40% auto auto -18%; width: 66vw; height: 66vw; border-radius: 50%; background: radial-gradient(circle, rgba(59,93,68,.32), transparent 64%); pointer-events: none; }
+.diary-v2-hero-inner { width: min(1340px, calc(100% - 56px)); margin: auto; display: grid; grid-template-columns: 1fr .83fr; gap: clamp(30px,5vw,80px); align-items: center; min-height: 660px; padding-block: 75px 88px; position: relative; }
+.diary-v2-hero-copy { z-index: 2; }
+.diary-v2-eyebrow, .diary-v2-section-label { text-transform: uppercase; font-size: 10px; font-weight: 850; letter-spacing: .18em; }
+.diary-v2-eyebrow { color: #b6ccb9; display: inline-flex; align-items: center; gap: 12px; }
+.diary-v2-spark { width: 9px; height: 9px; display: inline-block; border-radius: 50%; background: var(--v2-accent); box-shadow: 0 0 0 5px rgba(238,173,127,.12); }
+.diary-v2-hero-kicker { color: #f4c0a1; font-size: 15px; font-weight: 800; margin: 34px 0 15px !important; letter-spacing: .04em; }
+.diary-v2-hero h1 { font-size: clamp(52px,5.8vw,90px); line-height: 1.32; font-weight: 890; white-space: nowrap; }
+.diary-v2-hero h1 span { color: #f0ad84; }
+.diary-v2-hero-lead { max-width: 510px; margin-top: 29px !important; font-size: 14px; line-height: 2.2; color: #c5cdc4; }
+.diary-v2-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 34px; }
+.diary-v2-button { min-height: 56px; padding: 15px 26px; display: inline-flex; align-items: center; justify-content: center; gap: 25px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 900; transition: transform .22s, box-shadow .22s, background .22s; }
+.diary-v2-button:hover { transform: translateY(-3px); }
+.diary-v2-button-accent { background: #f4b78d; color: #2d271c; box-shadow: 0 10px 26px #0000001c; }
+.diary-v2-button-accent:hover { background: #ffd0ae; box-shadow: 0 15px 34px #00000026; }
+.diary-v2-text-link { color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 8px; font-size: 12px; font-weight: 850; transition: opacity .2s; }
+.diary-v2-text-link:hover, .diary-v2-inline-arrow:hover { opacity: .68; }
+.diary-v2-hero-promise { margin-top: 30px; font-size: 11px; color: #adbab0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.diary-v2-hero-promise > span:first-child { color: var(--v2-accent); font-size: 19px; }
+.diary-v2-poster { min-height: 552px; width: 100%; max-width: 510px; justify-self: end; align-self: center; overflow: hidden; position: relative; isolation: isolate; border: 1px solid #ffffff30; border-radius: 190px 190px 14px 14px; background: linear-gradient(145deg,#e1c5a4 0%,#d49a78 58%,#985d47 100%); box-shadow: 18px 30px 0 rgba(232,210,182,.055), 0 45px 70px rgba(0,0,0,.12); }
+.diary-v2-poster::after { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .18; background-image: radial-gradient(#453d31 0.75px,transparent 0.75px); background-size: 8px 8px; }
+.diary-v2-poster-top, .diary-v2-poster-bottom { display: flex; justify-content: space-between; gap: 10px; position: absolute; left: 31px; right: 30px; color: #24382c; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
+.diary-v2-poster-top { top: 40px; }
+.diary-v2-poster-disc { position: absolute; width: 360px; height: 360px; border-radius: 50%; top: 113px; right: -100px; background: radial-gradient(circle at 37% 30%,#f1d0ac,#e8aa6e 34%,#b8613e 77%); box-shadow: inset -35px -29px 65px #a64d3390, 0 20px 40px #62391b24; }
+.diary-v2-poster-disc::before { content: ""; position: absolute; width: 250px; height: 250px; border-radius: 50%; top: 135px; left: -200px; background: radial-gradient(circle at 60% 30%,#6d966c,#244b38 65%,#193e2c); }
+.diary-v2-poster-text { position: absolute; top: 42%; left: 9%; right: 7%; color: #fffaf1; text-shadow: 0 4px 18px #3b312b3b; transform: rotate(-5deg); font-family: Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.diary-v2-poster-text span { display: block; font-size: clamp(38px,4.3vw,64px); font-weight: 750; white-space: nowrap; }
+.diary-v2-poster-text strong { display: block; font-size: clamp(47px,5vw,74px); white-space: nowrap; letter-spacing: -.11em; }
+.diary-v2-poster-bottom { bottom: 29px; align-items: flex-end; }
+.diary-v2-poster-bottom > span:first-child { font-size: 22px; line-height: .92; letter-spacing: -.04em; }
+.diary-v2-poster-bottom > span:last-child { font-size: 8px; line-height: 1.65; text-align: right; }
+.diary-v2-hero-edge { position: absolute; left: 0; bottom: 20px; font-size: 9px; letter-spacing: .15em; color: #90a99b; }
+.diary-v2-price-ribbon { background: #f1e6da; }
+.diary-v2-price-ribbon-inner { min-height: 126px; display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-block: 22px; }
+.diary-v2-ribbon-tag { color: #7e6655; font-size: 10px; letter-spacing: .12em; font-weight: 900; display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
+.diary-v2-ribbon-dot { width: 7px; height: 7px; background: #bf6b46; border-radius: 50%; }
+.diary-v2-ribbon-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.diary-v2-ribbon-price small { font-size: 12px; font-weight: 850; }
+.diary-v2-ribbon-price strong { font-size: clamp(25px,2.65vw,37px); white-space: nowrap; letter-spacing: -.055em; }
+.diary-v2-ribbon-price strong em { font-style: normal; color: #a65e3d; }
+.diary-v2-ribbon-price > span { font-size: 10px; color: #77766b; }
+.diary-v2-ribbon-desc { font-size: 11px; line-height: 1.8; color: #5f6158; }
+.diary-v2-ribbon-link { font-size: 12px; font-weight: 900; white-space: nowrap; text-decoration: underline !important; text-underline-offset: 5px; color: var(--v2-ink); }
+.diary-v2-section { padding-block: clamp(75px,9vw,126px); }
+.diary-v2-section-head { display: flex; justify-content: space-between; align-items: end; gap: 45px; margin-bottom: 43px; }
+.diary-v2-section-head > div:first-child { flex: 1; }
+.diary-v2-section-label { display: block; margin-bottom: 27px; color: #b16c4e; }
+.diary-v2-section-head > p, .diary-v2-section-aside { color: #64716a; font-size: 13px; line-height: 2.1; max-width: 350px; }
+.diary-v2-section-aside p { margin-bottom: 15px; }
+.diary-v2-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.diary-v2-metric { border: 1px solid var(--v2-line); padding: 29px clamp(18px,2vw,34px); border-radius: 18px; background: #fff; position: relative; overflow: hidden; min-width: 0; transition: transform .2s, box-shadow .2s; }
+.diary-v2-metric:hover { transform: translateY(-3px); box-shadow: 0 20px 45px #1f3a2b0b; }
+.diary-v2-metric-label { font-size: 11px; font-weight: 800; color: #5c6a60; }
+.diary-v2-metric > div { display: flex; align-items: baseline; margin-top: 19px; gap: 7px; }
+.diary-v2-metric strong { font-size: clamp(36px,4vw,62px); line-height: 1.12; font-weight: 850; letter-spacing: -.075em; }
+.diary-v2-metric > div span { font-size: 12px; font-weight: 800; }
+.diary-v2-metric-decoration { position: absolute; right: 27px; top: 24px; font-size: 22px; color: #d5a98c; }
+.diary-v2-data-note { margin-top: 20px !important; color: #818c83; font-size: 10px; line-height: 1.8; }
+.diary-v2-instagram { background: #172c23; color: #f4f3ea; }
+.diary-v2-instagram .diary-v2-section-label { color: #f0ac84; }
+.diary-v2-section-head-light > p, .diary-v2-section-head-light .diary-v2-section-aside { color: #bbcbc0; }
+.diary-v2-instagram em { color: #eeb58f; }
+.diary-v2-inline-arrow { color: inherit; text-decoration: underline !important; text-underline-offset: 6px; font-size: 12px; font-weight: 900; }
+.diary-v2-instagram .diary-post-list { gap: 18px; }
+.diary-v2-instagram .diary-post-card { background: #faf9f5; color: var(--v2-ink); border-radius: 18px; box-shadow: 0 23px 48px #07150f21; overflow: hidden; border: 1px solid #ffffff44; transition: transform .25s; }
+.diary-v2-instagram .diary-post-card:hover { transform: translateY(-5px); }
+.diary-v2-instagram .diary-post-footnote { color: #c2cec4; }
+.diary-v2-instagram .diary-post-footnote a { color: #f3b38b; }
+.diary-v2-plans { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.diary-v2-plan { padding: clamp(26px,3.2vw,44px); border-radius: 20px; background: #fff; border: 1px solid #dadecf; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.diary-v2-plan-featured { background: #dfe8dc; border-color: #c1d0c1; }
+.diary-v2-plan-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 10px; font-weight: 900; letter-spacing: .13em; color: #5c7964; }
+.diary-v2-plan-pill { background: #1a3426; color: #fff; border-radius: 999px; padding: 7px 13px; font-size: 10px; letter-spacing: 0; }
+.diary-v2-plan-pill-outline { color: #33513b; background: #f0f2eb; border: 1px solid #d3dacd; }
+.diary-v2-plan h3 { font-size: clamp(24px,3vw,34px); line-height: 1.4; }
+.diary-v2-plan > p { font-size: 12px; line-height: 1.9; color: #59655a; }
+.diary-v2-plan-price { margin-top: auto; padding-block: 20px; border-top: 1px solid #cad3c7; border-bottom: 1px solid #cad3c7; display: flex; flex-direction: column; gap: 9px; }
+.diary-v2-plan-price strong { font-size: clamp(36px,4.5vw,58px); font-weight: 900; line-height: 1.2; letter-spacing: -.065em; color: #1a3428; }
+.diary-v2-plan-price strong small { font-size: .5em; }
+.diary-v2-plan-price span { font-size: 11px; color: #62776a; }
+.diary-v2-plan-rule { min-height: 50px; }
+.diary-v2-plan-cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 14px; color: #fff; background: #1c3729; border-radius: 12px; padding: 17px 19px; font-weight: 900; font-size: 13px; transition: background .2s, transform .2s; }
+.diary-v2-plan-cta:hover { background: #2a543f; transform: translateY(-2px); }
+.diary-v2-plan-cta span { font-size: 20px; }
+.diary-v2-package-foot { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px 2px 0; font-size: 12px; color: #6e7c6f; }
+.diary-v2-package-foot a { color: #9c5c42; font-weight: 900; white-space: nowrap; }
+.diary-v2-story { padding: 0; background: #eceee6; }
+.diary-v2-story-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(38px,7vw,95px); padding-block: clamp(76px,9vw,125px); }
+.diary-v2-story-visual { position: relative; isolation: isolate; min-height: 440px; background: #284431; border-radius: 200px 200px 16px 16px; overflow: hidden; padding: 65px 42px; color: #f5ead8; display: flex; flex-direction: column; justify-content: center; box-shadow: 20px 20px 0 rgba(48,76,53,.075); }
+.diary-v2-story-visual::before { content: ""; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#d59e77,#984d38); position: absolute; right: -90px; top: 28%; z-index: -1; }
+.diary-v2-story-visual > span { font: 750 clamp(29px,4.1vw,56px)/1.55 "Yu Mincho", "Hiragino Mincho ProN", serif; }
+.diary-v2-story-visual b { position: absolute; right: 26px; bottom: 34px; font-size: 76px; font-family: serif; opacity: .3; }
+.diary-v2-story-visual small { font-size: 9px; letter-spacing: .18em; margin-top: auto; font-weight: 850; }
+.diary-v2-story-copy h2 { margin-bottom: 33px; }
+.diary-v2-story-copy p { font-size: 13px; line-height: 2.2; color: #58695d; margin-bottom: 18px; }
+.diary-v2-story-copy .diary-v2-inline-arrow { display: inline-block; margin-top: 16px; }
+.diary-v2-process-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+.diary-v2-process-grid li { min-width: 0; background: #fff; border: 1px solid #e3e4db; border-radius: 16px; padding: 28px 23px 34px; }
+.diary-v2-process-grid li > span { font-size: 35px; color: #c47c5b; font-family: Georgia,serif; }
+.diary-v2-process-grid h3 { font-size: 19px; margin-top: 28px; margin-bottom: 15px; line-height: 1.5; }
+.diary-v2-process-grid p { color: #657168; font-size: 12px; line-height: 1.9; }
+.diary-v2-faq { background: #eeefe9; }
+.diary-v2-faq-grid { display: grid; grid-template-columns: .75fr 1.25fr; gap: 85px; }
+.diary-v2-faq-grid > div:first-child > p { font-size: 13px; color: #738074; margin-top: 23px; }
+.diary-v2-questions details { padding: 22px 0; border-bottom: 1px solid #cbd5ca; }
+.diary-v2-questions details:first-child { border-top: 1px solid #cbd5ca; }
+.diary-v2-questions summary { cursor: pointer; list-style: none; font-size: 15px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+.diary-v2-questions summary::-webkit-details-marker { display: none; }
+.diary-v2-questions summary span { font-size: 23px; color: #a9674b; transition: transform .2s; }
+.diary-v2-questions details[open] summary span { transform: rotate(45deg); }
+.diary-v2-questions details p { color: #627268; font-size: 13px; line-height: 2; margin-top: 16px; padding-right: 32px; }
+.diary-v2-end { background: #152a21; color: #fff9ed; position: relative; overflow: hidden; }
+.diary-v2-end::after { content: "食"; position: absolute; right: -40px; bottom: -140px; opacity: .08; font-family: serif; font-weight: 900; font-size: min(60vw,570px); pointer-events: none; }
+.diary-v2-end-inner { padding-block: 115px; position: relative; z-index: 1; }
+.diary-v2-end .diary-v2-section-label { color: #f8c6a2; }
+.diary-v2-end h2 { font-size: clamp(40px,5.8vw,82px); line-height: 1.36; }
+.diary-v2-end p { color: #bacabd; font-size: 14px; margin-top: 23px; }
+.diary-v2-end-actions { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; margin-top: 36px; }
+.diary-v2-footer { background: #0f1e18; color: #faf7ee; border-top: 1px solid #ffffff17; }
+.diary-v2-footer > div { display: grid; grid-template-columns: 1fr auto; column-gap: 45px; row-gap: 32px; padding-block: 55px 34px; }
+.diary-v2-footer-logo { font-size: 23px; color: #faf7ee; font-weight: 900; letter-spacing: -.08em; }
+.diary-v2-footer-logo small { font-size: 10px; letter-spacing: .25em; margin-left: 6px; }
+.diary-v2-footer p { font-size: 11px; margin-top: 13px; color: #a7b8ab; }
+.diary-v2-footer nav { display: flex; gap: 17px 25px; flex-wrap: wrap; max-width: 420px; justify-content: flex-end; align-items: start; font-size: 11px; font-weight: 750; color: #b8c9bb; }
+.diary-v2-footer nav a { color: inherit; }
+.diary-v2-footer > div > span { grid-column: 1/-1; color: #899d8b; font-size: 10px; letter-spacing: .1em; padding-top: 24px; border-top: 1px solid #ffffff20; }
+.diary-v2-mobile-cta { display: none; }
+/* Service pages and request form use the same visual language */
+.diary-v2 .diary-services-page { background: var(--v2-paper); min-height: 100vh; }
+.diary-v2 .diary-services-hero { padding: 92px max(28px,calc((100vw - 1200px)/2)) 85px; background: #172c23; color: #f8f6ed; }
+.diary-v2 .diary-services-hero h1 { font-size: clamp(45px,5.7vw,80px); line-height: 1.32; }
+.diary-v2 .diary-services-hero p { color: #c3cfc5; }
+.diary-v2 .diary-services-hero .diary-price-teaser { max-width: 620px; color: #334536; background: #f4e9dd; border-left: 4px solid #edac82; font-size: 13px; }
+.diary-v2 .diary-services-layout { background: #f1f2ea; }
+.diary-v2 .diary-service-detail { border-radius: 18px; border-color: #dce2d7; }
+.diary-v2 .diary-service-request-link { background: #1b3929; border-radius: 12px; }
+.diary-v2 .diary-pricing-section { padding-top: 70px; padding-bottom: 100px; }
+.diary-v2 .diary-portfolio-price { border-radius: 22px; background: #e5e9df; }
+.diary-v2 .diary-form-page { max-width: 920px; padding-top: 76px; padding-bottom: 40px; }
+.diary-v2 .diary-form-head h1 { font-size: clamp(45px,5.2vw,66px); line-height: 1.35; }
+.diary-v2 .diary-inquiry-form { box-shadow: 0 22px 65px #2843300c; border-color: #e2e3d8; border-radius: 22px; }
+.diary-v2 .diary-inquiry-choice label.selected { border-color: #c16c47; }
+.diary-v2 .diary-inquiry-form .diary-button-primary { background: #1c3929; color: #fff; }
+.diary-v2 .diary-inquiry-form :is(input:not([type="checkbox"]), textarea, select) { border-radius: 9px; }
+@media (max-width: 1150px) {
+  .diary-v2-price-ribbon-inner { flex-wrap: wrap; gap: 12px 26px; }
+  .diary-v2-ribbon-tag { width: 100%; }
+  .diary-v2-hero h1 { font-size: clamp(48px,5.8vw,70px); }
+  .diary-v2-poster-text span { font-size: 48px; }
+  .diary-v2-poster-text strong { font-size: 56px; }
+}
+@media (max-width: 900px) {
+  .diary-v2-nav { gap: 15px; }
+  .diary-v2-nav a { font-size: 11px; }
+  .diary-v2-header-inner { min-height: 75px; }
+  .diary-v2-header-cta { gap: 8px; padding: 12px 15px; }
+  .diary-v2-hero-inner { grid-template-columns: 1fr .72fr; gap: 24px; }
+  .diary-v2-poster { min-height: 430px; }
+  .diary-v2-poster-text span { font-size: 37px; }
+  .diary-v2-poster-text strong { font-size: 45px; }
+  .diary-v2-metric strong { font-size: 40px; }
+  .diary-v2-plan { padding: 25px; }
+  .diary-v2-process-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .diary-v2-faq-grid { gap: 45px; }
+}
+@media (max-width: 700px) {
+  .diary-v2-container { width: min(100% - 36px, 540px); }
+  .diary-v2-header-inner { width: calc(100% - 32px); min-height: 68px; }
+  .diary-v2-brand { font-size: 17px; gap: 8px; }
+  .diary-v2-brand-symbol { width: 38px; height: 38px; font-size: 20px; }
+  .diary-v2-brand small { font-size: 7px; }
+  .diary-v2-header-cta { padding: 12px 14px; font-size: 11px; }
+  .diary-v2-nav { display: none; }
+  .diary-v2-hero-inner { grid-template-columns: 1fr; width: calc(100% - 36px); padding-block: 62px 45px; gap: 30px; }
+  .diary-v2-hero h1 { font-size: clamp(42px,9.4vw,65px); white-space: normal; }
+  .diary-v2-hero-lead { font-size: 13px; }
+  .diary-v2-hero-promise { margin-top: 22px; }
+  .diary-v2-poster { min-height: 370px; max-width: 480px; border-radius: 160px 160px 12px 12px; justify-self: center; }
+  .diary-v2-poster-disc { top: 65px; }
+  .diary-v2-poster-text { top: 37%; }
+  .diary-v2-poster-text span { font-size: clamp(36px,8.4vw,51px); }
+  .diary-v2-poster-text strong { font-size: clamp(46px,10.2vw,61px); }
+  .diary-v2-poster-top { top: 27px; }
+  .diary-v2-hero-edge { display: none; }
+  .diary-v2-price-ribbon-inner { display: grid; grid-template-columns: 1fr auto; padding-block: 25px; gap: 12px; }
+  .diary-v2-ribbon-tag { grid-column: 1/-1; }
+  .diary-v2-ribbon-price { grid-column: 1/-1; }
+  .diary-v2-ribbon-desc { font-size: 11px; }
+  .diary-v2-ribbon-link { align-self: center; }
+  .diary-v2-section { padding-block: 76px; }
+  .diary-v2-section-head { display: block; margin-bottom: 31px; }
+  .diary-v2-section-head > p, .diary-v2-section-aside { max-width: none; margin-top: 22px; }
+  .diary-v2 h2 { font-size: clamp(36px,8vw,49px); }
+  .diary-v2-section-label { margin-bottom: 22px; }
+  .diary-v2-metrics { grid-template-columns: 1fr; gap: 9px; }
+  .diary-v2-metric { padding: 22px; }
+  .diary-v2-metric strong { font-size: 49px; }
+  .diary-v2-plans { grid-template-columns: 1fr; gap: 15px; }
+  .diary-v2-package-foot { display: block; }
+  .diary-v2-package-foot a { display: block; margin-top: 15px; }
+  .diary-v2-story-grid { grid-template-columns: 1fr; gap: 32px; }
+  .diary-v2-story-visual { min-height: 330px; padding: 45px 30px; }
+  .diary-v2-process-grid { gap: 10px; }
+  .diary-v2-process-grid li { padding: 20px 17px; }
+  .diary-v2-process-grid h3 { font-size: 16px; margin-top: 19px; }
+  .diary-v2-faq-grid { grid-template-columns: 1fr; gap: 36px; }
+  .diary-v2-end-inner { padding-block: 85px 95px; }
+  .diary-v2-end h2 { font-size: clamp(36px,8vw,54px); }
+  .diary-v2-footer > div { grid-template-columns: 1fr; gap: 23px; padding-block: 46px 110px; }
+  .diary-v2-footer nav { justify-content: flex-start; }
+  .diary-v2-mobile-cta { position: fixed; z-index: 42; display: flex; justify-content: space-between; align-items: center; bottom: 0; left: 0; right: 0; padding: 11px max(16px,env(safe-area-inset-left)) calc(11px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-right)); background: rgba(252,250,245,.97); backdrop-filter: blur(20px); border-top: 1px solid #d7ddd3; box-shadow: 0 -6px 25px #192b1e15; gap: 15px; }
+  .diary-v2-mobile-cta > span { min-width: 0; }
+  .diary-v2-mobile-cta strong { display: block; font-size: 12px; white-space: nowrap; letter-spacing: -.05em; }
+  .diary-v2-mobile-cta small { display: block; color: #667568; margin-top: 4px; font-size: 10px; }
+  .diary-v2-mobile-cta a { flex-shrink: 0; border-radius: 100px; background: #1c3929; color: #fff; padding: 14px 19px; font-weight: 850; font-size: 12px; }
+  .diary-v2 .diary-services-hero { padding: 66px 18px 66px; }
+  .diary-v2 .diary-services-hero h1 { font-size: clamp(38px,9vw,53px); }
+  .diary-v2 .diary-pricing-section { padding: 68px 18px; }
+  .diary-v2 .diary-form-page { padding: 55px 18px 15px; }
+  .diary-v2 .diary-form-head h1 { font-size: 42px; }
+  .diary-v2 .diary-inquiry-form { padding: 22px 17px; }
+}
+@media (max-width: 370px) {
+  .diary-v2-header-cta { padding: 10px 12px; }
+  .diary-v2-brand { font-size: 15px; }
+  .diary-v2-hero h1 { font-size: 39px; }
+  .diary-v2-poster { min-height: 330px; }
+  .diary-v2-poster-top, .diary-v2-poster-bottom { left: 20px; right: 20px; }
+  .diary-v2-ribbon-price strong { font-size: 29px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diary-v2 *, .diary-v2 *::before, .diary-v2 *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+}
