@@ -125,10 +125,10 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
       </div>
       <fieldset className="diary-request-brief">
         <legend>お店のPRで伝えてほしいこと</legend>
-        <label>紹介してほしい内容 {inquiryKind === "application" ? <em>必須</em> : <span>任意</span>}
-          <textarea name="desired_coverage" rows={4} maxLength={1200} required={inquiryKind === "application"} placeholder="例：看板料理や店内のこだわり、家族連れにも利用しやすいポイントなど" />
+        <label>特に伝えてほしいポイント・PRで押してほしい点 {inquiryKind === "application" ? <em>必須</em> : <span>任意</span>}
+          <textarea name="desired_coverage" rows={4} maxLength={1200} required={inquiryKind === "application"} placeholder="例：看板の和牛の柔らかさを伝えたい／ランチのコスパ／デートに使いやすい落ち着いた雰囲気。表現は実際の体験に基づいて制作します。" />
         </label>
-        <label>特に紹介してほしいメニュー <span>任意</span>
+        <label>紹介希望メニュー・料理・コース <span>任意</span>
           <input name="featured_menu" maxLength={500} placeholder="例：季節限定コース、新作のランチ" />
         </label>
         <label>届けたい相手・PRの目的 <span>任意</span>
