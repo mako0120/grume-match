@@ -17,7 +17,7 @@ const offerings = [
     title: "写真フィードPR",
     description: "訪問・撮影・編集・キャプション作成から、Instagramフィード1投稿の公開まで。",
     includes: ["店舗を訪問して撮影", "写真の選定・編集", "キャプション・PR表記", "Instagramへのフィード投稿1件"],
-    note: "投稿内の写真枚数に応じた料金設定はありません。紹介内容は事前に合意します。",
+    note: "いつものInstagram投稿と同じスタイルで制作します。画像枚数で料金は変わりません。",
   },
   {
     id: "instagram_feed_video",
@@ -67,7 +67,7 @@ export default function DiaryServices() {
 
         <section className="diary-pricing-section diary-v2-pricing-section" id="pricing">
           <div className="diary-v2-container">
-            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">01 / CLEAR PRICING</span><h2>わかりやすい、<br /><em>投稿単位の料金。</em></h2></div><p>一投稿に込める内容を大切に。画像枚数で区切るのではなく、何を伝えるかを相談して決めます。</p></div>
+            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">01 / CLEAR PRICING</span><h2>わかりやすい、<br /><em>投稿単位の料金。</em></h2></div><p>普段のInstagram投稿と同じ流れで制作します。写真の枚数や細かな撮影指示を決めていただく必要はありません。</p></div>
             <DiaryPricingPanel />
           </div>
         </section>
@@ -92,7 +92,8 @@ export default function DiaryServices() {
                 </article>
               ))}
             </div>
-            <p className="diary-v2-service-disclaimer">グルメ日誌への直接依頼として、写真フィードの基本料金は投稿1件の制作・公開を対象とします。追加媒体・交通費・素材の二次利用等は個別にご案内し、契約前に合意します。食べログやGoogleマップへの対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。</p>
+            <p className="diary-v2-service-disclaimer">グルメ日誌への直接依頼として、写真フィードの基本料金は投稿1件の制作・公開を対象とします。来店日時・紹介希望メニュー・追加媒体・交通費・素材の二次利用等は必要に応じて確認し、契約前に合意します。食べログやGoogleマップへの対価付き口コミ、高評価の指定、ステルスマーケティングはお受けしていません。</p>
+            <aside className="diary-v2-photo-privacy" aria-label="店内撮影で大切にしていること"><span aria-hidden="true">✳</span><div><strong>お食事中のお客様への配慮を徹底します。</strong><p>料理や店内の雰囲気を中心に撮影します。お客様やスタッフが特定される顔・声・個人情報は、許可なく投稿しません。写り込みがある場合は撮り直し・切り取り・ぼかし等で対応し、適切に処理できない素材は掲載しません。</p><Link href="/diary/policy">撮影・PRの方針を見る ↗</Link></div></aside>
           </div>
         </section>
 
@@ -109,6 +110,7 @@ export default function DiaryServices() {
             <div className="diary-v2-questions">
               <details><summary>フィード投稿の画像枚数で料金は変わりますか？<span aria-hidden="true">＋</span></summary><p>変わりません。料金単位は公開するInstagramフィード投稿1件です。使用する画像や紹介内容は事前にご相談いただきます。</p></details>
               <details><summary>動画制作も依頼できますか？<span aria-hidden="true">＋</span></summary><p>はい。写真フィード投稿に動画を加えるプランは15,000円（税込）からです。尺、制作物、投稿形態などは見積もり時に確認します。</p></details>
+              <details><summary>お客様の顔が映ることはありませんか？<span aria-hidden="true">＋</span></summary><p>一般のお客様が識別できる映像を必要な許可なく投稿しない方針です。撮影時は背景の写り込みにも気を配り、編集での除外・ぼかしを行います。十分な配慮ができない場合は、その素材を使いません。</p></details>
               <details><summary>申込み後すぐに料金が発生しますか？<span aria-hidden="true">＋</span></summary><p>フォームの送信だけでは契約は成立しません。提案された日時・制作内容・料金に双方が合意したあと確定します。お支払いは投稿公開後7日以内の後払いを基本としています。</p></details>
             </div>
           </div>
