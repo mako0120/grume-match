@@ -29,12 +29,13 @@ export default function DiaryHomePage() {
               <span className="diary-v2-eyebrow"><span aria-hidden="true" className="diary-v2-spark" /> OSAKA × GOURMET × STORYTELLING</span>
               <p className="diary-v2-hero-kicker">おいしい、を届ける仕事。</p>
               <h1 id="diary-v2-hero-heading">まだ知らない<br /><span>「おいしい」</span>を、<br />次の出会いへ。</h1>
-              <p className="diary-v2-hero-lead">料理の魅力も、お店の空気も。一皿に込められた想いを、写真と言葉に。大阪のグルメ日誌が、訪れてみたくなるInstagram投稿を制作します。</p>
+              <p className="diary-v2-hero-lead">大阪の飲食店向けInstagram PR。グルメ日誌本人が来店し、撮影・編集・投稿まで対応します。写真フィードは1投稿8,000円（税込）から。新メニューも、お店ならではの魅力も、丁寧に届けます。</p>
               <div className="diary-v2-hero-actions">
                 <Link className="diary-v2-button diary-v2-button-accent" href="/diary/request?intent=consultation">無料でPR相談する <span aria-hidden="true">↗</span></Link>
                 <a className="diary-v2-text-link" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る <span aria-hidden="true">↗</span></a>
               </div>
               <div className="diary-v2-hero-promise"><span aria-hidden="true">✳</span> グルメ日誌本人が直接対応 <span aria-hidden="true">·</span> 相談・見積もり無料</div>
+              <div className="diary-hero-trust" aria-label="ご依頼前の安心ポイント"><span>投稿前に内容・費用を確認</span><span>実際のInstagram投稿を公開</span><span>公開後の後払い</span></div>
             </div>
             <div className="diary-v2-poster" aria-label="グルメ日誌 大阪のブランドビジュアル">
               <span className="diary-v2-poster-top">A GOOD MEAL, A GOOD STORY. <span>001 / OSAKA</span></span>
@@ -52,6 +53,21 @@ export default function DiaryHomePage() {
             <div className="diary-v2-ribbon-price"><small>Instagram写真フィード</small><strong>1投稿 <em>{formatDiaryYen(price.amountYen)}</em></strong><span>税込・基本料金</span></div>
             <div className="diary-v2-ribbon-desc">投稿内の画像枚数で料金は変わりません。<br />動画込みは{formatDiaryYen(videoPrice)}〜。</div>
             <Link href="/diary/services#pricing" className="diary-v2-ribbon-link">プラン詳細 <span aria-hidden="true">↗</span></Link>
+          </div>
+        </section>
+
+        <section className="diary-v2-section diary-usecases" id="consultation-themes" aria-labelledby="diary-usecases-title">
+          <div className="diary-v2-container">
+            <div className="diary-v2-section-head">
+              <div><span className="diary-v2-section-label">WHAT WOULD YOU LIKE TO SHARE?</span><h2 id="diary-usecases-title">こんな「伝えたい」から、<br /><em>気軽に相談できます。</em></h2></div>
+              <p>まだ企画が固まっていなくても大丈夫。お店の目的を伺い、適切な見せ方を相談します。</p>
+            </div>
+            <div className="diary-usecases-grid">
+              <article className="diary-usecase"><span>01 / NEW MENU</span><h3>新メニューを<br />知ってもらいたい</h3><p>新作ランチや季節限定コースなど、今伝えたい料理を中心に紹介したい店舗様へ。</p><Link href="/diary/request?intent=consultation&goal=new_menu">この内容を相談する ↗</Link></article>
+              <article className="diary-usecase"><span>02 / FIRST IMPRESSION</span><h3>初めてのお客様に<br />お店を知ってほしい</h3><p>アクセスや店内の雰囲気、人気メニューをまとめて魅力を届けたい店舗様へ。</p><Link href="/diary/request?intent=consultation&goal=first_visit">この内容を相談する ↗</Link></article>
+              <article className="diary-usecase"><span>03 / STORYTELLING</span><h3>料理やお店のこだわりを<br />伝えたい</h3><p>素材や調理法、空間づくりなど、価格だけでは伝わらない魅力を見せたい店舗様へ。</p><Link href="/diary/request?intent=consultation&goal=story">この内容を相談する ↗</Link></article>
+            </div>
+            <div className="diary-value-stripe" aria-label="PR依頼の安心ポイント"><div><b>01</b><span>ご相談・見積もり無料</span></div><div><b>02</b><span>合意するまで契約なし</span></div><div><b>03</b><span>公開後7日以内の後払い</span></div></div>
           </div>
         </section>
 
