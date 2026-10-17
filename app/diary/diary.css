@@ -453,44 +453,12 @@
   .diary-editorial-steps strong { font-size: 14px; }
 }
 
-/* Verified Canva work samples and scoped creator-service price ranges */
-.diary-canva-samples {
+/* Instagram-only public PR price guide */
+.diary-pricing-section {
   padding: 100px 32px 108px;
   max-width: 1304px;
   margin: auto;
 }
-.diary-portfolio-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
-.diary-work-card { overflow: hidden; background: #fff; border: 1px solid #e3e2d8; border-radius: 15px; min-width: 0; display: flex; flex-direction: column; }
-.diary-work-cover {
-  position: relative;
-  min-height: 355px;
-  padding: 20px 23px 24px;
-  color: #fffdf4;
-  background: radial-gradient(circle at 88% 82%,rgba(255,244,210,.13) 0 28%,transparent 28.5%),
-    linear-gradient(138deg,#1c3c32,#73856a);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-.diary-work-card:nth-child(2) .diary-work-cover { background: radial-gradient(circle at 80% 72%,#d3b185 0 28%,transparent 28.5%),linear-gradient(140deg,#385b61,#142d40); }
-.diary-work-card:nth-child(3) .diary-work-cover { background: radial-gradient(circle at 80% 72%,#db9b74 0 25%,transparent 25.5%),linear-gradient(145deg,#713c2c,#292724); }
-.diary-work-cover-meta { display: flex; align-items: flex-start; justify-content: space-between; position: absolute; top: 25px; left: 23px; right: 22px; gap: 10px; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
-.diary-work-cover-meta span:last-child { font-size: 8px; text-align: right; max-width: 110px; }
-.diary-work-cover-type { font-size: 11px; font-weight: 750; color: #f8debc; margin: 0 0 15px; }
-.diary-work-cover strong { font-size: clamp(24px,2.5vw,34px); line-height: 1.45; font-weight: 900; letter-spacing: -.05em; z-index: 1; }
-.diary-work-cover-hook { max-width: 250px; margin-top: 13px; font-size: 12px; line-height: 1.7; font-weight: 800; color: #f9e5bf; z-index: 1; }
-.diary-work-cover-number { font-size: 40px; font-weight: 900; letter-spacing: -.07em; margin-top: 25px; z-index: 1; }
-.diary-work-cover-number small { font-size: 9px; letter-spacing: .1em; }
-.diary-work-cover-foot { font-size: 9px; letter-spacing: .12em; color: #e3dfce; margin-top: 5px; }
-.diary-work-card-info { padding: 24px 24px 26px; display: flex; flex-direction: column; flex: 1; }
-.diary-work-card-top { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; font-weight: 850; color: var(--diary-orange); letter-spacing: .04em; }
-.diary-work-card-info h3 { font-size: 22px; margin: 19px 0 8px; letter-spacing: -.04em; }
-.diary-work-card-info p { color: var(--diary-muted); line-height: 1.85; font-size: 12px; }
-.diary-work-card-info ul { margin: 3px 0 24px; padding-left: 18px; color: #536052; line-height: 1.8; font-size: 11px; }
-.diary-work-link { margin-top: auto; border-top: 1px solid var(--diary-line); display: flex; justify-content: space-between; align-items: center; padding-top: 18px; color: var(--diary-orange); font-size: 12px; font-weight: 900; }
-.diary-work-link span { font-size: 18px; }
-.diary-portfolio-note { margin: 18px 0 8px; font-size: 11px; line-height: 1.9; color: var(--diary-muted); }
-.diary-work-after { margin: 26px 0 0; display: flex; justify-content: center; }
 .diary-portfolio-price { margin-top: 62px; padding: 37px 38px; border-radius: 17px; background: #edece4; }
 .diary-portfolio-price-head { display: grid; grid-template-columns: 1.5fr 1fr; align-items: end; gap: 25px; }
 .diary-portfolio-price-head h3 { font-size: clamp(25px,3vw,35px); line-height: 1.55; letter-spacing: -.05em; margin: 15px 0 0; }
@@ -503,24 +471,14 @@
 .diary-price-tier p { font-size: 12px; line-height: 1.85; color: var(--diary-muted); margin: 14px 0 0; }
 .diary-price-conditions { font-size: 11px; line-height: 1.9; color: var(--diary-muted); margin: 19px 0; }
 @media (max-width: 980px) {
-  .diary-portfolio-grid { gap: 13px; }
-  .diary-work-cover { padding: 21px 17px; }
-  .diary-work-cover-meta { left: 17px; right: 17px; }
-  .diary-work-card-info { padding: 19px 15px 22px; }
   .diary-price-tier { padding: 20px 15px; }
   .diary-price-tier strong { font-size: clamp(17px,2.3vw,24px); }
 }
 @media (max-width: 720px) {
-  .diary-canva-samples { padding: 74px 18px; }
-  .diary-portfolio-grid { grid-template-columns: 1fr; gap: 18px; }
-  .diary-work-card { width: 100%; max-width: 470px; margin: auto; }
-  .diary-work-cover { min-height: 325px; }
-  .diary-work-card-info { padding: 22px; }
-  .diary-work-cover strong { font-size: 30px; }
+  .diary-pricing-section { padding: 74px 18px; }
   .diary-portfolio-price { padding: 26px 17px; margin-top: 40px; }
   .diary-portfolio-price-head, .diary-portfolio-price-grid { grid-template-columns: 1fr; }
   .diary-price-tier strong { font-size: 29px; }
-  .diary-work-after .diary-button { max-width: 100%; }
 }
 
 /* Transparent first-party 8,000-yen PR price, follower-based future revision */
