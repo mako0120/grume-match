@@ -375,3 +375,59 @@
 @media (max-width: 700px) {
  .diary-v2 .diary-v2-goal-context { padding: 12px 15px; }
 }
+
+/* Trust-first on-location shoot policy for restaurant businesses. */
+.diary-v2 .diary-v2-photo-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 21px;
+  background: #e8eee4;
+  border: 1px solid #cdddc9;
+  border-radius: 18px;
+  padding: 27px 30px;
+  margin-top: 25px;
+}
+.diary-v2 .diary-v2-photo-privacy > span {
+  flex-shrink: 0;
+  color: #468063;
+  font-size: 29px;
+  line-height: 1;
+}
+.diary-v2 .diary-v2-photo-privacy strong {
+  font-size: clamp(16px,2vw,20px);
+  color: #294f37;
+}
+.diary-v2 .diary-v2-photo-privacy p {
+  max-width: 770px;
+  color: #506b59;
+  font-size: 12px;
+  line-height: 2;
+  margin: 10px 0 12px;
+}
+.diary-v2 .diary-v2-photo-privacy a {
+  font-size: 12px;
+  font-weight: 850;
+  color: #316647;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.diary-v2 .diary-photo-privacy-note {
+  font-size: 12px;
+  color: #475f4f;
+  background: #eff4ed;
+  border-left: 3px solid #6c9a76;
+  border-radius: 8px;
+  padding: 16px 19px;
+  line-height: 1.9;
+  margin: 0;
+}
+.diary-v2 .diary-photo-privacy-note a {
+  color: #316647;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width:700px) {
+  .diary-v2 .diary-v2-photo-privacy { padding: 21px 19px; gap: 14px; }
+  .diary-v2 .diary-v2-photo-privacy > span { font-size: 23px; }
+}
