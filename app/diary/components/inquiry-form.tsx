@@ -80,7 +80,11 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
           </label>
         </div>
       </fieldset>
-      <div className="diary-form-section-title"><span>01</span><h2>お店・ご担当者様の情報</h2></div>
+      <div className="diary-conversion-intro">
+        <span>ご相談に必要な内容だけで大丈夫です</span>
+        <p>{inquiryKind === "consultation" ? "まずは店舗名・連絡先・相談したいことだけ。詳細はあとから相談できます。" : "正式な申込みに向けて、希望する投稿内容と日時をお聞かせください。"}</p>
+      </div>
+      <div className="diary-form-section-title"><span>01</span><h2>お店・ご担当者様</h2></div>
       <div className="diary-input-grid">
         <label>店舗・企業名 <em>必須</em>
           <input name="restaurant_name" required maxLength={100} placeholder="例：大阪食堂" autoComplete="organization" />
@@ -91,61 +95,86 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
         <label>メールアドレス <em>必須</em>
           <input name="email" type="email" required maxLength={254} placeholder="hello@example.com" autoComplete="email" />
         </label>
-        <label>お電話番号 <span>任意</span>
-          <input name="phone" type="tel" maxLength={30} placeholder="06-1234-5678" autoComplete="tel" />
-        </label>
+        {inquiryKind === "application" ? (
+          <label>お電話番号 <span>任意</span>
+            <input name="phone" type="tel" maxLength={30} placeholder="例：06-1234-5678" autoComplete="tel" />
+          </label>
+        ) : null}
       </div>
-      <label>お店のInstagram URL <span>任意</span>
-        <input name="instagram_url" type="url" maxLength={250} placeholder="https://www.instagram.com/..." />
-      </label>
-      <div className="diary-form-section-title"><span>02</span><h2>PRについてのご希望</h2></div>
-      <p className="diary-brief-help">グルメ日誌本人へのご依頼です。<Link href="/diary/services">制作内容と実際の投稿例はこちら ↗</Link></p>
-      <div className="diary-input-grid">
-        <label>ご希望の内容 <em>必須</em>
-          <select name="service" defaultValue={initialService} required>
-            <option value="" disabled>選択してください</option>
-            <option value="instagram_feed">Instagramフィード投稿</option>
-            <option value="instagram_feed_video">フィード投稿＋ショート動画（15,000円〜）</option>
-            <option value="instagram_reel">Instagramリール</option>
-            <option value="instagram_stories">ストーリーズ</option>
-            <option value="photo_video">写真・動画素材の撮影</option>
-            <option value="consultation">まずは相談したい</option>
-          </select>
-        </label>
-        <label>ご予算の目安 <em>必須</em>
-          <select name="budget" defaultValue="" required>
-            <option value="" disabled>選択してください</option>
-            <option value="undecided">相談して決めたい</option>
-            <option value="under_10000">1万円未満</option>
-            <option value="10000_30000">1万円〜3万円</option>
-            <option value="30000_50000">3万円〜5万円</option>
-            <option value="over_50000">5万円以上</option>
-          </select>
-        </label>
-      </div>
-      <fieldset className="diary-request-brief">
-        <legend>お店のPRで伝えてほしいこと</legend>
-        <label>特に伝えてほしいポイント・PRで押してほしい点 {inquiryKind === "application" ? <em>必須</em> : <span>任意</span>}
-          <textarea name="desired_coverage" rows={4} maxLength={1200} required={inquiryKind === "application"} placeholder="例：看板の和牛の柔らかさを伝えたい／ランチのコスパ／デートに使いやすい落ち着いた雰囲気。表現は実際の体験に基づいて制作します。" />
-        </label>
-        <label>紹介希望メニュー・料理・コース <span>任意</span>
-          <input name="featured_menu" maxLength={500} placeholder="例：季節限定コース、新作のランチ" />
-        </label>
-        <label>届けたい相手・PRの目的 <span>任意</span>
-          <textarea name="requested_outcome" rows={3} maxLength={500} placeholder="例：大阪の20〜30代に新メニューを知ってほしい" />
-        </label>
-        <label>店舗様が対応可能な日時（候補） <span>任意</span>
-          <textarea name="visit_preference" rows={3} maxLength={600} placeholder="例：11/4(水)・11/6(金) 18:00〜20:00。まだ未定でも構いません。" />
-        </label>
-      </fieldset>
-      <label>ご希望の時期 <span>任意</span>
-        <input name="desired_period" maxLength={120} placeholder="例：11月中、日程は相談" />
-      </label>
+      {inquiryKind === "application" ? (
+        <>
+          <label>お店のInstagram URL <span>任意</span>
+            <input name="instagram_url" type="url" maxLength={250} placeholder="https://www.instagram.com/..." />
+          </label>
+          <div className="diary-form-section-title"><span>02</span><h2>PRのご希望</h2></div>
+          <p className="diary-brief-help">グルメ日誌本人へのご依頼です。<Link href="/diary/services">サービス内容とInstagramの投稿実例を見る ↗</Link></p>
+          <div className="diary-input-grid">
+            <label>ご希望の内容 <em>必須</em>
+              <select name="service" defaultValue={initialService} required>
+                <option value="" disabled>選択してください</option>
+                <option value="instagram_feed">写真フィードPR：1投稿8,000円〜</option>
+                <option value="instagram_feed_video">フィード投稿＋ショート動画：15,000円〜</option>
+                <option value="instagram_reel">Instagramリール：お見積もり</option>
+                <option value="instagram_stories">ストーリーズ：お見積もり</option>
+                <option value="photo_video">写真・動画素材の撮影：お見積もり</option>
+                <option value="consultation">まずは相談したい</option>
+              </select>
+            </label>
+            <label>ご予算の目安 <em>必須</em>
+              <select name="budget" defaultValue="undecided" required>
+                <option value="undecided">相談して決めたい</option>
+                <option value="under_10000">1万円未満</option>
+                <option value="10000_30000">1万円〜3万円</option>
+                <option value="30000_50000">3万円〜5万円</option>
+                <option value="over_50000">5万円以上</option>
+              </select>
+            </label>
+          </div>
+          <fieldset className="diary-request-brief">
+            <legend>お店のPRで伝えてほしいこと</legend>
+            <label>特に伝えてほしいポイント・PRで押してほしい点 <em>必須</em>
+              <textarea name="desired_coverage" rows={3} maxLength={1200} required placeholder="例：看板メニューの特徴、ランチの魅力、落ち着いた店内。実体験に基づいて発信します。" />
+            </label>
+            <label>紹介希望メニュー・料理・コース <span>任意</span>
+              <input name="featured_menu" maxLength={500} placeholder="例：季節限定コース、新作ランチ" />
+            </label>
+            <label>届けたい相手・PRの目的 <span>任意</span>
+              <textarea name="requested_outcome" rows={2} maxLength={500} placeholder="例：近隣の20〜30代に新メニューを知ってほしい" />
+            </label>
+            <label>店舗様が対応可能な日時（候補） <span>任意</span>
+              <textarea name="visit_preference" rows={2} maxLength={600} placeholder="例：平日18時以降。未定でも構いません。" />
+            </label>
+          </fieldset>
+          <label>ご希望の時期 <span>任意</span>
+            <input name="desired_period" maxLength={120} placeholder="例：11月中、日程は相談" />
+          </label>
+        </>
+      ) : (
+        <>
+          <input type="hidden" name="service" value="consultation" />
+          <input type="hidden" name="budget" value="undecided" />
+        </>
+      )}
+      <div className="diary-form-section-title"><span>{inquiryKind === "consultation" ? "02" : "03"}</span><h2>{inquiryKind === "consultation" ? "どんなことを相談したいですか？" : "ご相談の詳細"}</h2></div>
       <label>お店の魅力・ご相談内容 <em>必須</em>
-        <textarea name="message" required minLength={10} maxLength={2000} rows={6} placeholder="お店の特徴、紹介してほしいメニュー、ご希望の投稿イメージなどを自由にお書きください。" />
+        <textarea name="message" required minLength={10} maxLength={2000} rows={inquiryKind === "consultation" ? 4 : 5} placeholder={inquiryKind === "consultation" ? "例：新しいランチメニューをInstagramで紹介してほしいです。料金と流れを教えてください。" : "お店の特徴、紹介してほしいメニュー、ご希望の投稿イメージなどをお書きください。"} />
       </label>
-      <section className="diary-compliance" aria-label="お受けできない案件">
-        <strong>安心してご依頼いただくために</strong>
+      {inquiryKind === "consultation" ? (
+        <details className="diary-extra-details">
+          <summary>伝えたいことを詳しく書く（任意） <span aria-hidden="true">＋</span></summary>
+          <div className="diary-extra-details-body">
+            <label>お電話番号 <span>任意</span><input name="phone" type="tel" maxLength={30} autoComplete="tel" placeholder="例：06-1234-5678" /></label>
+            <label>お店のInstagram URL <span>任意</span><input name="instagram_url" type="url" maxLength={250} placeholder="https://www.instagram.com/..." /></label>
+            <label>特に伝えてほしいポイント <span>任意</span><textarea name="desired_coverage" rows={2} maxLength={1200} placeholder="例：料理の特徴や雰囲気" /></label>
+            <label>紹介希望メニュー・料理・コース <span>任意</span><input name="featured_menu" maxLength={500} placeholder="例：季節の限定メニュー" /></label>
+            <label>PRの目的・届けたい相手 <span>任意</span><textarea name="requested_outcome" rows={2} maxLength={500} placeholder="例：近隣の方への認知拡大" /></label>
+            <label>来店候補日時 <span>任意</span><textarea name="visit_preference" rows={2} maxLength={600} placeholder="例：平日18時以降" /></label>
+            <label>ご希望の時期 <span>任意</span><input name="desired_period" maxLength={120} placeholder="例：11月頃" /></label>
+          </div>
+        </details>
+      ) : null}
+      <details className="diary-compliance diary-policy-details" aria-label="お受けできない案件">
+        <summary>案件受注のルールを確認する <span aria-hidden="true">＋</span></summary><strong>安心してご依頼いただくために</strong>
         <p>当アカウントでは、次のご依頼はお受けしておりません。</p>
         <ul>
           <li>食べログ・Googleマップ等への報酬や飲食提供を条件とする口コミ・評価投稿</li>
@@ -154,7 +183,7 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
         </ul>
         <p>実体験に基づき、必要なPR表示をしたInstagram投稿などを制作いたします。</p>
         <Link href="/diary/policy">案件受注ポリシーを確認する ↗</Link>
-      </section>
+      </details>
       <div className="diary-honeypot" aria-hidden="true">
         <label>Webサイト <input name="website" tabIndex={-1} autoComplete="off" /></label>
       </div>
@@ -170,8 +199,8 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
         <div className="cf-turnstile" data-sitekey={siteKey} />
       </div>
       <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" />
-      {error ? <p role="alert" className="diary-error">{error}</p> : null}
-      <button className="diary-button diary-button-primary diary-submit" type="submit" disabled={pending}>{pending ? "送信中..." : "無料でPRを相談する"} <span>↗</span></button>
+      {error ? <p role="alert" aria-live="assertive" className="diary-error">{error}</p> : null}
+      <button className="diary-button diary-button-primary diary-submit" type="submit" disabled={pending}>{pending ? "送信中..." : inquiryKind === "consultation" ? "無料相談を送信する" : "申込み内容を送信する"} <span>↗</span></button>
       <p className="diary-submit-foot">{inquiryKind === "consultation" ? "事前相談は無料です。": "お申し込み後、内容確認と日程提案を行います。"} 日程確認・報酬・制作範囲の合意まで契約は確定しません。支払いは投稿公開後7日以内を基本とし、合意した条件を優先します。</p>
     </form>
   );
