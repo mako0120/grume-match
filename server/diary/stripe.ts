@@ -4,7 +4,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 const ROOT = "https://api.stripe.com/v1";
 
 export function stripeDiaryConfigured(): boolean {
-  // Deliberate standalone credentials. NEVER reuse BASE/eBay Stripe keys.
+  // A shared Stripe account is allowed by owner choice. Diary invoices must
+  // have diary-specific metadata and are never merged with BASE/eBay records.
   return process.env.DIARY_STRIPE_ENABLED === "true" &&
     !!process.env.DIARY_STRIPE_SECRET_KEY?.startsWith("sk_") &&
     !!process.env.DIARY_STRIPE_ACCOUNT_ID?.startsWith("acct_");
@@ -16,11 +17,11 @@ type StripeCallOptions = {
   idempotencyKey?: string;
 };
 export async function diaryStripeApi<T>(path: string, options: StripeCallOptions = {}): Promise<T> {
-  if (!stripeDiaryConfigured()) throw new Error("Dedicated Diary Stripe account is disabled or missing");
+  if (!stripeDiaryConfigured()) throw new Error("Diary Stripe billing is disabled or missing");
   if (!path.startsWith("/") || path.includes("://")) throw new Error("Invalid Stripe path");
   const key = process.env.DIARY_STRIPE_SECRET_KEY!;
-  // A key belongs to one Stripe account. Verify it before every billable operation:
-  // this must NEVER silently write invoices to the unrelated BASE/eBay account.
+  // Verify the key matches the explicitly approved shared Stripe account.
+  // This operation is disabled unless the user enables DIARY_STRIPE_ENABLED.
   const accountResponse = await fetch(ROOT + "/account", {
     headers: { Authorization: "Bearer " + key },
     signal: AbortSignal.timeout(10000), cache: "no-store",
