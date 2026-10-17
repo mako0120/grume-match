@@ -134,7 +134,7 @@ export default function DiaryHomePage() {
 
         <section className="diary-v2-end" aria-labelledby="diary-v2-cta-title">
           <div className="diary-v2-container diary-v2-end-inner">
-            <span className="diary-v2-section-label">LET'S TELL YOUR STORY</span>
+            <span className="diary-v2-section-label">LET US TELL YOUR STORY</span>
             <h2 id="diary-v2-cta-title">その「おいしい」を、<br />一緒に届けませんか。</h2>
             <p>まずは、お店のことを聞かせてください。</p>
             <div className="diary-v2-end-actions"><Link href="/diary/request?intent=consultation" className="diary-v2-button diary-v2-button-accent">無料で相談する ↗</Link><Link href="/diary/services" className="diary-v2-text-link">料金・サービスを確認する ↗</Link></div>
