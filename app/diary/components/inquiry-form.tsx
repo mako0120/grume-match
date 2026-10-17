@@ -5,7 +5,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "consultation" }: { enabled: boolean; initialService?: string; initialKind?: "consultation" | "application" }) {
+export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "consultation", initialGoal = "" }: { enabled: boolean; initialService?: string; initialKind?: "consultation" | "application"; initialGoal?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">(initialKind);
@@ -157,7 +157,7 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
       )}
       <div className="diary-form-section-title"><span>{inquiryKind === "consultation" ? "02" : "03"}</span><h2>{inquiryKind === "consultation" ? "どんなことを相談したいですか？" : "ご相談の詳細"}</h2></div>
       <label>お店の魅力・ご相談内容 <em>必須</em>
-        <textarea name="message" required minLength={10} maxLength={2000} rows={inquiryKind === "consultation" ? 4 : 5} placeholder={inquiryKind === "consultation" ? "例：新しいランチメニューをInstagramで紹介してほしいです。料金と流れを教えてください。" : "お店の特徴、紹介してほしいメニュー、ご希望の投稿イメージなどをお書きください。"} />
+        <textarea name="message" required minLength={10} maxLength={2000} rows={inquiryKind === "consultation" ? 4 : 5} placeholder={inquiryKind === "consultation" ? (initialGoal ? `例：${initialGoal}です。料金や制作の流れを教えてください。` : "例：新しいランチメニューをInstagramで紹介してほしいです。料金と流れを教えてください。") : "お店の特徴、紹介してほしいメニュー、ご希望の投稿イメージなどをお書きください。"} />
       </label>
       {inquiryKind === "consultation" ? (
         <details className="diary-extra-details">
