@@ -39,7 +39,7 @@ test("application keeps meaningful brief and verified price while consultation s
   assert.ok(form.includes('name="desired_coverage" rows={3} maxLength={1200} required'));
   assert.ok(form.includes('name="budget" defaultValue="undecided" required'));
   assert.match(schema, /inquiry_kind === "application" && !desired_coverage/);
-  assert.match(home, /投稿前に内容・費用を確認/);
+  assert.match(home, /内容・費用は事前に合意/);
   assert.match(home, /合意するまで契約なし/);
 });
 
