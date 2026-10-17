@@ -365,3 +365,13 @@
   .diary-v2 .diary-extra-details-body { padding: 16px; }
   .diary-v2 .diary-post-embed-container iframe { min-height: 430px; }
 }
+
+/* Non-invasive personalization: theme selected by a public goal link. */
+.diary-v2 .diary-v2-goal-context { background: #eaf2e8; color: #31513b; border: 1px solid #d4e3d2; border-radius: 10px; padding: 13px 18px; margin-bottom: 17px; font-size: 12px; line-height: 1.8; }
+.diary-v2 .diary-v2-goal-context strong { font-size: 13px; }
+.diary-v2 .diary-form-section-title h2 { text-wrap: pretty; }
+.diary-v2 .diary-hero-trust { margin-top: 25px; }
+.diary-v2 .diary-extra-details-body textarea { min-height: 80px; }
+@media (max-width: 700px) {
+ .diary-v2 .diary-v2-goal-context { padding: 12px 15px; }
+}
