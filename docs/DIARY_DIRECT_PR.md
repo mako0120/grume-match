@@ -86,20 +86,15 @@ Scope:
 - Instagram embed is third-party content: an iframe is created only when explicitly requested (privacy-conscious click-to-load), and may fail because of platform availability. A clickable direct original is always present.
 
 
-## 2026-10-16: Verified operator Canva work / PR pricing reference
+## Public samples policy (2026-10-17)
 
-The user provided three Canva shortlinks. Resolved and read using the connected Canva service (not scraped).
-- `https://canva.link/npriuj056xwfe89` -> design `DAHX3RmQv9A`: **北浜 焼とりporc｜グルメ日誌 大阪**, 20 pages, 1080x1350. Read-only view URL from Canva API: `https://www.canva.com/d/ZEZQi8CDw9j20b1`.
-- `https://canva.link/s64qvg0rdx301z1` -> design `DAHWjXqkIUg`: **銀蔵 小野原本店｜銀蔵特選海鮮定食**, 16 pages, 1080x1350. Read-only view URL: `https://www.canva.com/d/1FAjRigIi5A1R15`.
-- `https://canva.link/69kj5suzejtnk50` -> design `DAHVJGkwLVk`: **煮炊き焼き鳥 御尽｜Bコース**, 10 pages, 1080x1350. Read-only view URL: `https://www.canva.com/d/w2WQ2iTGl7CCtqz`.
-
-The content includes cover hooks, restaurant access, dish highlights, first-hand impressions and many original layouts. Do **not** copy the user's original edit-token share URLs into public pages. These are actual designed works, not automatically verified **paid sponsored** work or verified Instagram engagement. The site displays typographic illustration cards (NOT exact thumbnails) plus verified view-only links. Check public viewer access for each link before external publication.
+The owner requires the business-facing website to display **Instagram-published posts only**. Do not expose design-editor viewer URLs, sharing tokens, draft work, unpublished client assets or internal templates. Legacy publication URLs were deleted from the current branch; previous GitHub commits and old deployments may still contain them. Revoke legacy shared-document links in the original editor and retire previous Netlify deploy artifacts. Editing originals remain private and untouched.
 
 ## Current owner-approved fee and forward-looking milestones (2026-10-16)
 
 **Owner decision overrides the earlier proposed 18,000–30,000 yen page-count tiers.** Those tiers were removed from the live PR site.
 
-Current direct **Instagram feed 1 post: ¥8,000 inclusive of tax**, at the owner-reported approximately 5,000 followers. This base scope is an on-site visit, photo capture, editing, written caption and correctly labeled Instagram feed post. Exact number of slides, shooting time, travel expenses, meals, revision cycles and secondary material rights must be agreed BEFORE contracts; 10/16/20-page Canva works are examples, not unlimited deliverables promised at ¥8,000.
+Current direct **Instagram feed 1 post: ¥8,000 inclusive of tax**, at the owner-reported approximately 5,000 followers. This base scope is an on-site visit, photo capture, editing, written caption and correctly labeled Instagram feed post. Exact number of slides, shooting time, travel expenses, meals, revision cycles and secondary material rights must be agreed BEFORE contracts; Prior internal portfolio examples do not imply unlimited deliverables promised at ¥8,000.
 
 A **proposed** automatic price mapping when the operator confirms the actual number of followers is now implemented in `lib/diary/pricing.ts`:
 - 0–7,499: ¥8,000
