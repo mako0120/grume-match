@@ -74,7 +74,7 @@ export default function DiaryServices() {
 
         <section className="diary-services-layout diary-v2-service-details" id="details">
           <div className="diary-v2-container">
-            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">02 / WHAT'S INCLUDED</span><h2>依頼したいことに、<br /><em>合わせて選べる。</em></h2></div><p>写真投稿を軸に、動画やストーリーズなども選択できます。最終的な納品内容と料金は双方で合意して決定します。</p></div>
+            <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">02 / WHAT WE INCLUDE</span><h2>依頼したいことに、<br /><em>合わせて選べる。</em></h2></div><p>写真投稿を軸に、動画やストーリーズなども選択できます。最終的な納品内容と料金は双方で合意して決定します。</p></div>
             <div className="diary-service-grid">
               {offerings.map((service) => (
                 <article id={service.id} className="diary-service-detail" key={service.id}>
