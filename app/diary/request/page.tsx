@@ -9,8 +9,9 @@ export const metadata = {
   description: "グルメ日誌へのInstagram PR相談・お申し込み。無料の事前相談から始められます。",
 };
 
-export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string }> }) {
-  const { service, intent } = await searchParams;
+export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string; goal?: string }> }) {
+  const { service, intent, goal } = await searchParams;
+  const goalLabel = goal === "new_menu" ? "新メニューを紹介したい" : goal === "first_visit" ? "初めてのお客様にお店を知ってほしい" : goal === "story" ? "お店のこだわりを伝えたい" : "";
   const initialKind = intent === "application" ? "application" : "consultation";
   const price = currentDiaryPricing();
   const initialService = DIARY_SERVICES.find((option) => option === service) ?? "";
@@ -32,8 +33,9 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
           <div><span>動画込みPR</span><strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong><small>税込・制作内容は個別見積もり</small></div>
           <Link href="/diary/services#pricing">プランを見る ↗</Link>
         </div>
+        {goalLabel ? <p className="diary-v2-goal-context">ご相談テーマ：<strong>{goalLabel}</strong>（内容は自由に変更できます）</p> : null}
         <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> 送信時点では契約は成立しません。日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
-        <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} />
+        <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} initialGoal={goalLabel} />
         <p className="diary-form-aside">ご入力いただく連絡先などはPR相談の対応にのみ利用します。<Link href="/legal/privacy">プライバシーポリシー</Link>をご確認ください。</p>
         <footer className="diary-footer diary-form-footer">
           <Link href="/diary">← グルメ日誌 トップへ戻る</Link>
