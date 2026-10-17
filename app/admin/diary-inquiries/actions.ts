@@ -154,6 +154,9 @@ export async function markDiaryPostPublished(form: FormData) {
 
 export async function markDiaryPaymentReceived(form: FormData) {
   await requireRole(["admin"]);
+  if (process.env.DIARY_STRIPE_ENABLED === "true") {
+    throw new Error("Stripe請求の入金は署名検証済みWebhookでのみ確認します。");
+  }
   const id = formId(form);
   const admin = createAdminClient();
   const { data, error } = await admin.from("diary_pr_inquiries")
