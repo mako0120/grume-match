@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { bookingTokenHash } from "@/lib/diary/booking";
 import { sendOperatorBookingNotification } from "@/server/diary/notification";
+import { createDiaryDraftInvoice } from "@/server/diary/invoicing";
 
 export async function confirmDiaryBooking(form: FormData) {
   const token = form.get("token");
@@ -28,6 +29,8 @@ export async function confirmDiaryBooking(form: FormData) {
     .select("id").maybeSingle();
   if (error || !data) throw new Error("Could not confirm. The link may be expired, already used, or the date already booked.");
 
+  // Draft only. If Stripe is not yet configured, the worker creates it later.
+  await createDiaryDraftInvoice(data.id);
   await sendOperatorBookingNotification(data.id);
   redirect("/diary/confirmed");
 }
