@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { PostShowcase } from "./components/post-showcase";
-import { CanvaPortfolio } from "./components/canva-portfolio";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 const metrics = [
@@ -25,7 +24,7 @@ export default function DiaryHomePage() {
           <span>グルメ日誌 <small>OSAKA</small></span>
         </Link>
         <nav aria-label="ページ内メニュー">
-          <a href="#canva-work">制作実績</a>
+          <a href="#work">Instagram投稿</a>
           <a href="#services">サービス</a>
           <a href="#philosophy">想い</a>
           <a href="#results">実績</a>
@@ -46,7 +45,7 @@ export default function DiaryHomePage() {
             </div>
             <div className="diary-direct-offer">
               <div><span>DIRECT PR / CURRENT PRICE</span><strong>{formatDiaryYen(price.amountYen)}</strong><small>Instagramフィード1投稿・税込総額</small></div>
-              <div><p>写真投稿は8,000円。動画を組み合わせたPRは{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜。グルメ日誌本人への直接依頼だからこその価格です。</p><Link href="/diary/services">料金と制作実例を確認する ↗</Link></div>
+              <div><p>写真投稿は8,000円。動画を組み合わせたPRは{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜。グルメ日誌本人への直接依頼だからこその価格です。</p><Link href="/diary/services">料金と投稿実例を確認する ↗</Link></div>
             </div>
             <span className="diary-hero-caption">PRのご相談・お見積もりは無料です。グルメ日誌本人が直接対応します。 動画込みは15,000円〜（税込）。</span>
           </div>
@@ -80,21 +79,12 @@ export default function DiaryHomePage() {
           </div>
         </section>
 
-        <section className="diary-canva-samples" id="canva-work">
-          <div className="diary-section-top"><span>DESIGN PORTFOLIO</span><span>CANVA / CAROUSEL</span></div>
-          <div className="diary-work-intro">
-            <h2>実際に制作した、<br /><em>10〜20枚の投稿例。</em></h2>
-            <p>飲食店の魅力を、表紙から料理紹介まで丁寧に構成。作例3件はCanvaの閲覧用リンクから全ページをご覧いただけます。</p>
-          </div>
-          <CanvaPortfolio />
-          <div className="diary-work-after"><Link className="diary-button diary-button-primary" href="/diary/services">制作枚数・料金目安を確認する <span>↗</span></Link></div>
-        </section>
 
         <section className="diary-work" id="work">
           <div className="diary-section-top"><span>RECENT POSTS</span><span>@gurunavi_diary</span></div>
           <div className="diary-work-intro">
             <h2>どんな投稿が届くのか、<br /><em>まず実例をご覧ください。</em></h2>
-            <p>グルメ日誌の最近のInstagram投稿3件を掲載しています。依頼する前に、写真の見せ方や文章の雰囲気をご確認ください。</p>
+            <p>実際にInstagramで公開した投稿をご覧いただけます。撮影素材や制作途中のデータは公開していません。</p>
           </div>
           <PostShowcase />
         </section>
