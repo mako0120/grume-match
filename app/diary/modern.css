@@ -317,3 +317,51 @@
   .diary-v2 .diary-portfolio-price { padding: 23px 17px; }
   .diary-v2 :is(#work,#results,#services,#philosophy,#flow,#pricing,#details,#faq) { scroll-margin-top: 68px; }
 }
+
+
+/* CRO refinements 2026-10-17: remove friction without weakening the contract. */
+.diary-v2 .diary-conversion-intro { padding: 16px 20px; border-radius: 14px; background: #f0f4ec; border: 1px solid #d6e0d3; }
+.diary-v2 .diary-conversion-intro span { display: block; font-size: 13px; font-weight: 900; color: #234732; }
+.diary-v2 .diary-conversion-intro p { margin-top: 6px; color: #65786a; font-size: 12px; line-height: 1.8; }
+.diary-v2 .diary-extra-details { border: 1px solid #dde4da; border-radius: 14px; background: #f9fbf7; overflow: hidden; }
+.diary-v2 .diary-extra-details > summary,
+.diary-v2 .diary-policy-details > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 19px; cursor: pointer; list-style: none; font-size: 13px; font-weight: 850; color: #284535; }
+.diary-v2 .diary-extra-details > summary::-webkit-details-marker,
+.diary-v2 .diary-policy-details > summary::-webkit-details-marker { display: none; }
+.diary-v2 .diary-extra-details > summary > span,
+.diary-v2 .diary-policy-details > summary > span { font-size: 20px; font-weight: 700; color: #a05f3d; }
+.diary-v2 .diary-extra-details[open] > summary > span,
+.diary-v2 .diary-policy-details[open] > summary > span { transform: rotate(45deg); }
+.diary-v2 .diary-extra-details-body { display: grid; gap: 17px; padding: 20px; border-top: 1px solid #dfe5dc; }
+.diary-v2 .diary-policy-details { margin: 0; padding: 0; overflow: hidden; }
+.diary-v2 .diary-policy-details > :not(summary) { margin-left: 19px; margin-right: 19px; }
+.diary-v2 .diary-policy-details > summary { background: #f7f8f2; }
+.diary-v2 .diary-inquiry-form .diary-inquiry-choice label { min-height: 90px; }
+.diary-v2 .diary-inquiry-form .diary-inquiry-choice label input[type=radio] { accent-color: #bb6946; }
+.diary-v2 .diary-inquiry-form .diary-extra-details label,
+.diary-v2 .diary-inquiry-form .diary-request-brief label { font-weight: 800; }
+.diary-v2 .diary-post-placeholder { min-height: 280px; }
+.diary-v2 .diary-post-placeholder-art { min-height: 235px; }
+.diary-v2 .diary-post-embed-container { min-height: 400px; }
+.diary-v2 .diary-post-embed-container iframe { min-height: 400px; }
+.diary-v2 .diary-hero-trust { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.diary-v2 .diary-hero-trust span { border: 1px solid #ffffff36; border-radius: 100px; padding: 7px 12px; font-size: 11px; color: #d9e0d6; }
+.diary-v2 .diary-usecases { background: #f0f1eb; border-block: 1px solid #dde3d8; }
+.diary-v2 .diary-usecases-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.diary-v2 .diary-usecase { min-width: 0; border: 1px solid #dce1d8; background: #fff; border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; gap: 13px; transition: transform .2s, border-color .2s; }
+.diary-v2 .diary-usecase:hover { transform: translateY(-2px); border-color: #c6b8a3; }
+.diary-v2 .diary-usecase > span { color: #bc7757; font-size: 10px; font-weight: 850; letter-spacing: .1em; }
+.diary-v2 .diary-usecase h3 { font-size: clamp(18px,2vw,23px); line-height: 1.5; }
+.diary-v2 .diary-usecase p { font-size: 12px; line-height: 1.9; color: #65726a; flex: 1; }
+.diary-v2 .diary-usecase a { font-size: 12px; font-weight: 900; color: #9b583b; display: inline-flex; align-items: center; gap: 8px; padding-top: 12px; }
+.diary-v2 .diary-value-stripe { border: 1px solid #e3dfd4; border-radius: 16px; background: #faf6eb; padding: 20px 26px; margin-top: 34px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
+.diary-v2 .diary-value-stripe > div { display: flex; align-items: center; gap: 12px; font-size: 12px; line-height: 1.7; font-weight: 800; }
+.diary-v2 .diary-value-stripe b { font-size: 20px; color: #ad6847; }
+@media (max-width: 700px) {
+  .diary-v2 .diary-usecases-grid { grid-template-columns: 1fr; gap: 10px; }
+  .diary-v2 .diary-usecase { padding: 22px 20px; gap: 10px; }
+  .diary-v2 .diary-value-stripe { grid-template-columns: 1fr; gap: 15px; padding: 18px; }
+  .diary-v2 .diary-inquiry-form .diary-inquiry-choice label { min-height: 80px; }
+  .diary-v2 .diary-extra-details-body { padding: 16px; }
+  .diary-v2 .diary-post-embed-container iframe { min-height: 430px; }
+}
