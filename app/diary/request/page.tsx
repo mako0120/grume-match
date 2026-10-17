@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { DiaryInquiryForm } from "../components/inquiry-form";
+import { DiaryHeader } from "../components/site-header";
 import { DIARY_SERVICES } from "@/lib/diary/inquiry";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
+
+export const metadata = {
+  title: "無料相談・PR申込み｜グルメ日誌｜大阪",
+  description: "グルメ日誌へのInstagram PR相談・お申し込み。無料の事前相談から始められます。",
+};
 
 export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string }> }) {
   const { service, intent } = await searchParams;
@@ -11,34 +17,29 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
   const enabled = process.env.DIARY_INQUIRIES_ENABLED === "true" &&
     !!process.env.DIARY_TURNSTILE_SECRET_KEY &&
     !!process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
+
   return (
-    <main className="diary-form-page">
-      <Link className="diary-back" href="/diary">← グルメ日誌へ戻る</Link>
-      <div className="diary-form-head">
-        <span className="diary-overline"><span className="diary-dot" /> PR INQUIRY</span>
-        <h1>お店の魅力を、<br /><em>一緒に届けませんか。</em></h1>
-        <p><strong>「事前相談」と「お申し込み」から選べます。</strong>申込み後は内容と条件を確認し、グルメ日誌から日時をご提案。企業様の承諾で正式に案件が決定します。</p>
-        <p>ご相談・お見積もりは無料です。お店のこと、伝えたいことをぜひ聞かせてください。</p>
-      </div>
-      <div className="diary-before-request">
-        <span>BEFORE INQUIRY</span>
-        <div>
-          <strong>制作内容・投稿実例は確認済みですか？</strong>
-          <p>どんなPRを依頼できるか、実際の投稿とサービス内容を事前に確認できます。</p>
+    <div className="diary-v2">
+      <DiaryHeader active="request" />
+      <main id="diary-main" className="diary-form-page">
+        <div className="diary-v2-request-intro">
+          <span className="diary-v2-section-label">START YOUR STORY / INQUIRY</span>
+          <h1>お店の「伝えたい」を、<br /><em>聞かせてください。</em></h1>
+          <p>事前相談だけでも大歓迎です。撮影・発信の内容、費用、希望日時を確認してから、ご納得いただける形をご提案します。</p>
         </div>
-        <Link href="/diary/services">実例とサービスを見る ↗</Link>
-      </div>
-      <div className="diary-request-price">
-        <span>現在のInstagramフィードPR基本料金</span>
-        <strong>{formatDiaryYen(price.amountYen)}</strong>
-        <p>フィード1投稿・税込総額。動画込みPRは{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜（税込）。フォロワー約{price.followers.toLocaleString("ja-JP")}人の時点での参考料金です。ご相談時の参考料金を記録しますが、正式な依頼内容・お支払い金額は双方の合意で確定します。</p>
-      </div>
-      <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} />
-      <p className="diary-form-aside">発信内容・制作費・日程は双方で合意してから決定します。送信だけで契約は成立しません。</p>
-      <footer className="diary-footer diary-form-footer">
-        <Link href="/diary">グルメ日誌｜大阪</Link>
-        <Link href="/legal/privacy">プライバシーポリシー</Link>
-      </footer>
-    </main>
+        <div className="diary-v2-request-summary">
+          <div><span>写真フィードPR</span><strong>1投稿 {formatDiaryYen(price.amountYen)}</strong><small>税込・画像枚数による追加料金なし</small></div>
+          <div><span>動画込みPR</span><strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong><small>税込・制作内容は個別見積もり</small></div>
+          <Link href="/diary/services#pricing">プランを見る ↗</Link>
+        </div>
+        <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> 送信時点では契約は成立しません。日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
+        <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} />
+        <p className="diary-form-aside">ご入力いただく連絡先などはPR相談の対応にのみ利用します。<Link href="/legal/privacy">プライバシーポリシー</Link>をご確認ください。</p>
+        <footer className="diary-footer diary-form-footer">
+          <Link href="/diary">← グルメ日誌 トップへ戻る</Link>
+          <Link href="/diary/policy">案件受注ポリシー</Link>
+        </footer>
+      </main>
+    </div>
   );
 }
