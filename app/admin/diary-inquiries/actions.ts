@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { parseVisitDate, makeBookingToken, bookingTokenHash, formatTokyoVisit, safeBookingSiteUrl, sevenDaysAfter } from "@/lib/diary/booking";
 import { sendDiaryEmail, diaryEmailConfigured, diaryOwnerEmail } from "@/server/diary/email";
 import { detectProhibitedPRRequest } from "@/lib/diary/inquiry";
+import { sendPublishedDiaryInvoice } from "@/server/diary/invoicing";
 
 const idPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -146,6 +147,8 @@ export async function markDiaryPostPublished(form: FormData) {
     .eq("id", id).eq("status", "booked").is("published_at", null)
     .select("id").maybeSingle();
   if (error || !data) throw new Error("Not booked or already published");
+  // Send only after a successful published-post audit; cron retries failures.
+  await sendPublishedDiaryInvoice(id);
   revalidatePath("/admin/diary-inquiries");
 }
 
