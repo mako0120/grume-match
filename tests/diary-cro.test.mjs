@@ -14,7 +14,7 @@ test("first consultation submits with only essential public inputs and no lead-s
   assert.match(form, /name="restaurant_name" required/);
   assert.match(form, /name="contact_name" required/);
   assert.match(form, /name="email" type="email" required/);
-  assert.match(form, /name="message" required minLength={10}/);
+  assert.ok(form.includes('name="message" required minLength={10}'));
   assert.match(form, /name="consent" required/);
   assert.match(form, /name="compliance_confirmed" required/);
   assert.match(form, /data-sitekey={siteKey}/);
@@ -36,8 +36,8 @@ test("application keeps meaningful brief and verified price while consultation s
   const form = read("app/diary/components/inquiry-form.tsx");
   const schema = read("lib/diary/inquiry.ts");
   const home = read("app/diary/page.tsx");
-  assert.match(form, /name="desired_coverage" rows={3} maxLength={1200} required/);
-  assert.match(form, /name="budget" defaultValue="undecided" required/);
+  assert.ok(form.includes('name="desired_coverage" rows={3} maxLength={1200} required'));
+  assert.ok(form.includes('name="budget" defaultValue="undecided" required'));
   assert.match(schema, /inquiry_kind === "application" && !desired_coverage/);
   assert.match(home, /投稿前に内容・費用を確認/);
   assert.match(home, /合意するまで契約なし/);
