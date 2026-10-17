@@ -50,3 +50,7 @@ Other foundational platform release gates (`LEGAL_REVIEW_COMPLETED`, `ACCOUNTING
 - Do not commit secrets, reuse the deactivated existing Supabase project, or copy BASE/eBay Vercel secrets into Netlify.
 - Production content must not claim verified follower counts or fabricated performance figures. Confirm owner identity and Instagram link before external distribution.
 - If Netlify Free plan reaches its monthly 300-credit limit, the site can pause; review usage regularly.
+
+## Required privacy redeploy (2026-10-17)
+
+Only already-published Instagram posts may appear in the business-facing website; private design-editor examples, IDs, shared-document links and template previews must be absent from both `/diary` and `/diary/services`. After deploying the privacy update, verify page HTML and client bundles expose no old viewer URLs. Because the Netlify production site `brilliant-custard-364003.netlify.app` is connected to a **different repository** `mako0120/grume-match-cb4c4`, commits made to `mako0120/grume-match` will NOT automatically reach that Netlify site. Switch Netlify's Git repository to the original `mako0120/grume-match` (same `feat/gurume-diary-direct-pr` branch) or establish a reviewed sync mechanism. The old duplicate repository is read-only in the ChatGPT GitHub connector. Independently revoke any previously exposed design-editor viewer links; link removal from new app code cannot revoke access to old URLs or Git history. Do not touch BASE/eBay deployments.
