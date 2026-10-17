@@ -19,6 +19,17 @@ export async function diaryStripeApi<T>(path: string, options: StripeCallOptions
   if (!stripeDiaryConfigured()) throw new Error("Dedicated Diary Stripe account is disabled or missing");
   if (!path.startsWith("/") || path.includes("://")) throw new Error("Invalid Stripe path");
   const key = process.env.DIARY_STRIPE_SECRET_KEY!;
+  // A key belongs to one Stripe account. Verify it before every billable operation:
+  // this must NEVER silently write invoices to the unrelated BASE/eBay account.
+  const accountResponse = await fetch(ROOT + "/account", {
+    headers: { Authorization: "Bearer " + key },
+    signal: AbortSignal.timeout(10000), cache: "no-store",
+  });
+  if (!accountResponse.ok) throw new Error("Cannot verify dedicated Diary Stripe account");
+  const account = (await accountResponse.json()) as { id?: string };
+  if (account.id !== process.env.DIARY_STRIPE_ACCOUNT_ID) {
+    throw new Error("Configured Stripe account ID mismatch; refusing to invoice");
+  }
   const headers: Record<string, string> = { Authorization: "Bearer " + key };
   if (options.body) headers["Content-Type"] = "application/x-www-form-urlencoded";
   if (options.idempotencyKey) headers["Idempotency-Key"] = options.idempotencyKey;
