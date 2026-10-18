@@ -5,14 +5,18 @@ import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InstagramDmFallback } from "./instagram-dm-fallback";
+import { NetlifyDiaryInquiryForm } from "./netlify-inquiry-form";
 
-export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "consultation", initialGoal = "" }: { enabled: boolean; initialService?: string; initialKind?: "consultation" | "application"; initialGoal?: string }) {
+export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialService = "", initialKind = "consultation", initialGoal = "" }: { enabled: boolean; netlifyEnabled?: boolean; initialService?: string; initialKind?: "consultation" | "application"; initialGoal?: string }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">(initialKind);
   const [error, setError] = useState("");
   const siteKey = process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   if (!enabled || !siteKey) {
+    if (netlifyEnabled) {
+      return <NetlifyDiaryInquiryForm initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
+    }
     return <InstagramDmFallback initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
