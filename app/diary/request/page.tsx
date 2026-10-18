@@ -18,6 +18,10 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
   const enabled = process.env.DIARY_INQUIRIES_ENABLED === "true" &&
     !!process.env.DIARY_TURNSTILE_SECRET_KEY &&
     !!process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
+  // Netlify-hosted first-party enquiries need no Supabase or custom mail API.
+  // Form detection and notifications must be enabled in the Netlify site dashboard.
+  const netlifyEnabled = process.env.DIARY_SITE_MODE === "true";
+  const acceptingForm = enabled || netlifyEnabled;
 
   return (
     <div className="diary-v2">
@@ -34,9 +38,9 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
           <Link href="/diary/services#pricing">プランを見る ↗</Link>
         </div>
         {goalLabel ? <p className="diary-v2-goal-context">ご相談テーマ：<strong>{goalLabel}</strong>（内容は自由に変更できます）</p> : null}
-        <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> {enabled ? "フォーム送信時点では契約は成立しません。" : "現在はInstagramのDMから無料でご相談いただけます。DMを送っただけでは契約は成立しません。"} 日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
-        <DiaryInquiryForm enabled={enabled} initialService={initialService} initialKind={initialKind} initialGoal={goalLabel} />
-        <p className="diary-form-aside">{enabled ? "ご入力いただく連絡先などはPR相談の対応にのみ利用します。" : "DMの文章をコピーしても、当サイトから個人情報が送信されることはありません。"}<Link href="/legal/privacy">プライバシーポリシー</Link>をご確認ください。</p>
+        <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> {acceptingForm ? "無料のフォームからご相談いただけます。送信時点では契約は成立しません。" : "現在はInstagramのDMから無料でご相談いただけます。DMを送っただけでは契約は成立しません。"} 日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
+        <DiaryInquiryForm enabled={enabled} netlifyEnabled={netlifyEnabled} initialService={initialService} initialKind={initialKind} initialGoal={goalLabel} />
+        <p className="diary-form-aside">{acceptingForm ? "送信いただいた情報はご相談・お見積もり・返信のために利用します。" : "DMの文章をコピーしても、当サイトから個人情報が送信されることはありません。"}<Link href="/legal/privacy">プライバシーポリシー</Link>をご確認ください。</p>
         <footer className="diary-footer diary-form-footer">
           <Link href="/diary">← グルメ日誌 トップへ戻る</Link>
           <Link href="/diary/policy">案件受注ポリシー</Link>
