@@ -20,7 +20,7 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
     !!process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   // Netlify-hosted first-party enquiries need no Supabase or custom mail API.
   // Form detection and notifications must be enabled in the Netlify site dashboard.
-  const netlifyEnabled = process.env.DIARY_SITE_MODE === "true";
+  const netlifyEnabled = process.env.DIARY_SITE_MODE === "true" && process.env.DIARY_NETLIFY_FORMS_ENABLED === "true";
   const acceptingForm = enabled || netlifyEnabled;
 
   return (
