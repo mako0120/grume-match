@@ -29,6 +29,18 @@ const privateHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Netlify's UI contains a non-secret, production-scoped flag.
+  // Compile its boolean into the Next.js build so the native Forms UI
+  // cannot silently fall back to Instagram DM if the SSR adapter omits
+  // an environment variable at function runtime.
+  // Both flag and production deploy context must match; previews stay off.
+  env: {
+    DIARY_NETLIFY_FORMS_ENABLED:
+      process.env.CONTEXT === "production" &&
+      process.env.DIARY_NETLIFY_FORMS_ENABLED === "true"
+        ? "true"
+        : "false",
+  },
   async redirects() {
     // Only for the separate Netlify diary production site, never for the PR OS.
     return process.env.DIARY_SITE_MODE === "true"
