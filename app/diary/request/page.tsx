@@ -4,6 +4,9 @@ import { DiaryHeader } from "../components/site-header";
 import { DIARY_SERVICES } from "@/lib/diary/inquiry";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
+// The intake toggle must be evaluated in the server runtime, never in a cached page.
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "無料相談・PR申込み｜グルメ日誌｜大阪",
   description: "グルメ日誌へのInstagram PR相談・お申し込み。フォーム準備中もInstagramのDMから無料で相談できます。",
@@ -20,7 +23,10 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
     !!process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   // Netlify-hosted first-party enquiries need no Supabase or custom mail API.
   // Form detection and notifications must be enabled in the Netlify site dashboard.
-  const netlifyEnabled = process.env.DIARY_SITE_MODE === "true" && process.env.DIARY_NETLIFY_FORMS_ENABLED === "true";
+  // Netlify env vars set in netlify.toml are build-only, not function runtime vars.
+  // DIARY_NETLIFY_FORMS_ENABLED is explicitly production-scoped in the Netlify UI.
+  // Keep the form closed unless that runtime flag is positively enabled.
+  const netlifyEnabled = process.env.DIARY_NETLIFY_FORMS_ENABLED === "true";
   const acceptingForm = enabled || netlifyEnabled;
 
   return (
