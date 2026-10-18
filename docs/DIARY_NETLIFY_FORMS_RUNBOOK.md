@@ -41,3 +41,11 @@ GitHub: `mako0120/grume-match` の `feat/gurume-diary-direct-pr`
 - https://docs.netlify.com/manage/forms/submissions/
 - https://docs.netlify.com/manage/forms/spam-filters/
 - https://docs.netlify.com/manage/forms/usage-and-billing/
+
+## 2026-10-18: DM案内が消えない場合（Netlify SSR実行時変数）
+
+Netlify UIで `DIARY_NETLIFY_FORMS_ENABLED=true` をProductionに保存して再デプロイしてもDM案内が残る現象を修正。元コードは `DIARY_SITE_MODE` も同時に確認していたが、`netlify.toml` の `[context.production.environment]` はビルド用で、Netlify Functions実行時には提供されない。Netlify本番固有のフラグはUIでProductionにのみ `true` を設定するものとし、`/diary/request` は実行時の `DIARY_NETLIFY_FORMS_ENABLED === "true"` だけで表示を切替える。キャッシュされた古いサーバー描画が残らないようSSRを動的にする。
+
+修正版をデプロイ後もDM案内が残る場合は、NetlifyのProject configuration → Environment variables → `DIARY_NETLIFY_FORMS_ENABLED` を開き、**Production** の値が文字列 `true`（余分な空白・引用符なし）、ScopesはAll scopesであることを確認する。値を保存したらProductionの再デプロイが必要。フォームが表示されても、Formsに `diary-pr-inquiry` が登録・テスト投稿が保存されるまで稼働宣言しない。
+
+Netlify公式： https://docs.netlify.com/build/functions/environment-variables/ （`netlify.toml`内の環境変数はFunctionsランタイムで利用不可）
