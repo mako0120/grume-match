@@ -24,6 +24,8 @@ test("native Netlify form must be registered in a static public HTML file", () =
   assert.match(component, /application\/x-www-form-urlencoded/);
   assert.match(component, /new URLSearchParams\(\)/);
   assert.doesNotMatch(component, /fetch\("\/api\/diary\/inquiries"/);
+  assert.match(component, /router\.replace\("\/diary\/thanks"\)/);
+  assert.match(component, /if \(!response\.ok\)/);
 });
 
 test("Netlify lead intake does not activate before dashboard enablement", () => {
