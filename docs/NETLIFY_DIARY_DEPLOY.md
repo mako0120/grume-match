@@ -4,6 +4,15 @@ Deployment target: **Netlify Free**, using a **dedicated Netlify site** linked t
 
 Netlify supports Next.js 16 App Router, Server Actions and API route handlers automatically with OpenNext. See https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/.
 
+
+## 2026-10-18: 最短で本番相談を受け付ける方法（Netlify Forms）
+
+**Supabase契約がなくても、Netlify標準Formsで無料相談・PR申込みを受信できます。** Netlify側でフォーム検出を有効にし、`diary-pr-inquiry` 登録を確認してから、`DIARY_NETLIFY_FORMS_ENABLED=true` を設定して再デプロイします。未設定の間はInstagram DM案内に切り替わります。NetlifyのFormsダッシュボードで相談を閲覧・返信し、必要ならメール通知を設定します。サイト独自の `/admin/diary-inquiries` やStripe課金とは別の簡易受付です。
+
+必ず `docs/DIARY_NETLIFY_FORMS_RUNBOOK.md` の**試験送信の保存・メール通知の実確認**まで行い、Netlify管理画面で相談データが記録されるまで本番稼働とは宣言しないでください。フォーム送信は契約を自動成立させません。
+
+既存のSupabase承認フロー・Stripe後払いを有効にしたい場合には、別途権限・契約・DB・Turnstile・本人確認・請求検証が必要です。
+
 ## Operator Netlify setup (Netlify authorization is required)
 
 1. Sign in to https://app.netlify.com and use Free plan (commercial sites are allowed within resource quota; projects pause when the monthly 300 credit limit is exhausted).
@@ -53,4 +62,4 @@ Other foundational platform release gates (`LEGAL_REVIEW_COMPLETED`, `ACCOUNTING
 
 ## Required privacy redeploy (2026-10-17)
 
-Only already-published Instagram posts may appear in the business-facing website; private design-editor examples, IDs, shared-document links and template previews must be absent from both `/diary` and `/diary/services`. After deploying the privacy update, verify page HTML and client bundles expose no old viewer URLs. Because the Netlify production site `brilliant-custard-364003.netlify.app` is connected to a **different repository** `mako0120/grume-match-cb4c4`, commits made to `mako0120/grume-match` will NOT automatically reach that Netlify site. Switch Netlify's Git repository to the original `mako0120/grume-match` (same `feat/gurume-diary-direct-pr` branch) or establish a reviewed sync mechanism. The old duplicate repository is read-only in the ChatGPT GitHub connector. Independently revoke any previously exposed design-editor viewer links; link removal from new app code cannot revoke access to old URLs or Git history. Do not touch BASE/eBay deployments.
+Only already-published Instagram posts may appear in the business-facing website; private design-editor examples, IDs, shared-document links and template previews must be absent from both `/diary` and `/diary/services`. After deploying the privacy update, verify page HTML and client bundles expose no old viewer URLs. As of 2026-10-18, the owner switched Netlify Git source to `mako0120/grume-match` branch `feat/gurume-diary-direct-pr` and shared published UI text matching the updated branch. New commits must still be verified by deployed HEAD SHA and live submission check; do not assume every subsequent commit has deployed. The old duplicate repository is read-only in the ChatGPT GitHub connector. Independently revoke any previously exposed design-editor viewer links; link removal from new app code cannot revoke access to old URLs or Git history. Do not touch BASE/eBay deployments.
