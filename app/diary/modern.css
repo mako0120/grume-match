@@ -498,7 +498,7 @@
   background: #f8faf5;
   color: #33473b;
   padding: 18px 20px;
-  font: 13px/1.85 inherit;
+  font-family: inherit;
   font-size: 13px;
   line-height: 1.85;
 }
