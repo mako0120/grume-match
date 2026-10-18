@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { InstagramDmFallback } from "./instagram-dm-fallback";
 
 export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "consultation", initialGoal = "" }: { enabled: boolean; initialService?: string; initialKind?: "consultation" | "application"; initialGoal?: string }) {
   const router = useRouter();
@@ -12,13 +13,7 @@ export function DiaryInquiryForm({ enabled, initialService = "", initialKind = "
   const [error, setError] = useState("");
   const siteKey = process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   if (!enabled || !siteKey) {
-    return (
-      <div className="diary-form-unavailable">
-        <h2>フォームは現在準備中です。</h2>
-        <p>PRのご相談はInstagramのDMから承っています。</p>
-        <a className="diary-button diary-button-primary" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramで相談する ↗</a>
-      </div>
-    );
+    return <InstagramDmFallback initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
