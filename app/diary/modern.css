@@ -557,3 +557,38 @@
   .diary-v2 .diary-dm-actions { flex-direction: column; }
   .diary-v2 .diary-v2-dm-copy, .diary-v2 .diary-dm-actions > a { width: 100%; }
 }
+
+/* Native Netlify Forms intake; stylistically consistent with the existing Diary form. */
+.diary-v2 .diary-netlify-inquiry {
+  border: 1px solid #d4dfd1;
+}
+.diary-v2 .diary-netlify-inquiry .diary-privacy-box {
+  background: #f3f6f0;
+}
+.diary-v2 .diary-netlify-inquiry .diary-submit {
+  min-height: 56px;
+  background: #214631;
+  color: #fff;
+}
+.diary-v2 .diary-netlify-inquiry .diary-submit:hover:not(:disabled) {
+  background: #316149;
+}
+.diary-v2 .diary-netlify-inquiry .diary-submit:disabled {
+  opacity: .68;
+  cursor: wait;
+}
+.diary-v2 .diary-netlify-fallback {
+  color: #617267;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 0;
+}
+.diary-v2 .diary-netlify-fallback a {
+  text-decoration: underline;
+  color: #305e43;
+  font-weight: 800;
+}
+.diary-v2 .diary-netlify-inquiry :is(input,textarea,select):focus-visible {
+  outline: 3px solid #c1835f;
+  outline-offset: 3px;
+}
