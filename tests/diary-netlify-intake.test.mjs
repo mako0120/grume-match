@@ -64,5 +64,5 @@ test("Netlify Forms PII processor is disclosed and operator checklist exists", (
   assert.match(docs, /Submission notifications/);
   assert.match(docs, /Verified submissions/);
   assert.match(docs, /Spam submissions/);
-  assert.match(docs, /実際に保存/);
+  assert.match(docs, /Netlify管理画面に現れるまで完了扱いにしない/);
 });
