@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   DIARY_OPS_STAGES,
@@ -42,7 +42,113 @@ export function DiaryOpsConsole() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("すべて");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginPending, setLoginPending] = useState(false);
+  const [liveError, setLiveError] = useState("");
+  const [lastSyncedAt, setLastSyncedAt] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [showLiveLogin, setShowLiveLogin] = useState(false);
   const picker = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    let cancelled = false;
+    async function sync() {
+      if (document.visibilityState === "hidden") return;
+      setSyncing(true);
+      try {
+        const response = await fetch("/.netlify/functions/diary-ops-feed", {
+          method: "GET",
+          headers: { Authorization: "Bearer " + accessToken, Accept: "application/json" },
+          credentials: "omit",
+          cache: "no-store",
+        });
+        const body: unknown = await response.json();
+        if (cancelled) return;
+        if (!response.ok) {
+          const err = typeof body === "object" && body !== null && "error" in body ? String(body.error) : "unknown";
+          if (response.status === 401 || response.status === 403) {
+            setAccessToken("");
+            setLiveError("本人認証の有効期限が切れたか、管理者権限がありません。再ログインしてください。");
+          } else {
+            setLiveError("自動同期に失敗しました（" + err + "）。Netlifyの設定と接続を確認してください。");
+          }
+          return;
+        }
+        if (typeof body !== "object" || body === null || !("leads" in body) || !Array.isArray(body.leads)) {
+          setLiveError("想定外の同期レスポンスです。");
+          return;
+        }
+        const incoming = body.leads as Array<{
+          id: string; receivedAt: string; restaurant: string; contact: string;
+          email: string; service: string; kind: string; message: string;
+          featuredMenu: string; visitPreference: string;
+        }>;
+        setItems(previous => {
+          const existing = new Map(previous.map(item => [item.id, item]));
+          const updated = incoming.map(lead => {
+            const before = existing.get(lead.id);
+            return {
+              ...lead,
+              status: before?.status ?? "未対応",
+              nextAction: before?.nextAction ?? "",
+              dueDate: before?.dueDate ?? "",
+              visitDate: before?.visitDate ?? "",
+              postDate: before?.postDate ?? "",
+              agreedFee: before?.agreedFee ?? 0,
+              paidAmount: before?.paidAmount ?? 0,
+              note: before?.note ?? "",
+              postUrl: before?.postUrl ?? "",
+            } as DiaryOpsCase;
+          });
+          const missing = previous.filter(item => !incoming.some(lead => lead.id === item.id));
+          return [...updated, ...missing];
+        });
+        setImportedFile("NETLIFY LIVE / " + new Date().toLocaleTimeString("ja-JP"));
+        setLastSyncedAt(new Date().toLocaleTimeString("ja-JP"));
+        setLiveError(body.partial === true ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : "");
+      } catch {
+        if (!cancelled) setLiveError("ネットワークエラーのため再接続を待っています。");
+      } finally {
+        if (!cancelled) setSyncing(false);
+      }
+    }
+    void sync();
+    const timer = window.setInterval(() => { void sync(); }, 60000);
+    const onVisible = () => { void sync(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { cancelled = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); };
+  }, [accessToken]);
+
+  async function loginToLive(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (loginPending) return;
+    setLoginPending(true);
+    setLiveError("");
+    try {
+      const response = await fetch("/.netlify/identity/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+        credentials: "omit",
+        cache: "no-store",
+        body: new URLSearchParams({ grant_type: "password", username: email.trim(), password }),
+      });
+      const data: unknown = await response.json();
+      if (!response.ok || !data || typeof data !== "object" || !("access_token" in data) ||
+          typeof data.access_token !== "string" || data.access_token.length < 50) {
+        throw new Error("login_failed");
+      }
+      setPassword("");
+      setAccessToken(data.access_token);
+      setShowLiveLogin(false);
+    } catch {
+      setLiveError("ログインできませんでした。Netlify Identityの招待・本人のパスワード・管理者権限を確認してください。");
+    } finally {
+      setLoginPending(false);
+    }
+  }
 
   const visible = useMemo(() => items.filter(item => {
     const query = search.trim().toLocaleLowerCase("ja-JP");
