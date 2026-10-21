@@ -65,6 +65,16 @@ const nextConfig: NextConfig = {
         source: "/diary/confirmed",
         headers: privateHeaders,
       },
+      {
+        // Browser-only CSV workspace: no PII may be cached by proxies or browsers.
+        source: "/diary/ops/:path*",
+        headers: [
+          ...privateHeaders,
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; connect-src 'self'; img-src 'self' data:" },
+        ],
+      },
       ...[
         "/creator/:path*",
         "/restaurant/:path*",
