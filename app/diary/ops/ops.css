@@ -129,3 +129,12 @@
 @media(max-width:1300px){.ops-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.ops-overview-grid{grid-template-columns:1fr}.ops-kanban{grid-template-columns:repeat(5,minmax(205px,1fr))}}
 @media(max-width:800px){.ops-workspace{grid-template-columns:1fr}.ops-sidebar{height:auto;min-height:0;position:static;padding:16px 19px}.ops-logo{margin:0 0 13px}.ops-sidebar-caption,.ops-sidebar-bottom{display:none}.ops-navigation{display:flex;overflow-x:auto;padding-bottom:4px}.ops-navigation button{white-space:nowrap;padding:10px 13px;font-size:11px;gap:7px}.ops-topbar{min-height:0;padding:15px 20px}.ops-content{padding:29px 17px 80px}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ops-metrics>div{padding:19px 13px}.ops-metrics strong{font-size:24px}.ops-start{padding:40px 18px;margin:20px auto 0}.ops-top-actions{width:100%}.ops-private-pill{margin-left:auto}.ops-kanban{grid-template-columns:repeat(5,minmax(230px,1fr))}.ops-detail header,.ops-detail-body,.ops-detail footer{padding-left:20px;padding-right:20px}}
 @media(max-width:480px){.ops-page-intro h1{font-size:30px}.ops-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.ops-metrics strong{font-size:19px}.ops-detail-fields{grid-template-columns:1fr}.ops-detail-original dl{grid-template-columns:100px minmax(0,1fr)}.ops-detail footer{display:grid}.ops-detail footer .ops-button{width:100%}.ops-top-actions .ops-button{flex:1}.ops-private-pill{order:3}.ops-panel{padding:20px 14px}}
+
+.ops-live-login{display:grid;grid-template-columns:minmax(180px,2fr) minmax(140px,1fr) minmax(140px,1fr) auto;gap:14px;align-items:end;margin:16px 0 24px;background:#fff;border:1px solid #cae3da;border-radius:16px;padding:22px}
+.ops-live-login h2{font-size:16px;margin:6px 0}
+.ops-live-login p{font-size:11px;color:#677a82;line-height:1.55;margin:0}
+.ops-live-login label{display:grid;gap:7px;font-size:11px;color:#35485a;font-weight:700}
+.ops-live-login input{background:#fff;border:1px solid #d4e1e4;padding:12px 10px;border-radius:8px;font-size:12px;min-width:0;max-width:100%}
+.ops-error{background:#fff0f0;border-color:#f3caca;color:#952d30}
+@media(max-width:1150px){.ops-live-login{grid-template-columns:1fr 1fr}.ops-live-login>div{grid-column:1/-1}}
+@media(max-width:600px){.ops-live-login{grid-template-columns:1fr}.ops-live-login>div{grid-column:auto}}
