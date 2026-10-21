@@ -251,7 +251,12 @@ export function DiaryOpsConsole() {
           <header className="ops-topbar">
             <span className="ops-breadcrumb">グルメ日誌 <span>/</span> 案件管理</span>
             <div className="ops-top-actions">
-              <span className="ops-private-pill">● LOCAL ONLY</span>
+              <span className="ops-private-pill">{accessToken ? "● LIVE / 60秒更新" : "● PRIVATE MODE"}</span>
+              <button type="button" className="ops-button ops-secondary"
+                onClick={() => { if (accessToken) { setAccessToken(""); setLastSyncedAt(""); setLiveError(""); }
+                  else setShowLiveLogin(!showLiveLogin); }}>
+                {accessToken ? "自動同期を終了" : "自動同期ログイン"}
+              </button>
               <input ref={picker} type="file" accept=".csv,text/csv" className="ops-visually-hidden" aria-label="CSVを読み込む"
                 onChange={event => { void importCsv(event.target.files?.[0]); }} />
               <button type="button" className="ops-button ops-secondary" disabled={loading} onClick={() => picker.current?.click()}>
@@ -271,30 +276,49 @@ export function DiaryOpsConsole() {
             </div>
             <div className="ops-safety-note" role="status">
               <strong>プライバシー優先</strong>
-              この画面はNetlifyのデータを自動取得しません。Netlify Formsから書き出したCSVだけをローカルで表示します。共有端末では開かないでください。
+              {accessToken
+                ? "管理者認証済み。Netlify Formsの依頼を60秒ごとにサーバー経由で取得しています。"
+                : "自動同期はNetlify Identityの管理者認証が必要です。CSVを選択した場合はブラウザ内のみで処理します。"}
+              {accessToken ? "　最新確認：" + (lastSyncedAt || "接続中…") + (syncing ? "（更新中）" : "") : ""}
             </div>
-            {alert && <p className="ops-feedback" role="status">{alert}</p>}
+            {showLiveLogin && !accessToken && (
+              <form className="ops-live-login" onSubmit={event => { void loginToLive(event); }}>
+                <div><span className="ops-eyebrow">SECURE LIVE CONNECTION</span>
+                  <h2>Netlify Identityでログイン</h2>
+                  <p>事前にNetlifyでIdentityを有効化し、専用Gmailを招待してadminロールを設定してください。管理者パスワードは保存しません。</p>
+                </div>
+                <label>管理者メールアドレス
+                  <input type="email" autoComplete="username" required maxLength={254} value={email} onChange={e => setEmail(e.target.value)} />
+                </label>
+                <label>Netlify Identityパスワード
+                  <input type="password" autoComplete="current-password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} />
+                </label>
+                <button type="submit" className="ops-button ops-primary" disabled={loginPending}>{loginPending ? "確認中…" : "本人確認して自動同期"}</button>
+              </form>
+            )}
+            {liveError && <p className="ops-feedback ops-error" role="alert">{liveError}</p>}
+            {alert && <p className="ops-feedback" role="status">{alert}</p>
 
             {!items.length ? (
               <section className="ops-start">
                 <div className="ops-start-icon" aria-hidden="true">◈</div>
-                <span className="ops-eyebrow">SET UP YOUR WORKSPACE</span>
+                <span className="ops-eyebrow">AUTOMATIC SYNC / BACKUP CSV</span>
                 <h2>まず、申込みCSVを読み込みましょう。</h2>
-                <p>Netlify管理画面の <strong>Forms → diary-pr-inquiry</strong> からCSVをエクスポートしてください。読み込んだ内容はサーバーにアップロードされません。</p>
+                <p>自動同期は右上の「自動同期ログイン」。設定前はNetlify管理画面の <strong>Forms → diary-pr-inquiry</strong> からCSVを読み込めます。CSVはサーバーにアップロードされません。</p>
                 <button type="button" className="ops-button ops-primary" onClick={() => picker.current?.click()}>
                   CSVを選択する <span aria-hidden="true">↗</span>
                 </button>
                 <div className="ops-start-footer">
                   <span>✓ 専用データベース不要</span>
-                  <span>✓ 認証トークン不要</span>
-                  <span>✓ ブラウザ内のみで処理</span>
+                  <span>✓ CSV用トークン不要</span>
+                  <span>✓ 認証後は自動同期可能</span>
                 </div>
               </section>
             ) : (
               <>
                 <div className="ops-loaded-status">
                   <span>{items.length}件を読込済み　/　{importedFile}</span>
-                  <span>変更内容はCSVで保存してください。ページ更新時に破棄されます。</span>
+                  <span>進捗・金額の編集はまだ端末内のみ。変更後はCSV保存が必要です。</span>
                 </div>
                 {screen === "overview" && (
                   <>
@@ -429,7 +453,7 @@ export function DiaryOpsConsole() {
               </dl>
             </div>
           </div>
-          <footer><p>変更はブラウザ内のみ。必ずCSVを書き出して保存してください。</p>
+          <footer><p>編集内容はブラウザ内のみ。変更後はCSVを書き出してください（自動同期は新着受付の取得のみ）。</p>
             <button className="ops-button ops-primary" onClick={() => { exportCsv(); setSelectedId(null); }}>変更内容をCSV保存 ↗</button>
           </footer>
         </section>
