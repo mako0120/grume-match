@@ -48,7 +48,7 @@ function fixture({ auditEnabled = true } = {}) {
     PropertiesService: { getScriptProperties: () => ({
       getProperty: key => props[key] ?? null,
     }) },
-    SpreadsheetApp: { openById: id => {
+    SpreadsheetApp: { flush: () => {}, openById: id => {
       if (id !== SITE) throw Error("Unexpected spreadsheet");
       return { getSheetByName: name => name === "01_案件ボード" ? sheet : null };
     } },
