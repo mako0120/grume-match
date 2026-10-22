@@ -124,16 +124,24 @@ function diaryOpsOpen_() {
   return sheet;
 }
 function diaryOpsRows_(sheet) {
-  const total = Math.min(1000, Math.max(0, sheet.getLastRow() - 5));
-  return total ? sheet.getRange(6, 1, total, 26).getValues() : [];
+  const actualRows = Math.max(0, sheet.getLastRow() - 5);
+  // Never display stale/incomplete financial totals as if they were complete.
+  // Operators must archive or migrate before extending beyond this bound.
+  if (actualRows > 1000) throw Error('unavailable');
+  return actualRows ? sheet.getRange(6, 1, actualRows, 26).getValues() : [];
 }
 function diaryOpsList_() {
   const records = diaryOpsRows_(diaryOpsOpen_());
-  return {
-    ok: true,
-    items: records.filter(row => /^[A-Za-z0-9-]{8,128}$/.test(String(row[20] || '')))
-      .map(diaryOpsItem_),
-  };
+  const ids = new Set();
+  const items = [];
+  records.forEach(row => {
+    const id = String(row[20] || '');
+    if (!/^[A-Za-z0-9-]{8,128}$/.test(id)) return;
+    if (ids.has(id)) throw Error('conflict');
+    ids.add(id);
+    items.push(diaryOpsItem_(row));
+  });
+  return { ok: true, items };
 }
 function diaryOpsUpdate_(payload) {
   if (!payload || typeof payload !== 'object' ||
@@ -156,17 +164,27 @@ function diaryOpsUpdate_(payload) {
   Object.entries(patch).forEach(([field, value]) => {
     newRow[DIARY_OPS_COLUMNS_[field] - 1] = value;
   });
-  // Preserve formulas from the original row in one batched row write. This
-  // prevents the ledger's outstanding-balance formula (L) from being erased.
   const physicalRow = matches[0] + 6;
   const formulas = sheet.getRange(physicalRow, 1, 1, 26).getFormulas()[0];
-  formulas.forEach((formula, i) => { if (formula) newRow[i] = formula; });
+  // Never overwrite a calculated cell or touch unrelated fields (including
+  // untrusted contact data, manual comments, and the outstanding-balance formula).
+  if (Object.keys(patch).some(field => formulas[DIARY_OPS_COLUMNS_[field] - 1])) {
+    throw Error('conflict');
+  }
   const after = diaryOpsItem_(newRow);
   if (after.version === before.version) return { ok: true, item: before };
-  sheet.getRange(physicalRow, 1, 1, 26).setValues([newRow]);
-  // Only field names and digest are logged. Never log contact name, email,
-  // consultation text, the patch values, or the signing secret.
-  audit.appendRow([new Date(), payload.id, Object.keys(patch).join(','), before.version, after.version]);
+  const changeFields = Object.keys(patch);
+  const record = [new Date(), payload.id, changeFields.join(','),
+    before.version, after.version];
+  // Append a BEGIN record BEFORE edits. If any later call fails, this
+  // remains visible for reconciliation rather than silently losing the audit.
+  audit.appendRow(record.concat(['BEGIN']));
+  changeFields.forEach(field => {
+    const column = DIARY_OPS_COLUMNS_[field];
+    sheet.getRange(physicalRow, column).setValue(patch[field]);
+  });
+  // A missing COMMITTED record must be investigated; never return success.
+  audit.appendRow(record.concat(['COMMITTED']));
   return { ok: true, item: after };
 }
 function setupDiaryOpsAuditSheet() {
@@ -191,10 +209,12 @@ function doPost(e) {
       e.postData.contents.length > 12000) return fail('invalid');
   let envelope;
   try { envelope = JSON.parse(e.postData.contents); } catch { return fail('invalid'); }
+  // Verify before acquiring the lock so unauthenticated requests cannot
+  // monopolize the shared sync/write mutex.
+  if (!diaryOpsVerify_(envelope, PropertiesService.getScriptProperties())) return fail('invalid');
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) return fail('rate_limited');
   try {
-    if (!diaryOpsVerify_(envelope, PropertiesService.getScriptProperties())) return fail('invalid');
     const cache = CacheService.getScriptCache();
     const key = 'DIARY_OPS_' + envelope.nonce;
     if (cache.get(key)) return fail('invalid');
