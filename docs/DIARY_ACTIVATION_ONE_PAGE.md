@@ -10,17 +10,16 @@
 - 接続する原本: 今の「グルメ日誌｜PR案件管理ボード」（大学のGoogle Drive）、移行・コピー不要
 - Netlify Forms名称: `diary-pr-inquiry`
 - 正本: `07_自動受付`（受付）、`01_案件ボード`（運用・金額）、`08_変更履歴`（監査）
-- Apps Scriptに配置するコードは **3本**:
-  - `scripts/diary-netlify-sheets-sync.gs`
-  - `scripts/diary-ops-state-webapp.gs`
-  - `scripts/diary-integration-readiness.gs`
+- Apps Scriptに配置するのは、**統合済みの1ファイル** `scripts/diary-ops-install-bundle.gs` のみ。
+  - 元ソースは `diary-netlify-sheets-sync.gs` / `diary-ops-state-webapp.gs` / `diary-integration-readiness.gs` の3本。
+  - `node scripts/build-diary-install-bundle.mjs` で再生成し、CIテストで一致確認。統合版と個別版を**同時に貼り付けない**（関数の二重定義になる）。
 - バックアップ機能は別の `scripts/diary-ops-backup.gs`。自動バックアップは初期OFF。
 - GitHubとWeb画面に実際のNetlify APIトークンやHMAC秘密値を書かない。Netlify/Apps Scriptの**秘密設定画面だけ**に登録。
 
 ## 1. 既存Google SheetsでApps Scriptを設定
 
 1. 大学Googleアカウントで既存の管理表を開き、拡張機能 → Apps Script を選択。
-2. 上記3ファイルの内容を同じApps Scriptプロジェクトに配置。古いバージョンがある場合はバックアップを確認して最新コードに更新。
+2. GitHubの `scripts/diary-ops-install-bundle.gs` の内容をコピーし、既存のApps Scriptプロジェクトの**単一ファイルへ貼り付ける**。過去の同名関数を含む古いコードは別途控えを保存した上で整理し、個別版との重複配置を避ける。
 3. プロジェクトの設定 → スクリプト プロパティ:
    - `SPREADSHEET_ID`: **現在の管理表のID**（URLの `/d/…/edit` 部分）。
    - `NETLIFY_API_TOKEN`: Netlifyユーザー設定で発行した、保護された個人アクセストークン。
