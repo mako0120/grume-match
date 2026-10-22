@@ -51,6 +51,46 @@ export function DiaryOpsConsole() {
   const [syncing, setSyncing] = useState(false);
   const [showLiveLogin, setShowLiveLogin] = useState(false);
   const picker = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Owner-only live data is never kept visible after logout or role revocation.
+  function clearLiveData() {
+    setAccessToken("");
+    setItems([]);
+    setSelectedId(null);
+    setImportedFile("");
+    setLastSyncedAt("");
+    setEmail("");
+    setPassword("");
+  }
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setSelectedId(null);
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const controls = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]'
+      ));
+      if (!controls.length) return;
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => { document.removeEventListener("keydown", onKeyDown); previousFocus?.focus(); };
+  }, [selectedId]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -70,7 +110,7 @@ export function DiaryOpsConsole() {
         if (!response.ok) {
           const err = typeof body === "object" && body !== null && "error" in body ? String(body.error) : "unknown";
           if (response.status === 401 || response.status === 403) {
-            setAccessToken("");
+            clearLiveData();
             setLiveError("本人認証の有効期限が切れたか、管理者権限がありません。再ログインしてください。");
           } else {
             setLiveError("自動同期に失敗しました（" + err + "）。Netlifyの設定と接続を確認してください。");
@@ -141,6 +181,9 @@ export function DiaryOpsConsole() {
         throw new Error("login_failed");
       }
       setPassword("");
+      setItems([]);
+      setSelectedId(null);
+      setImportedFile("");
       setAccessToken(data.access_token);
       setShowLiveLogin(false);
     } catch {
@@ -253,7 +296,7 @@ export function DiaryOpsConsole() {
             <div className="ops-top-actions">
               <span className="ops-private-pill">{accessToken ? "● LIVE / 60秒更新" : "● PRIVATE MODE"}</span>
               <button type="button" className="ops-button ops-secondary"
-                onClick={() => { if (accessToken) { setAccessToken(""); setLastSyncedAt(""); setLiveError(""); }
+                onClick={() => { if (accessToken) { clearLiveData(); setLiveError(""); }
                   else setShowLiveLogin(!showLiveLogin); }}>
                 {accessToken ? "自動同期を終了" : "自動同期ログイン"}
               </button>
@@ -424,9 +467,9 @@ export function DiaryOpsConsole() {
       </div>
 
       {selected && <div className="ops-modal-shade" onMouseDown={event => { if (event.target === event.currentTarget) setSelectedId(null); }}>
-        <section className="ops-detail" role="dialog" aria-modal="true" aria-label={selected.restaurant + "の案件詳細"}>
+        <section ref={dialogRef} className="ops-detail" role="dialog" aria-modal="true" aria-label={selected.restaurant + "の案件詳細"}>
           <header><div><span className="ops-eyebrow">CASE DETAIL</span><h2>{selected.restaurant}</h2><p>{selected.id}</p></div>
-            <button aria-label="閉じる" className="ops-close" onClick={() => setSelectedId(null)}>✕</button></header>
+            <button ref={closeButtonRef} aria-label="閉じる" className="ops-close" onClick={() => setSelectedId(null)}>✕</button></header>
           <div className="ops-detail-body">
             <div className="ops-detail-fields">
               <label>進捗ステータス<select value={selected.status} onChange={event => updateCase(selected.id, { status: event.target.value as DiaryOpsStatus })}>
