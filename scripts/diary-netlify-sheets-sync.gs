@@ -105,56 +105,60 @@ function diaryReconcileBoard_(ss, sourceRows) {
   if (count) {
     const keys = board.getRange(6, 1, count, 1).getDisplayValues();
     const sourceIds = board.getRange(6, 21, count, 1).getDisplayValues();
+    const seenSources = new Set();
     keys.forEach((r, i) => {
       if (r[0]) ids.add(String(r[0]));
-      if (sourceIds[i][0]) ids.add(String(sourceIds[i][0]));
+      const sourceId = String(sourceIds[i][0] || '').trim();
+      if (sourceId) {
+        if (seenSources.has(sourceId)) {
+          throw new Error('案件ボードに受付IDの重複があります。自動登録を停止しました');
+        }
+        seenSources.add(sourceId);
+        ids.add(sourceId);
+      }
     });
   }
 
-  // Column C is the operational record's presence indicator. Formula-filled
-  // column L must NEVER be used to determine where the next case belongs.
+  // All 26 columns are checked: a partially edited manual record may have
+  // only a due date, fee, email or note. A formula-only template cell is NOT
+  // considered a manual record. We must never overwrite a populated row.
   const maxRows = board.getMaxRows();
-  const restaurants = maxRows > 5 ?
-    board.getRange(6, 3, maxRows - 5, 1).getDisplayValues() : [];
-  const caseKeys = maxRows > 5 ?
-    board.getRange(6, 1, maxRows - 5, 1).getDisplayValues() : [];
-  const statuses = maxRows > 5 ?
-    board.getRange(6, 4, maxRows - 5, 1).getDisplayValues() : [];
-  const receptionIds = maxRows > 5 ?
-    board.getRange(6, 21, maxRows - 5, 1).getDisplayValues() : [];
-  // Preserve a partially filled manual entry even if its restaurant is blank.
-  const occupied = i => [restaurants, caseKeys, statuses, receptionIds]
-    .some(column => String(column[i] && column[i][0] || '').trim());
+  const existingRows = maxRows > 5 ?
+    board.getRange(6, 1, maxRows - 5, 26) : null;
+  const values = existingRows ? existingRows.getDisplayValues() : [];
+  const formulas = existingRows ? existingRows.getFormulas() : [];
+  const occupied = i => (values[i] || []).some((cell, j) =>
+    String(cell ?? '').trim() !== '' && !(formulas[i] && formulas[i][j]));
   let nextRow = 6;
-  while (nextRow - 6 < restaurants.length && occupied(nextRow - 6)) nextRow++;
+  while (nextRow - 6 < values.length && occupied(nextRow - 6)) nextRow++;
 
   let added = 0;
   for (const received of sourceRows) {
     const id = received[0];
     if (ids.has(id)) continue;
     if (nextRow > board.getMaxRows()) board.insertRowsAfter(board.getMaxRows(), 1);
-    const values = Array(26).fill('');
-    values[0] = id;
-    values[1] = received[1];         // 受付日
-    values[2] = received[2];         // 店舗
-    values[3] = '未対応';
-    values[4] = '受付内容を確認して返信';
-    values[7] = received[5];         // 希望PR
-    values[11] = '=IF(OR($C' + nextRow + '="",$I' + nextRow +
+    const newCase = Array(26).fill('');
+    newCase[0] = id;
+    newCase[1] = received[1];         // 受付日
+    newCase[2] = received[2];         // 店舗
+    newCase[3] = '未対応';
+    newCase[4] = '受付内容を確認して返信';
+    newCase[7] = received[5];         // 希望PR
+    newCase[11] = '=IF(OR($C' + nextRow + '="",$I' + nextRow +
       '="",$D' + nextRow + '="終了"),"",MAX(0,$I' + nextRow + '-N($M' + nextRow + ')))';
-    values[16] = received[3];        // 担当者
-    values[17] = received[4];        // email
-    values[19] = '自動受付から追加・未確認';
-    values[20] = id;                 // Netlify受付ID
-    values[21] = 'Netlify Forms';
-    values[23] = received[7];        // 相談
+    newCase[16] = received[3];        // 担当者
+    newCase[17] = received[4];        // email
+    newCase[19] = '自動受付から追加・未確認';
+    newCase[20] = id;                 // Netlify受付ID
+    newCase[21] = 'Netlify Forms';
+    newCase[23] = received[7];        // 相談
     // One row operation preserves the financial formula in L, and a retry
     // deduplicates by column A even if another sheet write later fails.
-    board.getRange(nextRow, 1, 1, 26).setValues([values]);
+    board.getRange(nextRow, 1, 1, 26).setValues([newCase]);
     ids.add(id);
     added++;
     nextRow++;
-    while (nextRow - 6 < restaurants.length && occupied(nextRow - 6)) nextRow++;
+    while (nextRow - 6 < values.length && occupied(nextRow - 6)) nextRow++;
   }
   return added;
 }
