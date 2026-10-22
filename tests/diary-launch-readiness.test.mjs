@@ -50,3 +50,10 @@ test("billing and unsupported performance claims fail closed", () => {
   assert.match(home, /DIARY_METRICS_VERIFIED === "true"/);
   assert.match(config, /DIARY_SITE_MODE: process.env.CONTEXT === "production"/);
 });
+
+test("public homepage does not shadow Node process.env with the journey steps", () => {
+  const home = read("app/diary/page.tsx");
+  assert.match(home, /const processSteps = \[/);
+  assert.match(home, /process.env.DIARY_METRICS_VERIFIED/);
+  assert.doesNotMatch(home, /const process = \[/);
+});
