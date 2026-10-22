@@ -36,6 +36,7 @@ function fixture({ auditEnabled = true } = {}) {
         setValues: values => {
           for (let i = 0; i < height; i++) cells[row - 1 + i].splice(column - 1, width, ...values[i]);
         },
+        setValue: value => { cells[row - 1][column - 1] = value; },
       };
     },
     getParent: () => ({ getSheetByName: name =>
@@ -106,12 +107,14 @@ test("owner update preserves formula, audits keys only and refuses stale revisio
   assert.equal(changed.item.status, "制作中");
   assert.equal(x.cells[5][8], 15000);
   assert.match(x.cells[5][11], /^=IF/);
-  assert.equal(x.audits.length, 1);
+  assert.equal(x.audits.length, 2);
+  assert.equal(x.audits[0][5], "BEGIN");
+  assert.equal(x.audits[1][5], "COMMITTED");
   assert.equal(JSON.stringify(x.audits).includes("投稿準備"), false);
   const old = x.send(signSheetRequest("update", update, SECRET));
   assert.equal(old.ok, false);
   assert.equal(old.error, "conflict");
-  assert.equal(x.audits.length, 1);
+  assert.equal(x.audits.length, 2);
   x.cells[5][3] = "返信済"; // a concurrent manual Sheets edit
   const stale = x.send(signSheetRequest("update", {
     id: ID, expectedVersion: changed.item.version, patch: { note: "追記" },
@@ -134,4 +137,43 @@ test("no audit sheet means no writes, and formulas in text are neutralized", () 
   }, SECRET));
   assert.equal(result.ok, true);
   assert.equal(withAudit.cells[5][19], "'=HYPERLINK(1)");
+});
+
+test("read refuses duplicate reception IDs and over-limit operational rows", () => {
+  const duplicate = fixture();
+  duplicate.cells[6][20] = ID;
+  // The harness initially reports only 6 used rows. Switch to 7 so the
+  // duplicated ID is included in the real used range.
+  duplicate.context.diaryOpsRows_ = () => [duplicate.cells[5], duplicate.cells[6]];
+  const result = duplicate.send(signSheetRequest("list", {}, SECRET));
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "conflict");
+  const overflow = fixture();
+  const original = overflow.context.diaryOpsOpen_;
+  overflow.context.diaryOpsOpen_ = () => ({
+    getLastRow: () => 1006,
+    getRange: () => { throw Error("Should not read oversized dataset"); },
+  });
+  const failure = overflow.send(signSheetRequest("list", {}, SECRET));
+  assert.equal(failure.ok, false);
+  assert.equal(failure.error, "unavailable");
+  overflow.context.diaryOpsOpen_ = original;
+});
+
+test("failed journal BEGIN aborts before any operational write", () => {
+  const env = fixture();
+  const before = env.send(signSheetRequest("list", {}, SECRET)).items[0];
+  const original = env.context.diaryOpsOpen_;
+  env.context.diaryOpsOpen_ = () => {
+    const sheet = original();
+    sheet.getParent = () => ({ getSheetByName: () => ({
+      appendRow: () => { throw Error("Audit unavailable"); },
+    }) });
+    return sheet;
+  };
+  const failure = env.send(signSheetRequest("update", {
+    id: ID, expectedVersion: before.version, patch: { status: "成約" },
+  }, SECRET));
+  assert.equal(failure.ok, false);
+  assert.equal(env.cells[5][3], "未対応");
 });
