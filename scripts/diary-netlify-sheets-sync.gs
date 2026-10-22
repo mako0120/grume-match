@@ -81,6 +81,77 @@ function diaryToRow_(entry, now) {
   ];
 }
 
+/**
+ * Optional one-way new-lead reconciliation into the operational case board.
+ * OFF by default: Script Property DIARY_BOARD_AUTOCREATE_ENABLED must be "true".
+ * Never overwrite pre-existing operational fields. A failed intermediate run
+ * is repaired on the next poll because ALL fetched IDs are reconciled.
+ */
+function diaryReconcileBoard_(ss, sourceRows) {
+  const board = ss.getSheetByName('01_案件ボード');
+  if (!board) throw new Error('案件ボードが見つからないため同期を停止しました');
+  const headings = board.getRange(5, 1, 1, 26).getDisplayValues()[0];
+  if (headings[2] !== '店舗・企業' ||
+      headings[3] !== '進捗ステータス' ||
+      headings[20] !== 'Netlify受付ID') {
+    throw new Error('案件ボード列構成が変わったため同期を停止しました');
+  }
+
+  // A is our stable case key, U is the Netlify submission key. Also check U
+  // for cases entered manually before this automatic reconciliation existed.
+  const last = Math.max(board.getLastRow(), 5);
+  const count = Math.max(0, last - 5);
+  const ids = new Set();
+  if (count) {
+    const keys = board.getRange(6, 1, count, 1).getDisplayValues();
+    const sourceIds = board.getRange(6, 21, count, 1).getDisplayValues();
+    keys.forEach((r, i) => {
+      if (r[0]) ids.add(String(r[0]));
+      if (sourceIds[i][0]) ids.add(String(sourceIds[i][0]));
+    });
+  }
+
+  // Column C is the operational record's presence indicator. Formula-filled
+  // column L must NEVER be used to determine where the next case belongs.
+  const maxRows = board.getMaxRows();
+  const restaurants = maxRows > 5 ?
+    board.getRange(6, 3, maxRows - 5, 1).getDisplayValues() : [];
+  let nextRow = 6;
+  while (nextRow - 6 < restaurants.length &&
+      String(restaurants[nextRow - 6][0] || '').trim()) nextRow++;
+
+  let added = 0;
+  for (const received of sourceRows) {
+    const id = received[0];
+    if (ids.has(id)) continue;
+    if (nextRow > board.getMaxRows()) board.insertRowsAfter(board.getMaxRows(), 1);
+    const values = Array(26).fill('');
+    values[0] = id;
+    values[1] = received[1];         // 受付日
+    values[2] = received[2];         // 店舗
+    values[3] = '未対応';
+    values[4] = '受付内容を確認して返信';
+    values[7] = received[5];         // 希望PR
+    values[11] = '=IF(OR($C' + nextRow + '="",$I' + nextRow +
+      '="",$D' + nextRow + '="終了"),"",MAX(0,$I' + nextRow + '-N($M' + nextRow + ')))';
+    values[16] = received[3];        // 担当者
+    values[17] = received[4];        // email
+    values[19] = '自動受付から追加・未確認';
+    values[20] = id;                 // Netlify受付ID
+    values[21] = 'Netlify Forms';
+    values[23] = received[7];        // 相談
+    // One row operation preserves the financial formula in L, and a retry
+    // deduplicates by column A even if another sheet write later fails.
+    board.getRange(nextRow, 1, 1, 26).setValues([values]);
+    ids.add(id);
+    added++;
+    nextRow++;
+    while (nextRow - 6 < restaurants.length &&
+        String(restaurants[nextRow - 6][0] || '').trim()) nextRow++;
+  }
+  return added;
+}
+
 function syncDiaryNetlifyForms() {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(30000)) return;
@@ -105,6 +176,7 @@ function syncDiaryNetlifyForms() {
     const prefix = root + '/forms/' + encodeURIComponent(formId) + '/submissions';
     const current = new Date();
     const newRows = [];
+    const boardCandidates = new Map();
     let completed = false;
 
     for (let page = 1; page <= DIARY_SYNC.limitPages; page++) {
@@ -112,9 +184,12 @@ function syncDiaryNetlifyForms() {
       const data = diaryRequest_(prefix + '?page=' + page + '&per_page=' + DIARY_SYNC.pageSize, token);
       for (const entry of data) {
         const row = diaryToRow_(entry, current);
-        if (row && !existing.has(row[0])) {
-          existing.add(row[0]);
-          newRows.push(row);
+        if (row) {
+          boardCandidates.set(row[0], row);
+          if (!existing.has(row[0])) {
+            existing.add(row[0]);
+            newRows.push(row);
+          }
         }
       }
       if (data.length < DIARY_SYNC.pageSize) { completed = true; break; }
@@ -129,6 +204,11 @@ function syncDiaryNetlifyForms() {
       }
       sheet.getRange(start, 1, newRows.length, 14).setValues(newRows);
     }
+    const boardEnabled = PropertiesService.getScriptProperties()
+      .getProperty('DIARY_BOARD_AUTOCREATE_ENABLED') === 'true';
+    const boardCount = boardEnabled ?
+      diaryReconcileBoard_(ss, Array.from(boardCandidates.values()).reverse()) : 0;
+    PropertiesService.getScriptProperties().setProperty('DIARY_LAST_BOARD_COUNT', String(boardCount));
     PropertiesService.getScriptProperties().setProperty('DIARY_LAST_SUCCESS', new Date().toISOString());
     PropertiesService.getScriptProperties().setProperty('DIARY_LAST_COUNT', String(newRows.length));
     console.log('Diary Netlify sync OK; new submissions:', newRows.length);
