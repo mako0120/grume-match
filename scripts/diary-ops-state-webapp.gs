@@ -183,9 +183,15 @@ function diaryOpsUpdate_(payload) {
     const column = DIARY_OPS_COLUMNS_[field];
     sheet.getRange(physicalRow, column).setValue(patch[field]);
   });
+  // Google Sheets can normalize literal prefixes, date formats, and numbers.
+  // Report the value actually stored, never an optimistic client-side guess.
+  SpreadsheetApp.flush();
+  const persisted = diaryOpsItem_(sheet.getRange(physicalRow, 1, 1, 26).getValues()[0]);
+  if (persisted.version === before.version) throw Error('unavailable');
   // A missing COMMITTED record must be investigated; never return success.
-  audit.appendRow(record.concat(['COMMITTED']));
-  return { ok: true, item: after };
+  audit.appendRow([new Date(), payload.id, changeFields.join(','),
+    before.version, persisted.version, 'COMMITTED']);
+  return { ok: true, item: persisted };
 }
 function setupDiaryOpsAuditSheet() {
   const id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
