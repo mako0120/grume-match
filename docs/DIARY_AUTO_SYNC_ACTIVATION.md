@@ -67,3 +67,90 @@
 - https://docs.netlify.com/manage/security/secure-access-to-sites/identity/overview/
 - https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app
 - https://developers.google.com/apps-script/guides/v8-runtime
+
+---
+
+## D. オプション：案件ボード自動登録（V2・初期OFF）
+
+実装ファイルは `scripts/diary-netlify-sheets-sync.gs`、テストは
+`tests/diary-ops-board-reconcile.test.mjs` です。
+
+専用Gmail所有のコピーにあるApps Scriptを最新コードに更新した**後**、
+Script Propertiesに `DIARY_BOARD_AUTOCREATE_ENABLED=true` をオーナーが設定すると、
+次回の約5分同期から `07_自動受付` に加えて `01_案件ボード` にも新規IDを登録します。
+初期値はOFFです。列見出し `C5:店舗・企業`、`D5:進捗ステータス`、
+`U5:Netlify受付ID` が一致しなければ処理は停止します。
+
+- 受付ID（A/U列）で重複を拒否。すでに受付済みだが案件ボードに未登録のIDも次回再照合。
+- 手入力済みの行を検出してスキップ。既存のステータスや売上額は上書きしません。
+- 新規行のL列の未収額計算式を保持。新規登録は「未対応」に限定し、成約・入金を自動判定しません。
+- 一度でも成功した時点で `DIARY_LAST_BOARD_COUNT`、`DIARY_LAST_SUCCESS` を Script Properties に記録。
+- 失敗した場合はApps Script実行履歴で確認。外部への専用の同期失敗通知は**未実装**。
+
+**重要：** 対象の大学所有の元シートではなく、専用Gmail所有のコピーに適用してください。
+オーナーによるコード配置とトリガー設定の承認前には同期は動きません。
+
+## E. オプション：Web→Sheetsへの進捗保存（V2・初期OFF）
+
+Netlify Formsが**申込受付の原本**、専用Gmail所有の
+`01_案件ボード` が**進捗・金額・来店・投稿・入金の唯一の運用正本**です。
+Webは独立したDBを作りません。
+
+関連ファイル：
+
+- `netlify/functions/diary-ops-state.mjs` : Netlify Identity本人認証、管理ロール、保存要求の検証、署名通信
+- `scripts/diary-ops-state-webapp.gs` : Google Sheetsの読取・進捗保存、排他ロック、HMAC照合、再送防止、リビジョン検査
+- `app/diary/ops/components/diary-ops-console.tsx` : 60秒読取、画面での手動保存と競合警告
+
+### オーナーが承認後に実行する設定
+
+1. 専用GmailのコピーのApps Scriptに、元の同期コードと `diary-ops-state-webapp.gs` の**両方**を配置。
+2. Script Properties に `DIARY_SHEETS_HMAC_SECRET` を設定（長さ32文字以上の強いランダム値）。
+   秘密値をChatGPT・GitHub・Sheetセル・ブラウザJavaScriptへ貼らない。
+3. `setupDiaryOpsAuditSheet` を手動で一度実行し、
+   非公開の `08_変更履歴` シートを作成。共有設定は「制限付き」を維持。
+4. コード監査・権限テスト後、Apps ScriptをWebアプリとしてデプロイ。
+   **「自分として実行」かつ「全員」**の公開入口になるため、URLは秘密でなくとも
+   HMAC秘密値の保護が必須。使用するGoogleアカウント・権限範囲を確認してから承認する。
+5. NetlifyのFunctions専用秘密環境変数に
+   `DIARY_SHEETS_HMAC_SECRET` と `DIARY_SHEETS_WEBAPP_URL` を設定。
+   SecretはApps Scriptの値と一致させる。
+6. その他の本人認証設定と動作確認がすべて終了してから、Netlify環境で
+   `DIARY_OPS_STATE_ENABLED=true` とする（それまではOFF）。
+   `DIARY_OPS_AUTO_SYNC_ENABLED=true` および `DIARY_OPS_OWNER_EMAIL` も必要。
+7. 正規の管理者だけで疎通確認。未認証401・他ユーザー403・未設定503、
+   古いバージョン409、無効な入力400、保存後のSheetsリロード反映を確認。
+   Google Sheetを手編集した直後のWeb保存は競合として拒否すること。
+
+保存は明示的な「Google Sheetsに保存」操作のみ。
+Stripe請求、入金確認の自動実行、自動成約は含みません。
+クライアントにはAPIトークン・HMAC秘密値を返しません。
+
+### ロールバックと残余リスク
+
+- 即時停止：`DIARY_OPS_STATE_ENABLED=false`、
+  `DIARY_BOARD_AUTOCREATE_ENABLED=false`。
+  Netlify側設定変更や本番デプロイは事前のオーナー承認が必要。
+- Apps Scriptの公開Webアプリは署名により保護されますが、
+  認証付きGoogle API直接接続と比べて公開攻撃面が増えます。
+  コード実装だけをもって商用利用可能とは判定しません。
+- Sheetsは完全なトランザクションDBではありません。
+  更新した行と監査行の書込みの間で失敗した場合は、
+  Webで保存完了と判定せず、手動で変更履歴と対象行を確認してください。
+- Script Propertiesの秘密値はオーナーが保管し、
+  漏洩時には両サービスで交換してWebアプリのアクセスを遮断してください。
+- Netlify Identityのパスワード認証では独自MFAの強制をまだ検証できていません。
+  Googleログインなどの認証移行と管理者のMFA必須化を別途安全性評価します。
+
+## 公式仕様（2026-10-22確認）
+
+- Netlify Identityはcredit-basedプランで招待制とFunction認証に対応。
+  新規実装の推奨ライブラリは `@netlify/identity`（既存のログイン方式は移行検討中）。
+  https://docs.netlify.com/manage/security/secure-access-to-sites/identity/overview/
+- Google Apps Scriptは `doPost(e)` のWebアプリを所有者権限で実行可能。
+  https://developers.google.com/apps-script/guides/web
+- 無料GmailのApps Script UrlFetch上限は現在20,000回/日、トリガー合計90分/日。
+  5分ごとなら約288回/日で、受付1ページの場合はNetlify API約576回/日。
+  https://developers.google.com/apps-script/guides/services/quotas
+- Netlifyの従量クレジットはFunction computeとリクエスト量が課金対象。
+  https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/how-credits-work/
