@@ -191,12 +191,18 @@ export function DiaryOpsConsole() {
           stateWarning = "Sheets同期に失敗しました。進捗はまだ保存されていません。";
         }
         if (cancelled) return;
-        setStateConnected(canSave);
+        // Never present unregistered new leads as zero-revenue operational
+        // records. Sheets may lag the Forms intake by up to five minutes.
+        const complete = canSave && incoming.every(lead => persisted.has(lead.id)) &&
+          !("partial" in body && body.partial === true);
+        if (canSave && !complete && !stateWarning) {
+          stateWarning = "新着案件がSheetsに未登録、または一覧が一部未取得です。運用数値と保存を保留しています。";
+        }
+        stateVersions.current = complete ? stateVersions.current : new Map();
+        setStateConnected(complete);
         setItems(previous => {
-          const existing = new Map(previous.map(item => [item.id, item]));
           const updated = incoming.map(lead => {
-            const before = existing.get(lead.id);
-            const ops = persisted.get(lead.id) || before;
+            const ops = complete ? persisted.get(lead.id) : undefined;
             return {
               ...lead,
               status: ops?.status ?? "未対応",
@@ -210,8 +216,7 @@ export function DiaryOpsConsole() {
               postUrl: ops?.postUrl ?? "",
             } as DiaryOpsCase;
           });
-          const missing = previous.filter(item => !incoming.some(lead => lead.id === item.id));
-          return [...updated, ...missing];
+          return updated;
         });
         setImportedFile("NETLIFY LIVE / " + new Date().toLocaleTimeString("ja-JP"));
         setLastSyncedAt(new Date().toLocaleTimeString("ja-JP"));
@@ -305,6 +310,7 @@ export function DiaryOpsConsole() {
   const open = items.filter(item => !closed(item.status));
   const pending = open.filter(item => item.status === "未対応").length;
   const late = open.filter(overdue).length;
+  const opsReady = !accessToken || stateConnected;
   const contracted = items.reduce((sum, item) => sum + item.agreedFee, 0);
   const unpaid = items.reduce((sum, item) => sum + Math.max(0, item.agreedFee - item.paidAmount), 0);
   const next = open.slice().sort((a, b) => {
@@ -456,10 +462,10 @@ export function DiaryOpsConsole() {
               </button>
               <input ref={picker} type="file" accept=".csv,text/csv" className="ops-visually-hidden" aria-label="CSVを読み込む"
                 onChange={event => { void importCsv(event.target.files?.[0]); }} />
-              <button type="button" className="ops-button ops-secondary" disabled={loading} onClick={() => picker.current?.click()}>
+              <button type="button" className="ops-button ops-secondary" disabled={loading || Boolean(accessToken)} onClick={() => picker.current?.click()}>
                 {loading ? "読込中…" : "CSVを読み込む"}
               </button>
-              <button type="button" className="ops-button ops-primary" disabled={!items.length} onClick={exportCsv}>
+              <button type="button" className="ops-button ops-primary" disabled={!items.length || !opsReady} onClick={exportCsv}>
                 CSVを書き出す ↗
               </button>
             </div>
@@ -521,12 +527,17 @@ export function DiaryOpsConsole() {
                   <>
                     <div className="ops-metrics">
                       <div><span>総受付件数</span><strong>{items.length}<small> 件</small></strong><p>読み込まれた案件</p></div>
-                      <div><span>未対応</span><strong>{pending}<small> 件</small></strong><p>最優先で確認</p></div>
-                      <div className={late ? "ops-metric-warning" : ""}><span>期限超過</span><strong>{late}<small> 件</small></strong><p>対応期限を再確認</p></div>
-                      <div><span>合意金額</span><strong>{formatYen(contracted)}</strong><p>全案件の合計</p></div>
-                      <div><span>未入金</span><strong>{formatYen(unpaid)}</strong><p>未収の合計</p></div>
+                      {opsReady ? <>
+                        <div><span>未対応</span><strong>{pending}<small> 件</small></strong><p>最優先で確認</p></div>
+                        <div className={late ? "ops-metric-warning" : ""}><span>期限超過</span><strong>{late}<small> 件</small></strong><p>対応期限を再確認</p></div>
+                        <div><span>合意金額</span><strong>{formatYen(contracted)}</strong><p>全案件の合計</p></div>
+                        <div><span>未入金</span><strong>{formatYen(unpaid)}</strong><p>未収の合計</p></div>
+                      </> : <div className="ops-metric-warning">
+                        <span>進捗・売上</span><strong>未取得</strong>
+                        <p>Google Sheetsの同期が完了するまで集計しません</p>
+                      </div>}
                     </div>
-                    <div className="ops-overview-grid">
+                    {opsReady && <div className="ops-overview-grid">
                       <section className="ops-panel">
                         <div className="ops-panel-heading"><div><span className="ops-eyebrow">ACTION PRIORITY</span><h2>次にやること</h2></div>
                           <button onClick={() => setScreenTo("cases")} className="ops-text-action">すべて見る ↗</button>
@@ -554,7 +565,7 @@ export function DiaryOpsConsole() {
                         </div>
                         <button onClick={() => setScreenTo("pipeline")} className="ops-text-action">カンバンで確認 ↗</button>
                       </section>
-                    </div>
+                    </div>}
                   </>
                 )}
                 {(screen === "cases" || screen === "pipeline") && (
@@ -570,7 +581,10 @@ export function DiaryOpsConsole() {
                     <span>{visible.length}件を表示</span>
                   </div>
                 )}
-                {screen === "pipeline" && (
+                {screen === "pipeline" && !opsReady && <p className="ops-feedback ops-error" role="status">
+                  運用データはまだ取得できません。新着受付がSheetsへ反映されるまでお待ちください。
+                </p>}
+                {screen === "pipeline" && opsReady && (
                   <div className="ops-kanban">
                     {DIARY_OPS_STAGES.map(stage => {
                       const stageItems = visible.filter(item => (stage.statuses as readonly string[]).includes(item.status));
@@ -591,17 +605,20 @@ export function DiaryOpsConsole() {
                     <table className="ops-table"><thead><tr><th>店舗・企業</th><th>進捗</th><th>次の対応</th><th>期限</th><th>合意金額</th><th>詳細</th></tr></thead>
                       <tbody>{visible.map(item => <tr key={item.id}>
                         <td><strong>{item.restaurant}</strong><small>{item.contact}</small></td>
-                        <td><span className="ops-status-tag">{item.status}</span></td>
-                        <td>{item.nextAction || "未設定"}</td>
-                        <td className={overdue(item) ? "ops-date-late" : ""}>{readableDate(item.dueDate)}</td>
-                        <td>{formatYen(item.agreedFee)}</td>
+                        <td><span className="ops-status-tag">{opsReady ? item.status : "未取得"}</span></td>
+                        <td>{opsReady ? (item.nextAction || "未設定") : "同期中"}</td>
+                        <td className={opsReady && overdue(item) ? "ops-date-late" : ""}>{opsReady ? readableDate(item.dueDate) : "—"}</td>
+                        <td>{opsReady ? formatYen(item.agreedFee) : "—"}</td>
                         <td><button className="ops-text-action" onClick={() => setSelectedId(item.id)}>開く ↗</button></td>
                       </tr>)}</tbody>
                     </table>
                     {!visible.length && <p className="ops-empty">検索条件に一致する案件はありません。</p>}
                   </section>
                 )}
-                {screen === "calendar" && (
+                {screen === "calendar" && !opsReady && <p className="ops-feedback ops-error" role="status">
+                  来店・投稿予定は運用データの同期完了後に表示されます。
+                </p>}
+                {screen === "calendar" && opsReady && (
                   <section className="ops-panel ops-calendar">
                     <div className="ops-calendar-toolbar">
                       <div><span className="ops-eyebrow">VISIT & PUBLISH / SCHEDULE</span>
@@ -649,7 +666,10 @@ export function DiaryOpsConsole() {
                     {!calendarEvents.length && <p className="ops-empty">この月の来店・投稿予定はまだありません。</p>}
                   </section>
                 )}
-                {screen === "finance" && (
+                {screen === "finance" && !opsReady && <p className="ops-feedback ops-error" role="status">
+                  売上・入金データは未取得です。0円とは判断しないでください。
+                </p>}
+                {screen === "finance" && opsReady && (
                   <section className="ops-panel ops-finance">
                     <div className="ops-panel-heading"><div><span className="ops-eyebrow">BILLING & REVENUE</span><h2>入金状況の確認</h2></div></div>
                     <div className="ops-metrics ops-finance-metrics"><div><span>合意金額</span><strong>{formatYen(contracted)}</strong></div><div><span>着金額</span><strong>{formatYen(items.reduce((sum, item) => sum + item.paidAmount, 0))}</strong></div><div><span>未回収</span><strong>{formatYen(unpaid)}</strong></div></div>
@@ -673,7 +693,7 @@ export function DiaryOpsConsole() {
           <header><div><span className="ops-eyebrow">CASE DETAIL</span><h2>{selected.restaurant}</h2><p>{selected.id}</p></div>
             <button ref={closeButtonRef} aria-label="閉じる" className="ops-close" onClick={closeDetail}>✕</button></header>
           <div className="ops-detail-body">
-            <div className="ops-detail-fields">
+            <fieldset className="ops-detail-fields" disabled={Boolean(accessToken && !stateConnected)}>
               <label>進捗ステータス<select value={selected.status} onChange={event => updateCase(selected.id, { status: event.target.value as DiaryOpsStatus })}>
                 {DIARY_OPS_STATUSES.map(s => <option key={s}>{s}</option>)}
               </select></label>
@@ -685,7 +705,7 @@ export function DiaryOpsConsole() {
               <label>確認済み入金額<input type="number" min={0} max={1000000000} value={selected.paidAmount} onChange={event => updateCase(selected.id, { paidAmount: Math.max(0, Number(event.target.value) || 0) })} /></label>
               <label>投稿URL<input type="url" maxLength={300} value={selected.postUrl} onChange={event => updateCase(selected.id, { postUrl: event.target.value })} placeholder="https://www.instagram.com/p/..." /></label>
               <label className="ops-span-all">運用メモ<textarea value={selected.note} maxLength={2000} rows={4} onChange={event => updateCase(selected.id, { note: event.target.value })} placeholder="相手との合意条件や次回連絡の内容" /></label>
-            </div>
+            </fieldset>
             <div className="ops-detail-original">
               <h3>受付内容（読み込み元）</h3>
               <dl><dt>受付日時</dt><dd>{selected.receivedAt || "不明"}</dd>
