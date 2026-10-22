@@ -22,6 +22,8 @@ function fixture() {
   cells[6][2] = "既存店舗";
   cells[6][20] = ID2;
   cells[6][8] = 8000;
+  // A third manual draft has only a due date and must remain untouched.
+  cells[7][5] = "2026-10-30";
   const writes = [];
   const board = {
     getMaxRows: () => cells.length,
@@ -30,6 +32,9 @@ function fixture() {
       return {
         getDisplayValues: () => cells.slice(row - 1, row - 1 + height)
           .map(fields => fields.slice(col - 1, col - 1 + width)),
+        getFormulas: () => cells.slice(row - 1, row - 1 + height)
+          .map(fields => fields.slice(col - 1, col - 1 + width).map(value =>
+            typeof value === "string" && value.startsWith("=") ? value : "")),
         setValues(rows) {
           assert.equal(width, 26);
           assert.equal(height, 1);
@@ -64,17 +69,18 @@ test("reconcile appends once, preserves existing ops, and survives retry", () =>
   const env = fixture();
   assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1), lead(ID2)]), 1);
   assert.equal(env.writes.length, 1);
-  assert.equal(env.writes[0].row, 8); // Do not overwrite a partially filled case
-  const row = env.cells[7];
+  assert.equal(env.writes[0].row, 9); // Do not overwrite any partially filled case
+  const row = env.cells[8];
   assert.equal(row[0], ID1);
   assert.equal(row[2], "大阪テスト店舗");
   assert.equal(row[3], "未対応");
   assert.equal(row[20], ID1);
   assert.equal(row[16], "担当者");
   assert.equal(row[23], "'=HYPERLINK(1)");
-  assert.match(row[11], /\$C8.*\$I8.*\$M8/);
+  assert.match(row[11], /\$C9.*\$I9.*\$M9/);
   assert.equal(env.cells[5][3], "返信済");
   assert.equal(env.cells[6][8], 8000);
+  assert.equal(env.cells[7][5], "2026-10-30");
   assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1), lead(ID2)]), 0);
   assert.equal(env.writes.length, 1);
 });
@@ -91,4 +97,18 @@ test("reconcile prevents formula evaluation from pre-neutralized intake text", (
   assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1, "'=IMPORTXML()")]), 1);
   assert.equal(env.writes[0].values[2], "'=IMPORTXML()");
   assert.equal(env.writes[0].values[23], "'=HYPERLINK(1)");
+});
+
+test("duplicate reception IDs on the operational board stop before writing", () => {
+  const env = fixture();
+  env.cells[8][20] = ID2; // Same Netlify ID already exists on row 7.
+  assert.throws(() => env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1)]), /重複/);
+  assert.equal(env.writes.length, 0);
+});
+
+test("template-only calculated cells do not occupy manual draft rows", () => {
+  const env = fixture();
+  env.cells[8][11] = '=IF($C9="","",0)';
+  assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1)]), 1);
+  assert.equal(env.writes[0].row, 9);
 });
