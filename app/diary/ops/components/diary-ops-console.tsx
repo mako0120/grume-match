@@ -60,6 +60,7 @@ export function DiaryOpsConsole() {
   const picker = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const editingBaseline = useRef<DiaryOpsCase | null>(null);
 
   // Owner-only live data is never kept visible after logout or role revocation.
   function clearLiveData() {
@@ -76,12 +77,16 @@ export function DiaryOpsConsole() {
 
   useEffect(() => {
     if (!selectedId) return;
+    // Preserve a pristine snapshot while the detail drawer is being edited.
+    // The background poller remains stopped until this drawer closes.
+    const pristine = items.find(caseItem => caseItem.id === selectedId);
+    editingBaseline.current = pristine ? { ...pristine } : null;
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     closeButtonRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        setSelectedId(null);
+        closeDetail();
       }
       if (event.key !== "Tab" || !dialogRef.current) return;
       const controls = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
@@ -99,6 +104,8 @@ export function DiaryOpsConsole() {
     };
     document.addEventListener("keydown", onKeyDown);
     return () => { document.removeEventListener("keydown", onKeyDown); previousFocus?.focus(); };
+    // selectedId is the only trigger; preserve the edit baseline across keystrokes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
   useEffect(() => {
@@ -261,6 +268,22 @@ export function DiaryOpsConsole() {
   }), [items, search, status]);
 
   const selected = items.find(item => item.id === selectedId);
+  function closeDetail() {
+    if (!selectedId) return;
+    const baseline = editingBaseline.current;
+    const current = items.find(item => item.id === selectedId);
+    const opsFields: Array<keyof DiaryOpsCase> = [
+      "status", "nextAction", "dueDate", "visitDate", "postDate",
+      "agreedFee", "paidAmount", "note", "postUrl",
+    ];
+    if (baseline && current &&
+      opsFields.some(field => baseline[field] !== current[field])) {
+      if (!window.confirm("変更内容がGoogle Sheetsに保存されていません。破棄して閉じますか？")) return;
+      setItems(previous => previous.map(item => item.id === selectedId ? baseline : item));
+    }
+    editingBaseline.current = null;
+    setSelectedId(null);
+  }
   const calendarDays = useMemo(() => {
     const [year, month] = calendarMonth.split("-").map(Number);
     const offset = new Date(year, month - 1, 1).getDay();
@@ -362,6 +385,7 @@ export function DiaryOpsConsole() {
         return;
       }
       stateVersions.current.set(selected.id, result.item.version);
+      editingBaseline.current = null;
       setSelectedId(null);
       setLiveError("");
       setAlert("案件の進捗・金額・メモをGoogle Sheetsに保存しました。");
@@ -642,10 +666,10 @@ export function DiaryOpsConsole() {
         </div>
       </div>
 
-      {selected && <div className="ops-modal-shade" onMouseDown={event => { if (event.target === event.currentTarget) setSelectedId(null); }}>
+      {selected && <div className="ops-modal-shade" onMouseDown={event => { if (event.target === event.currentTarget) closeDetail(); }}>
         <section ref={dialogRef} className="ops-detail" role="dialog" aria-modal="true" aria-label={selected.restaurant + "の案件詳細"}>
           <header><div><span className="ops-eyebrow">CASE DETAIL</span><h2>{selected.restaurant}</h2><p>{selected.id}</p></div>
-            <button ref={closeButtonRef} aria-label="閉じる" className="ops-close" onClick={() => setSelectedId(null)}>✕</button></header>
+            <button ref={closeButtonRef} aria-label="閉じる" className="ops-close" onClick={closeDetail}>✕</button></header>
           <div className="ops-detail-body">
             <div className="ops-detail-fields">
               <label>進捗ステータス<select value={selected.status} onChange={event => updateCase(selected.id, { status: event.target.value as DiaryOpsStatus })}>
@@ -681,7 +705,7 @@ export function DiaryOpsConsole() {
                   onClick={() => { void persistSelectedCase(); }}>
                   {savingState ? "保存中…" : "Google Sheetsに保存 ↗"}
                 </button>
-              : <button className="ops-button ops-primary" onClick={() => { exportCsv(); setSelectedId(null); }}>
+              : <button className="ops-button ops-primary" onClick={() => { exportCsv(); editingBaseline.current = null; setSelectedId(null); }}>
                   変更内容をCSV保存 ↗
                 </button>}
           </footer>
