@@ -108,3 +108,21 @@ test("script has no direct code secrets and does not use unavailable V8 Web APIs
   assert.match(source, /followRedirects: false/);
   assert.match(source, /LockService\.getScriptLock/);
 });
+
+test("setup failure preserves existing scheduled sync instead of disabling it", () => {
+  const env = harness();
+  env.context.setupDiaryAutoSync();
+  assert.equal(env.triggers.length, 1);
+  const original = env.triggers[0];
+  env.setSubmissions(null); // Simulate malformed Netlify response.
+  assert.throws(() => env.context.setupDiaryAutoSync(), /Netlify API応答が不正/);
+  assert.equal(env.triggers.length, 1);
+  assert.equal(env.triggers[0], original);
+});
+
+test("failed first-time sync does not install an unusable trigger", () => {
+  const env = harness();
+  env.setSubmissions(null);
+  assert.throws(() => env.context.setupDiaryAutoSync(), /Netlify API応答が不正/);
+  assert.equal(env.triggers.length, 0);
+});

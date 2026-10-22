@@ -255,13 +255,18 @@ function syncDiaryNetlifyForms() {
 
 function setupDiaryAutoSync() {
   diaryProperties_();
-  // Never install overlapping pollers; this also supports safe reconfiguration.
-  ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'syncDiaryNetlifyForms')
-    .forEach(t => ScriptApp.deleteTrigger(t));
+  // A failed connectivity check MUST NOT delete the existing working trigger.
+  // This is idempotent: re-running setup never creates overlapping pollers.
   syncDiaryNetlifyForms();
-  ScriptApp.newTrigger('syncDiaryNetlifyForms')
-    .timeBased().everyMinutes(DIARY_SYNC.triggerMinutes).create();
-  console.log('Diary auto-sync installed (every 5 minutes).');
+  const triggers = ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'syncDiaryNetlifyForms');
+  if (!triggers.length) {
+    ScriptApp.newTrigger('syncDiaryNetlifyForms')
+      .timeBased().everyMinutes(DIARY_SYNC.triggerMinutes).create();
+  } else {
+    triggers.slice(1).forEach(t => ScriptApp.deleteTrigger(t));
+  }
+  console.log('Diary auto-sync active (one trigger, every 5 minutes when newly installed).');
 }
 
 function stopDiaryAutoSync() {

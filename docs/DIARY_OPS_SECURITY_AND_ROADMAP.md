@@ -1,39 +1,43 @@
-# グルメ日誌｜案件管理 Web V3 と情報漏洩対策（2026-10）
+# グルメ日誌｜案件管理 Web と情報漏洩対策（2026-10-22 更新）
 
-## 現在の構成
+## 利用中の構成と公開状態
 
-- 公開サイトのNetlify Formsは現行のまま。実際のPR申込みとGmail通知は稼働中。
-- グルメ日誌のGoogle Sheets管理ボードは、ホーム、スマホ確認、案件ボード、カンバン、要対応、来店・投稿、請求・入金、運用ガイド、セキュリティ点検を用意。
-- スプレッドシートの自動計算セルには編集前の警告を設定。期限警告・進捗・未収計算の連動はテスト済み。
-- Web管理コンソール（/diary/ops）は開発ブランチ上で実装。まだNetlify本番の公開ブランチにマージしていない。
+- 公開サイトはNetlify FormsでPR相談を受け付ける。受付原本はNetlify。
+- 現在のGoogle Drive（大学アカウント）と既存の「グルメ日誌｜PR案件管理ボード」を**継続利用**する。別アカウントへの所有権変更・共有範囲変更・移行用コピーはしない。
+- `/diary/ops` 管理画面・Netlify Functions・Apps Scriptの自動連携と永続化はGitHubの開発ブランチ・Draft PR #23に実装済み。ただし本番用のIdentity・API秘密値・実運用のApps Script設定はまだ有効化していない。
+- コード上の機能フラグは既定OFF。実環境で認証・復元・権限確認が終わる前に商用利用可能とは判定しない。
 
-## Webのセキュリティ境界
+## WebとGoogle Sheetsの権限境界
 
-管理画面はユーザーが選択したNetlify CSVを **ブラウザ内メモリでのみ処理**。サーバーへ顧客情報をPOSTしない。新たなサーバーDBや認証トークンを使わず、localStorage・sessionStorage・Cookieにも顧客情報を書かない。画面はログイン保護されていないため、誰でも空の画面に入れるが、他者の顧客情報を取得するサーバーAPIは存在しない。利用者自身が入力したCSVだけが表示される。
+- CSVモードは端末内メモリのみ。自動モードはNetlify Identityの本人＋adminロール照合を毎回実施し、秘密のNetlifyトークンはサーバー側の環境変数のみ保持する。
+- Netlify Formsの受付IDとGoogle Sheetsの案件ボードを照合し、不完全な同期を0件/0円として誤表示しない。
+- 進捗は保存機能が有効な場合のみ明示保存し、HMAC署名、nonce再利用拒否、楽観ロック、フィールド許可リスト、監査BEGIN/COMMITTEDの整合性を確認する。
+- 原本にアクセス可能なGoogleアカウントがApps Scriptを実行する。Workspace管理者の制限を回避しない。Netlify Identityの管理メールはGoogle Sheets所有者と一致させる必要はない。
+- シートの共有設定・アクセス期限はオーナーが定期確認する。卒業後に大学Googleアカウントが使えなくなるリスクは継続。
 
-編集情報は揮発性。必ず「CSVを書き出す」で暗号化された適切な保存先へバックアップしてください。CSVには実在する担当者名・メールアドレスが含まれるため、公共PC・共同端末・公開フォルダでは使用しないこと。
+## バックアップと復旧
 
-対策実装： noindex / noarchive / Cache-Control private no-store / no-referrer / same-origin通信 / CSV数式インジェクション対策 / 入力ファイルサイズと最大件数制限 / 重複受付IDの排除 / Reactによるテキストエスケープ。Stripe・請求書・顧客メールへの自動操作なし。
+- `scripts/diary-ops-backup.gs` に、読取専用点検と明示承認時の同一Drive内プライベートコピー、読取専用の復元差分確認を実装。
+- **現時点でコピー作成や原本の書換えは実施していない**。トリガーも自動では設置しない。
+- 複製されたバックアップにも担当者名・メール・売上情報が含まれる。個別共有や一般公開を禁止し、フォルダのアクセス管理を慎重に行う。
+- 同じ大学アカウント内のバックアップはGoogleアカウント失効・組織全体障害に対する独立した復旧手段にならない。別保管先への暗号化エクスポートは大学の規定とオーナーの別途承認が必要。
+- 復元は自動で原本へ上書きしない。隔離されたテスト環境で作成データ/請求/入金/監査を検証し、復旧対象・時点を確認してからオーナーが判断。
 
-## Google Sheetsのデータ権限
+詳しい運用手順: [DIARY_AUTO_SYNC_ACTIVATION.md](./DIARY_AUTO_SYNC_ACTIVATION.md)、
+[DIARY_BACKUP_RECOVERY.md](./DIARY_BACKUP_RECOVERY.md)。
 
-Google Drive APIの共有権限確認（2026-10-21時点）では大学アカウントが所有者、グルメ日誌専用Gmailが編集者の **2アカウントのみ**。一般公開設定なし。
+## 重要な残余リスク
 
-長期運用では学生アカウント依存が危険です。実際の顧客情報を登録する前にグルメ日誌専用Gmailにサインインし、Google Sheetsの「ファイル → コピーを作成」を使い、所有者も専用Gmailのファイルに切り替えてください。別ドメインの所有権移転は通常制限があるため直接移転は保証しません。
-
-## 今後の自動取込版（未実装）
-
-Netlify Formsを直接取得するにはサーバー認証が必要。ブラウザへ Netlify Personal Access Tokenを渡す方法は不可。
-
-Netlify Identityは2026年現在公式に継続サポート。Identityの招待のみ登録（Invite only）で専用Gmailのみ招待し、MFAを有効化したGoogle OAuthを利用、サーバーサイドのNetlify Functionで毎回getUserとadminロールを検証する。Netlify APIトークンはサーバー側のNetlify環境変数にのみ保存。フォームのID限定＋ページネーション＋エラー時fail closedを実装し、保存データは認可済みDBに分離する。操作監査・アクセス停止・レート制限・CSRF・バックアップ/復元検証を済ませて本番運用すること。
-
-オーナーの操作が必要：Netlify Identity有効化、Invite only選択、本人の招待、admin権限付与、サーバー用API資格情報の発行。本手順が完了するまでは自動取込を稼働させない。
+- 大学アカウントの有効期限・Workspace管理者ポリシーによるApps Script実行制約。
+- Apps Script Webアプリ公開面、Netlify IdentityのMFA/失効、トークン権限。
+- Google Sheetsには複数セルと監査記録を一体化したACIDトランザクションがない。
+- フォーム500件・案件1,000行・バックアップ走査150,000セルの上限。
+- バックアップが同じアカウント内のため、独立復旧性には限界がある。
 
 ## 一次資料
 
+- https://developers.google.com/apps-script/reference/drive/file
+- https://developers.google.com/apps-script/reference/drive/folder
+- https://developers.google.com/apps-script/guides/web
 - https://docs.netlify.com/manage/security/secure-access-to-sites/identity/overview/
-- https://docs.netlify.com/manage/security/secure-access-to-sites/identity/use-identity-in-functions/
-- https://docs.netlify.com/manage/security/secure-access-to-sites/identity/registration-login/
-- https://docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/
 - https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
-- https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html

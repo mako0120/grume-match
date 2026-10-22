@@ -76,7 +76,7 @@ function fixture() {
         getSheets: () => Object.entries(tabs).map(([name, cells]) => ({
           getName: () => name,
           getLastRow: () => cells.length,
-          getLastColumn: () => Math.max(...cells.map(row => row.length)),
+          getLastColumn: () => cells.length ? Math.max(...cells.map(row => row.length)) : 0,
           getRange(row, col, height, width) {
             return {
               getValues: () => cells.slice(row - 1, row + height - 1)
