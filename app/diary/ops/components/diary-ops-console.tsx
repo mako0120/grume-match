@@ -50,6 +50,9 @@ export function DiaryOpsConsole() {
   const [lastSyncedAt, setLastSyncedAt] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [showLiveLogin, setShowLiveLogin] = useState(false);
+  const [stateConnected, setStateConnected] = useState(false);
+  const [savingState, setSavingState] = useState(false);
+  const stateVersions = useRef<Map<string, string>>(new Map());
   const picker = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -61,6 +64,8 @@ export function DiaryOpsConsole() {
     setSelectedId(null);
     setImportedFile("");
     setLastSyncedAt("");
+    setStateConnected(false);
+    stateVersions.current.clear();
     setEmail("");
     setPassword("");
   }
@@ -93,7 +98,7 @@ export function DiaryOpsConsole() {
   }, [selectedId]);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!accessToken || selectedId) return;
     let cancelled = false;
     async function sync() {
       if (document.visibilityState === "hidden") return;
@@ -132,21 +137,64 @@ export function DiaryOpsConsole() {
           email: string; service: string; kind: string; message: string;
           featuredMenu: string; visitPreference: string;
         }>;
+        type SavedState = Partial<DiaryOpsCase> & { id: string; version: string };
+        const persisted = new Map<string, SavedState>();
+        let canSave = false;
+        let stateWarning = "";
+        try {
+          const stateResult = await fetch("/.netlify/functions/diary-ops-state", {
+            method: "GET",
+            headers: { Authorization: "Bearer " + accessToken, Accept: "application/json" },
+            credentials: "omit", cache: "no-store",
+          });
+          if (cancelled) return;
+          if (stateResult.status === 401 || stateResult.status === 403) {
+            setAccessToken("");
+            setItems([]);
+            setSelectedId(null);
+            setImportedFile("");
+            setStateConnected(false);
+            stateVersions.current.clear();
+            setLiveError("案件管理の権限がありません。再ログインしてください。");
+            return;
+          }
+          if (stateResult.ok) {
+            const value: unknown = await stateResult.json();
+            if (value && typeof value === "object" && "items" in value && Array.isArray(value.items)) {
+              for (const record of value.items as SavedState[]) {
+                if (record && typeof record.id === "string" &&
+                  typeof record.version === "string" && /^[a-f0-9]{64}$/.test(record.version)) {
+                  persisted.set(record.id, record);
+                }
+              }
+              stateVersions.current = new Map(Array.from(persisted, ([id, record]) => [id, record.version]));
+              canSave = true;
+            } else stateWarning = "案件保存APIから予期しない応答です。保存できません。";
+          } else if (stateResult.status !== 503) {
+            stateWarning = "案件のGoogle Sheets保存機能に接続できません。";
+          }
+        } catch {
+          if (cancelled) return;
+          stateWarning = "Sheets同期に失敗しました。進捗はまだ保存されていません。";
+        }
+        if (cancelled) return;
+        setStateConnected(canSave);
         setItems(previous => {
           const existing = new Map(previous.map(item => [item.id, item]));
           const updated = incoming.map(lead => {
             const before = existing.get(lead.id);
+            const ops = persisted.get(lead.id) || before;
             return {
               ...lead,
-              status: before?.status ?? "未対応",
-              nextAction: before?.nextAction ?? "",
-              dueDate: before?.dueDate ?? "",
-              visitDate: before?.visitDate ?? "",
-              postDate: before?.postDate ?? "",
-              agreedFee: before?.agreedFee ?? 0,
-              paidAmount: before?.paidAmount ?? 0,
-              note: before?.note ?? "",
-              postUrl: before?.postUrl ?? "",
+              status: ops?.status ?? "未対応",
+              nextAction: ops?.nextAction ?? "",
+              dueDate: ops?.dueDate ?? "",
+              visitDate: ops?.visitDate ?? "",
+              postDate: ops?.postDate ?? "",
+              agreedFee: ops?.agreedFee ?? 0,
+              paidAmount: ops?.paidAmount ?? 0,
+              note: ops?.note ?? "",
+              postUrl: ops?.postUrl ?? "",
             } as DiaryOpsCase;
           });
           const missing = previous.filter(item => !incoming.some(lead => lead.id === item.id));
@@ -154,7 +202,7 @@ export function DiaryOpsConsole() {
         });
         setImportedFile("NETLIFY LIVE / " + new Date().toLocaleTimeString("ja-JP"));
         setLastSyncedAt(new Date().toLocaleTimeString("ja-JP"));
-        setLiveError(("partial" in body && body.partial === true) ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : "");
+        setLiveError(("partial" in body && body.partial === true) ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : stateWarning);
       } catch {
         if (!cancelled) setLiveError("ネットワークエラーのため再接続を待っています。");
       } finally {
@@ -166,7 +214,7 @@ export function DiaryOpsConsole() {
     const onVisible = () => { void sync(); };
     document.addEventListener("visibilitychange", onVisible);
     return () => { cancelled = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); };
-  }, [accessToken]);
+  }, [accessToken, selectedId]);
 
   async function loginToLive(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -190,6 +238,8 @@ export function DiaryOpsConsole() {
       setItems([]);
       setSelectedId(null);
       setImportedFile("");
+      setStateConnected(false);
+      stateVersions.current.clear();
       setAccessToken(data.access_token);
       setShowLiveLogin(false);
     } catch {
@@ -251,6 +301,57 @@ export function DiaryOpsConsole() {
     setItems(previous => previous.map(item => item.id === id ? { ...item, ...patch } : item));
   }
 
+  async function persistSelectedCase() {
+    if (!selected || !stateConnected || savingState) return;
+    const expectedVersion = stateVersions.current.get(selected.id);
+    if (!expectedVersion) {
+      setLiveError("受付IDがまだ案件ボードへ反映されていません。5分同期後に再試行してください。");
+      return;
+    }
+    setSavingState(true);
+    try {
+      const patch = {
+        status: selected.status, nextAction: selected.nextAction,
+        dueDate: selected.dueDate, visitDate: selected.visitDate,
+        postDate: selected.postDate, agreedFee: selected.agreedFee,
+        paidAmount: selected.paidAmount, note: selected.note, postUrl: selected.postUrl,
+      };
+      const response = await fetch("/.netlify/functions/diary-ops-state", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken, Accept: "application/json",
+        },
+        credentials: "omit", cache: "no-store",
+        body: JSON.stringify({ id: selected.id, expectedVersion, patch }),
+      });
+      if (!response.ok) {
+        if (response.status === 409) {
+          setLiveError("Google Sheetsに別の更新があります。案件を閉じて最新情報を確認してください。");
+        } else if (response.status === 401 || response.status === 403) {
+          clearLiveData();
+          setLiveError("保存の管理者権限がなくなりました。再ログインしてください。");
+        } else setLiveError("Google Sheetsへの保存に失敗しました。接続とApps Script設定を確認してください。");
+        return;
+      }
+      const result: unknown = await response.json();
+      if (!result || typeof result !== "object" || !("item" in result) ||
+        !result.item || typeof result.item !== "object" ||
+        !("version" in result.item) || typeof result.item.version !== "string") {
+        setLiveError("保存結果を確認できませんでした。最新状態を確認してください。");
+        return;
+      }
+      stateVersions.current.set(selected.id, result.item.version);
+      setSelectedId(null);
+      setLiveError("");
+      setAlert("案件の進捗・金額・メモをGoogle Sheetsに保存しました。");
+    } catch {
+      setLiveError("保存結果を確認できませんでした。再保存する前にSheetsの最新状態を確認してください。");
+    } finally {
+      setSavingState(false);
+    }
+  }
+
   function exportCsv() {
     if (!items.length) return;
     const blob = new Blob([diaryOpsExportCsv(items)], { type: "text/csv;charset=utf-8" });
@@ -300,7 +401,7 @@ export function DiaryOpsConsole() {
           <header className="ops-topbar">
             <span className="ops-breadcrumb">グルメ日誌 <span>/</span> 案件管理</span>
             <div className="ops-top-actions">
-              <span className="ops-private-pill">{accessToken ? "● LIVE / 60秒更新" : "● PRIVATE MODE"}</span>
+              <span className="ops-private-pill">{accessToken ? (stateConnected ? "● LIVE / SHEETS接続" : "● LIVE / 受付のみ") : "● PRIVATE MODE"}</span>
               <button type="button" className="ops-button ops-secondary"
                 onClick={() => { if (accessToken) { clearLiveData(); setLiveError(""); }
                   else setShowLiveLogin(!showLiveLogin); }}>
@@ -326,7 +427,7 @@ export function DiaryOpsConsole() {
             <div className="ops-safety-note" role="status">
               <strong>プライバシー優先</strong>
               {accessToken
-                ? "管理者認証済み。Netlify Formsの依頼を60秒ごとにサーバー経由で取得しています。"
+                ? (stateConnected ? "管理者認証済み。申込み・運用状況をGoogle Sheetsと照合しています。" : "管理者認証済み。申込み情報は取得中ですが、進捗の保存はまだ有効ではありません。")
                 : "自動同期はNetlify Identityの管理者認証が必要です。CSVを選択した場合はブラウザ内のみで処理します。"}
               {accessToken ? "　最新確認：" + (lastSyncedAt || "接続中…") + (syncing ? "（更新中）" : "") : ""}
             </div>
@@ -352,7 +453,7 @@ export function DiaryOpsConsole() {
               <section className="ops-start">
                 <div className="ops-start-icon" aria-hidden="true">◈</div>
                 <span className="ops-eyebrow">AUTOMATIC SYNC / BACKUP CSV</span>
-                <h2>まず、申込みCSVを読み込みましょう。</h2>
+                <h2>{accessToken ? "案件を安全に取得中…" : "まず、申込みCSVを読み込みましょう。"}</h2>
                 <p>自動同期は右上の「自動同期ログイン」。設定前はNetlify管理画面の <strong>Forms → diary-pr-inquiry</strong> からCSVを読み込めます。CSVはサーバーにアップロードされません。</p>
                 <button type="button" className="ops-button ops-primary" onClick={() => picker.current?.click()}>
                   CSVを選択する <span aria-hidden="true">↗</span>
@@ -367,7 +468,7 @@ export function DiaryOpsConsole() {
               <>
                 <div className="ops-loaded-status">
                   <span>{items.length}件を読込済み　/　{importedFile}</span>
-                  <span>進捗・金額の編集はまだ端末内のみ。変更後はCSV保存が必要です。</span>
+                  <span>{stateConnected ? "進捗・金額は「Google Sheetsに保存」で永続化できます。" : "進捗・金額はまだ端末内のみ。CSV保存が必要です。"}</span>
                 </div>
                 {screen === "overview" && (
                   <>
@@ -502,8 +603,18 @@ export function DiaryOpsConsole() {
               </dl>
             </div>
           </div>
-          <footer><p>編集内容はブラウザ内のみ。変更後はCSVを書き出してください（自動同期は新着受付の取得のみ）。</p>
-            <button className="ops-button ops-primary" onClick={() => { exportCsv(); setSelectedId(null); }}>変更内容をCSV保存 ↗</button>
+          <footer><p>{stateConnected
+            ? "保存するとGoogle Sheetsの案件管理正本へ反映します。成約・入金は確認した内容のみ入力してください。"
+            : "編集は端末内のみ。変更後はCSVを保存してください。"}
+          </p>
+            {stateConnected
+              ? <button className="ops-button ops-primary" disabled={savingState}
+                  onClick={() => { void persistSelectedCase(); }}>
+                  {savingState ? "保存中…" : "Google Sheetsに保存 ↗"}
+                </button>
+              : <button className="ops-button ops-primary" onClick={() => { exportCsv(); setSelectedId(null); }}>
+                  変更内容をCSV保存 ↗
+                </button>}
           </footer>
         </section>
       </div>}
