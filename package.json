@@ -12,7 +12,8 @@
     "test": "node --test tests/**/*.test.mjs",
     "check": "npm run typecheck && npm run lint && npm run test",
     "smoke:prod": "node scripts/production-smoke.mjs",
-    "smoke:rls": "node scripts/rls-negative-smoke.mjs"
+    "smoke:rls": "node scripts/rls-negative-smoke.mjs",
+    "check:diary-launch": "node scripts/diary-launch-readiness.mjs --strict"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
