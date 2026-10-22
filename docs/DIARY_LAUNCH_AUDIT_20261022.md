@@ -69,3 +69,9 @@
   https://www.no-trouble.caa.go.jp/what/mailorder/advertising.htmljp
 - 個人情報保護委員会 通則編:
   https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/
+
+## V2.5 — 全件性と数式保護の修正（PR #26追加分）
+- Netlify FormsとGoogle Sheetsで受付IDを**双方向照合**。片方に残るレコード、重複、500件表示上限の一部取得は「売上0円」「全件一致」と扱わず、運用の保存・金額集計を停止する。
+- 同期APIに失敗したら接続状態を失効させ、過去の計算値を最新と表示しない。
+- 案件ボードの自動登録を事前検証し、テンプレート行の数式を破壊しない。A/U列の別行重複と数式衝突を検出した場合は原本未変更のまま停止。
+- 既存Google Sheets、Identity、Apps Scriptトリガー・秘密設定は今回も変更していない。

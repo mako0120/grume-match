@@ -106,9 +106,41 @@ test("duplicate reception IDs on the operational board stop before writing", () 
   assert.equal(env.writes.length, 0);
 });
 
-test("template-only calculated cells do not occupy manual draft rows", () => {
+test("formula-only template rows keep custom financial and auxiliary formulas", () => {
   const env = fixture();
   env.cells[8][11] = '=IF($C9="","",0)';
+  env.cells[8][14] = '=IF($C9="","",1)';
   assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1)]), 1);
   assert.equal(env.writes[0].row, 9);
+  assert.equal(env.cells[8][11], '=IF($C9="","",0)');
+  assert.equal(env.cells[8][14], '=IF($C9="","",1)');
+});
+
+test("formula in an intake field refuses any overwrite", () => {
+  const env = fixture();
+  env.cells[8][16] = '=IF($C9="","",1)';
+  assert.throws(() => env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1)]), /数式/);
+  assert.equal(env.writes.length, 0);
+});
+
+test("second-record formula conflict rejects the entire candidate batch", () => {
+  const env = fixture();
+  env.cells[9][20] = '=IF($C10="","",1)';
+  assert.throws(() => env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1), lead(ID1 + "2")]), /数式/);
+  assert.equal(env.writes.length, 0);
+});
+
+test("duplicate IDs across the A and U columns on different rows are rejected", () => {
+  const env = fixture();
+  env.cells[5][0] = ID2;
+  assert.throws(() => env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1)]), /重複/);
+  assert.equal(env.writes.length, 0);
+});
+
+test("multiple safe insertions preserve ordering and manual records", () => {
+  const env = fixture();
+  assert.equal(env.ctx.diaryReconcileBoard_(env.sheet, [lead(ID1), lead(ID1 + "2")]), 2);
+  assert.deepEqual(env.writes.map(x => x.row), [9, 10]);
+  assert.equal(env.cells[8][20], ID1);
+  assert.equal(env.cells[9][20], ID1 + "2");
 });
