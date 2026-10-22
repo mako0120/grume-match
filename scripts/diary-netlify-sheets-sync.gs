@@ -159,6 +159,28 @@ function diaryReconcileBoard_(ss, sourceRows) {
   return added;
 }
 
+/**
+ * Optional error email (no customer data, no tokens, at most once per six
+ * hours). Requires DIARY_ALERT_EMAIL and owner authorization for MailApp.
+ */
+function diaryNotifyFailure_() {
+  const props = PropertiesService.getScriptProperties();
+  const email = props.getProperty('DIARY_ALERT_EMAIL');
+  if (!email || !/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email)) return;
+  const now = Date.now();
+  const last = Number(props.getProperty('DIARY_LAST_ALERT_AT') || 0);
+  if (Number.isFinite(last) && now - last < 6 * 60 * 60 * 1000) return;
+  try {
+    MailApp.sendEmail(email, 'グルメ日誌：PR案件自動同期の確認が必要です',
+      '新規PR案件のGoogle Sheets同期でエラーが発生しました。' +
+      'Apps Scriptの「実行数」で詳細を確認してください。' +
+      '受付原本は引き続きNetlify Formsにあります。');
+    props.setProperty('DIARY_LAST_ALERT_AT', String(now));
+  } catch {
+    // Do not conceal the original sync error if email permissions are absent.
+  }
+}
+
 function syncDiaryNetlifyForms() {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(30000)) return;
@@ -219,6 +241,9 @@ function syncDiaryNetlifyForms() {
     PropertiesService.getScriptProperties().setProperty('DIARY_LAST_SUCCESS', new Date().toISOString());
     PropertiesService.getScriptProperties().setProperty('DIARY_LAST_COUNT', String(newRows.length));
     console.log('Diary Netlify sync OK; new submissions:', newRows.length);
+  } catch (error) {
+    diaryNotifyFailure_();
+    throw error;
   } finally {
     lock.releaseLock();
   }
