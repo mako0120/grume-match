@@ -154,3 +154,31 @@ Stripe請求、入金確認の自動実行、自動成約は含みません。
   https://developers.google.com/apps-script/guides/services/quotas
 - Netlifyの従量クレジットはFunction computeとリクエスト量が課金対象。
   https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/how-credits-work/
+
+---
+
+## F. V2.1 堅牢化（開発ブランチ / 未有効化）
+
+次の問題を修正し、ユニットテストを追加しました。
+
+- **手入力保護**: 案件ボードの全26列を調べ、日付・金額・メモなど一項目でも手入力された行を上書きしない。計算式だけ入ったテンプレート行は使用可能。
+- **重複・超過**: 同一Netlify受付IDが運用台帳で重複している場合、同期を拒否する。運用台帳が1000行を超えた場合は表示を途中で切り捨てず、エラーとして停止する。
+- **フィールド単位保存**: 進捗変更時に26列の行全体を再書込みしない。変更された許可列に限って更新し、既存の数式・担当者情報・リッチテキストなど無関係なセルを保持する。
+- **監査記録**: 書込み前に `BEGIN`、正常な保存・再読込後に `COMMITTED` を `08_変更履歴` へ追記。`BEGIN` のみ残る操作は**手動調査が必要な状態**であり、成功として扱わない。
+- **保存確定**: `SpreadsheetApp.flush()` と実セル読戻しを実行してから、実際に保存された値とバージョンをWebへ返す。
+- **操作中の保護**: 詳細画面の変更を保存せず閉じる場合、警告後に元の値へ戻す。Escapeキーでも同様に確認し、モーダルを閉じた後は最新データを再取得する。
+
+### 障害発生時に確認する場所
+
+1. Netlify Formsに申込み原本が残っていることを確認する。
+2. Apps Script「実行数」を確認する。ログやアラートメールに個人情報を載せない。
+3. `08_変更履歴` の `BEGIN` と `COMMITTED` を照合する。同じ受付ID・変更前/後バージョンが対応していないものは途中失敗の候補。
+4. 途中失敗の可能性がある場合、Webで安易に再保存せず、対象行の現在値を確認してから復旧する。
+5. 不正アクセスが疑われる場合はNetlify側の保存機能をOFFにして秘密値を更新する。本番設定変更はオーナー承認が必要。
+
+**制約**：Google Sheetsへの複数セル更新と監査記録は依然として単一のACIDトランザクションではありません。
+監査ジャーナルは失敗発見を補助しますが、自動復旧を保証するものではありません。
+本番適用前に、途中失敗時の復旧手順をテストデータで検証してください。
+
+参照: [Google Sheets Apps Script Range](https://developers.google.com/apps-script/reference/spreadsheet/range)
+と [Netlify Identity Functions](https://docs.netlify.com/manage/security/secure-access-to-sites/identity/use-identity-in-functions/)。
