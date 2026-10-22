@@ -102,20 +102,22 @@ function diaryReconcileBoard_(ss, sourceRows) {
   const last = Math.max(board.getLastRow(), 5);
   const count = Math.max(0, last - 5);
   const ids = new Set();
+  const keyRows = new Map();
   if (count) {
     const keys = board.getRange(6, 1, count, 1).getDisplayValues();
-    const sourceIds = board.getRange(6, 21, count, 1).getDisplayValues();
-    const seenSources = new Set();
-    keys.forEach((r, i) => {
-      if (r[0]) ids.add(String(r[0]));
-      const sourceId = String(sourceIds[i][0] || '').trim();
-      if (sourceId) {
-        if (seenSources.has(sourceId)) {
-          throw new Error('案件ボードに受付IDの重複があります。自動登録を停止しました');
-        }
-        seenSources.add(sourceId);
-        ids.add(sourceId);
+    const sources = board.getRange(6, 21, count, 1).getDisplayValues();
+    const register = (value, row) => {
+      const id = String(value || '').trim();
+      if (!id) return;
+      if (keyRows.has(id) && keyRows.get(id) !== row) {
+        throw new Error('案件ボードに受付IDの重複があります。自動登録を停止しました');
       }
+      keyRows.set(id, row);
+      ids.add(id);
+    };
+    keys.forEach((r, i) => {
+      register(r[0], i + 6);
+      register(sources[i][0], i + 6);
     });
   }
 
@@ -132,11 +134,11 @@ function diaryReconcileBoard_(ss, sourceRows) {
   let nextRow = 6;
   while (nextRow - 6 < values.length && occupied(nextRow - 6)) nextRow++;
 
-  let added = 0;
+  // Plan and validate every row before writing to the original sheet.
+  const planned = [];
   for (const received of sourceRows) {
     const id = received[0];
     if (ids.has(id)) continue;
-    if (nextRow > board.getMaxRows()) board.insertRowsAfter(board.getMaxRows(), 1);
     const newCase = Array(26).fill('');
     newCase[0] = id;
     newCase[1] = received[1];         // 受付日
@@ -152,15 +154,30 @@ function diaryReconcileBoard_(ss, sourceRows) {
     newCase[20] = id;                 // Netlify受付ID
     newCase[21] = 'Netlify Forms';
     newCase[23] = received[7];        // 相談
-    // One row operation preserves the financial formula in L, and a retry
-    // deduplicates by column A even if another sheet write later fails.
-    board.getRange(nextRow, 1, 1, 26).setValues([newCase]);
+    // Formula-only template rows are available, but existing formulas in
+    // every column (including a customized L) must survive the insertion.
+    const template = formulas[nextRow - 6] || [];
+    template.forEach((formula, col) => {
+      if (!formula) return;
+      if (newCase[col] !== '' && col !== 11) {
+        throw new Error('案件ボードの自動登録先に数式があります。手動確認まで停止しました');
+      }
+      newCase[col] = formula;
+    });
+    planned.push({ row: nextRow, values: newCase });
     ids.add(id);
-    added++;
     nextRow++;
     while (nextRow - 6 < values.length && occupied(nextRow - 6)) nextRow++;
   }
-  return added;
+  if (planned.length) {
+    const required = planned[planned.length - 1].row;
+    if (required > board.getMaxRows()) {
+      board.insertRowsAfter(board.getMaxRows(), required - board.getMaxRows());
+    }
+    // One complete row operation, never partial cell commits.
+    planned.forEach(entry => board.getRange(entry.row, 1, 1, 26).setValues([entry.values]));
+  }
+  return planned.length;
 }
 
 /**
