@@ -40,7 +40,14 @@ function fixture({ auditEnabled = true } = {}) {
       };
     },
     getParent: () => ({ getSheetByName: name =>
-      name === "08_変更履歴" && auditEnabled ? { appendRow: value => audits.push(value) } : null }),
+      name === "08_変更履歴" && auditEnabled ? {
+        appendRow: value => audits.push(value),
+        getLastRow: () => audits.length + 1,
+        getRange: (row, column, height, width) => ({
+          getValues: () => audits.slice(row - 2, row - 2 + height)
+            .map(event => event.slice(column - 1, column - 1 + width)),
+        }),
+      } : null }),
   };
   const props = { SPREADSHEET_ID: SITE, DIARY_SHEETS_HMAC_SECRET: SECRET };
   const context = vm.createContext({
@@ -124,7 +131,8 @@ test("owner update preserves formula, audits keys only and refuses stale revisio
 
 test("no audit sheet means no writes, and formulas in text are neutralized", () => {
   const x = fixture({ auditEnabled: false });
-  const current = x.send(signSheetRequest("list", {}, SECRET)).items[0];
+  const current = x.context.diaryOpsItem_(x.cells[5]);
+  assert.equal(x.send(signSheetRequest("list", {}, SECRET)).ok, false);
   const noAudit = x.send(signSheetRequest("update", {
     id: ID, expectedVersion: current.version, patch: { status: "成約" },
   }, SECRET));
@@ -176,4 +184,30 @@ test("failed journal BEGIN aborts before any operational write", () => {
   }, SECRET));
   assert.equal(failure.ok, false);
   assert.equal(env.cells[5][3], "未対応");
+});
+
+test("interrupted journal blocks read and future writes until investigated", () => {
+  const env = fixture();
+  const current = env.send(signSheetRequest("list", {}, SECRET)).items[0];
+  env.audits.push([new Date(), ID, "status", current.version, "b".repeat(64), "BEGIN"]);
+  const snapshot = env.send(signSheetRequest("list", {}, SECRET));
+  assert.equal(snapshot.ok, false);
+  assert.equal(snapshot.error, "conflict");
+  const attempted = env.send(signSheetRequest("update", {
+    id: ID, expectedVersion: current.version, patch: { status: "成約" },
+  }, SECRET));
+  assert.equal(attempted.ok, false);
+  assert.equal(attempted.error, "conflict");
+  assert.equal(env.cells[5][3], "未対応");
+  assert.equal(env.audits.length, 1);
+});
+
+test("matching journal completion re-enables safe reads", () => {
+  const env = fixture();
+  const old = env.send(signSheetRequest("list", {}, SECRET)).items[0];
+  env.audits.push([new Date(), ID, "status", old.version, "b".repeat(64), "BEGIN"]);
+  env.audits.push([new Date(), ID, "status", old.version, "c".repeat(64), "COMMITTED"]);
+  const safe = env.send(signSheetRequest("list", {}, SECRET));
+  assert.equal(safe.ok, true);
+  assert.equal(safe.items.length, 1);
 });
