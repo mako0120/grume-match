@@ -33,17 +33,6 @@ export default async function SignupPage({
               Private Alpha 招待コード
               <input
                 autoComplete="off"
-                name="alphaAccessCode"
-                required
-                type="password"
-              />
-            </label>
-          ) : null}
-          {privateAlpha ? (
-            <label>
-              Private Alpha 招待コード
-              <input
-                autoComplete="off"
                 name="privateAlphaAccessCode"
                 required
                 type="password"

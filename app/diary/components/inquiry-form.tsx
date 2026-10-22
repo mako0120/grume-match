@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 import { InstagramDmFallback } from "./instagram-dm-fallback";
 import { NetlifyDiaryInquiryForm } from "./netlify-inquiry-form";
 
-export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialService = "", initialKind = "consultation", initialGoal = "" }: { enabled: boolean; netlifyEnabled?: boolean; initialService?: string; initialKind?: "consultation" | "application"; initialGoal?: string }) {
+export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialService = "", initialKind = "consultation", initialGoal = "", photoFeedPriceYen, videoPackageStartYen }: {
+  enabled: boolean; netlifyEnabled?: boolean; initialService?: string;
+  initialKind?: "consultation" | "application"; initialGoal?: string;
+  photoFeedPriceYen: number; videoPackageStartYen: number;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [inquiryKind, setInquiryKind] = useState<"consultation" | "application">(initialKind);
@@ -15,7 +19,7 @@ export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialServi
   const siteKey = process.env.NEXT_PUBLIC_DIARY_TURNSTILE_SITE_KEY;
   if (!enabled || !siteKey) {
     if (netlifyEnabled) {
-      return <NetlifyDiaryInquiryForm initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
+      return <NetlifyDiaryInquiryForm initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} photoFeedPriceYen={photoFeedPriceYen} videoPackageStartYen={videoPackageStartYen} />;
     }
     return <InstagramDmFallback initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
   }
@@ -111,8 +115,8 @@ export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialServi
             <label>ご希望の内容 <em>必須</em>
               <select name="service" defaultValue={initialService} required>
                 <option value="" disabled>選択してください</option>
-                <option value="instagram_feed">写真フィードPR：1投稿8,000円〜</option>
-                <option value="instagram_feed_video">フィード投稿＋ショート動画：15,000円〜</option>
+                <option value="instagram_feed">写真フィードPR：1投稿{photoFeedPriceYen.toLocaleString("ja-JP")}円（税込）</option>
+                <option value="instagram_feed_video">フィード投稿＋ショート動画：{videoPackageStartYen.toLocaleString("ja-JP")}円〜（税込）</option>
                 <option value="instagram_reel">Instagramリール：お見積もり</option>
                 <option value="instagram_stories">ストーリーズ：お見積もり</option>
                 <option value="photo_video">写真・動画素材の撮影：お見積もり</option>

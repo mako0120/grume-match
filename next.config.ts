@@ -35,6 +35,10 @@ const nextConfig: NextConfig = {
   // an environment variable at function runtime.
   // Both flag and production deploy context must match; previews stay off.
   env: {
+    // Keep published-diary legal pages and their route-mode decision aligned
+    // with the build, even if SSR function runtime omits context variables.
+    DIARY_SITE_MODE: process.env.CONTEXT === "production" &&
+      process.env.DIARY_SITE_MODE === "true" ? "true" : "false",
     DIARY_NETLIFY_FORMS_ENABLED:
       process.env.CONTEXT === "production" &&
       process.env.DIARY_NETLIFY_FORMS_ENABLED === "true"

@@ -9,7 +9,7 @@ const metrics = [
   { value: "+1,335", unit: "人", label: "フォロワー純増" },
 ];
 
-const process = [
+const processSteps = [
   { number: "01", title: "相談・ご依頼", description: "お店の特徴や伝えたい魅力をフォームから送信。ご相談だけでも歓迎です。" },
   { number: "02", title: "内容と日程の合意", description: "紹介内容、投稿件数、料金、訪問日時を提案し、双方の確認後に確定します。" },
   { number: "03", title: "訪問・制作", description: "普段のInstagram投稿と同じ流れで撮影・編集。お客様など周囲の方のプライバシーにも配慮します。" },
@@ -71,7 +71,7 @@ export default function DiaryHomePage() {
           </div>
         </section>
 
-        <section className="diary-v2-section diary-v2-proof" id="results" aria-labelledby="diary-v2-results-title">
+        {process.env.DIARY_METRICS_VERIFIED === "true" && <section className="diary-v2-section diary-v2-proof" id="results" aria-labelledby="diary-v2-results-title">
           <div className="diary-v2-container">
             <div className="diary-v2-section-head">
               <div><span className="diary-v2-section-label">01 / TRACK RECORD</span><h2 id="diary-v2-results-title">投稿の先に、<br /><em>出会いがある。</em></h2></div>
@@ -82,7 +82,7 @@ export default function DiaryHomePage() {
             </div>
             <p className="diary-v2-data-note">※ Instagramインサイト（2026年9月16日〜10月15日の30日間）。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
           </div>
-        </section>
+        </section>}
 
         <section className="diary-v2-section diary-v2-instagram" id="work" aria-labelledby="diary-v2-posts-title">
           <div className="diary-v2-container">
@@ -132,7 +132,7 @@ export default function DiaryHomePage() {
         <section className="diary-v2-section diary-v2-process" id="flow">
           <div className="diary-v2-container">
             <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">05 / HOW IT WORKS</span><h2>相談から投稿まで、<br /><em>シンプルに。</em></h2></div><p>お問い合わせのみでは契約になりません。内容・費用・日程に双方が合意してから進みます。</p></div>
-            <ol className="diary-v2-process-grid">{process.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.description}</p></li>)}</ol>
+            <ol className="diary-v2-process-grid">{processSteps.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.description}</p></li>)}</ol>
           </div>
         </section>
 
