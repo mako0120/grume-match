@@ -28,12 +28,18 @@ export default function PrGuidelinesPage() {
           Creatorは案件条件を守りつつ、自身の表現で正確に紹介できます。
         </p>
 
-        <h2>Google口コミをPR成果物にしない</h2>
+        <h2>食べログ・Googleマップの口コミをPR成果物にしない</h2>
         <p>
-          Google Mapsの口コミ・評価は、現金報酬、割引、無料の商品やサービス等と
-          引き換えに投稿させることが禁止されています。
-          GOURMET DIARYの有償PRではGoogle口コミを必須成果物に設定しません。
-          その他の口コミサービスについても各サービスの最新ルールを優先してください。
+          食べログでは、報酬・無料招待・店舗のPRを目的とする口コミ投稿が禁止されています。
+          Googleマップでも、金銭や食事の無料提供・割引などの特典と引き換えに
+          口コミや評価を投稿させることは禁止されています。
+          GOURMET DIARYでは、これらの口コミ・評価投稿をPRの条件・成果物として受け付けません。
+          Instagram等のPRと「セット」で求められても同様です。
+        </p>
+        <p>
+          <a href="https://tabelog.com/help/review_guide/" target="_blank" rel="noopener noreferrer">食べログ公式ガイドライン ↗</a>
+          {" ／ "}
+          <a href="https://support.google.com/contributionpolicy/answer/7400114" target="_blank" rel="noopener noreferrer">Googleマップ公式ポリシー ↗</a>
         </p>
 
         <h2>誤認を招く表現を避ける</h2>
