@@ -35,12 +35,11 @@ function diaryProperties_() {
 }
 
 function diaryRequest_(url, token) {
-  const urlObject = new URL(url);
-  if (urlObject.origin !== DIARY_SYNC.apiOrigin ||
-      !urlObject.pathname.startsWith('/api/v1/')) {
-    throw new Error('Netlify以外への通信は禁止');
+  // Apps Script V8 has no URL constructor. Allow exactly the two read-only endpoints.
+  if (!/^https:\/\/api\.netlify\.com\/api\/v1\/(?:sites\/[0-9a-f-]{30,40}\/forms|forms\/[a-z0-9-]{8,128}\/submissions\?page=[0-9]+&per_page=100)$/i.test(url)) {
+    throw new Error('許可されていないNetlify API URLです');
   }
-  const resp = UrlFetchApp.fetch(urlObject.toString(), {
+  const resp = UrlFetchApp.fetch(url, {
     method: 'get', muteHttpExceptions: true, followRedirects: false,
     headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' },
   });
