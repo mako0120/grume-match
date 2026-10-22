@@ -1,4 +1,4 @@
-// Optional signed bridge for the dedicated-Gmail-owned operational Sheet.
+// Optional signed bridge for the existing owner-approved operational Sheet.
 // Disabled unless the owner explicitly configures Netlify + Apps Script.
 // Netlify Identity is verified on EVERY request; customer data and signing
 // credentials are never embedded in client code or logged.

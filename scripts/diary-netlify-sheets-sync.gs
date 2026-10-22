@@ -1,13 +1,13 @@
 /**
  * グルメ日誌：Netlify Forms -> Google Sheets 定期取込
  *
- * Install in Apps Script linked to a COPY of the Google Sheet owned by
- * the dedicated Gmail account. Do not share this bound script with others.
+ * Install in Apps Script linked to the CURRENT owner-approved Google Sheet.
+ * Do not share the bound script or expose its token to other users.
  *
  * Script Properties (NOT script source, sheet cells, GitHub or chat):
  *   NETLIFY_API_TOKEN  - Netlify personal access token; protect as a secret
  *   NETLIFY_SITE_ID    - Netlify site API ID (UUID)
- *   SPREADSHEET_ID     - Google Sheet ID (dedicated Gmail-owned copy)
+ *   SPREADSHEET_ID     - Google Sheet ID (existing owner-approved Sheet)
  *
  * Activate only by manually running setupDiaryAutoSync once in Apps Script.
  * Default poll interval 5 minutes. No external write APIs are contacted.

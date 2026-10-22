@@ -1,7 +1,7 @@
 /**
  * Optional private operational state bridge for グルメ日誌.
  * Copy this file into the SAME Apps Script project as
- * diary-netlify-sheets-sync.gs, on the dedicated-Gmail-owned Sheet.
+ * diary-netlify-sheets-sync.gs, on the existing owner-approved Sheet.
  *
  * Deployment must be explicitly approved. A Web App executed as the owner
  * has an anonymously reachable URL, but this handler will NOT read or write
