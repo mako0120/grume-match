@@ -1,5 +1,7 @@
 "use client";
 
+import { hasCompleteOpsSnapshot } from "@/lib/diary/ops-sync-integrity";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -137,11 +139,15 @@ export function DiaryOpsConsole() {
             setPassword("");
             setLiveError("本人認証の有効期限が切れたか、管理者権限がありません。再ログインしてください。");
           } else {
+            setStateConnected(false);
+            stateVersions.current.clear();
             setLiveError("自動同期に失敗しました（" + err + "）。Netlifyの設定と接続を確認してください。");
           }
           return;
         }
         if (typeof body !== "object" || body === null || !("leads" in body) || !Array.isArray(body.leads)) {
+          setStateConnected(false);
+          stateVersions.current.clear();
           setLiveError("想定外の同期レスポンスです。");
           return;
         }
@@ -174,14 +180,17 @@ export function DiaryOpsConsole() {
           if (stateResult.ok) {
             const value: unknown = await stateResult.json();
             if (value && typeof value === "object" && "items" in value && Array.isArray(value.items)) {
-              for (const record of value.items as SavedState[]) {
-                if (record && typeof record.id === "string" &&
-                  typeof record.version === "string" && /^[a-f0-9]{64}$/.test(record.version)) {
-                  persisted.set(record.id, record);
-                }
+              const records = value.items as SavedState[];
+              const valid = records.every(record => record && typeof record.id === "string" &&
+                /^[a-z0-9-]{8,128}$/i.test(record.id) &&
+                typeof record.version === "string" && /^[a-f0-9]{64}$/.test(record.version));
+              if (valid) for (const record of records) persisted.set(record.id, record);
+              if (!valid || persisted.size !== records.length) {
+                stateWarning = "Google Sheetsの案件一覧に重複・不正データがあります。保存を停止しました。";
+              } else {
+                stateVersions.current = new Map(Array.from(persisted, ([id, record]) => [id, record.version]));
+                canSave = true;
               }
-              stateVersions.current = new Map(Array.from(persisted, ([id, record]) => [id, record.version]));
-              canSave = true;
             } else stateWarning = "案件保存APIから予期しない応答です。保存できません。";
           } else if (stateResult.status !== 503) {
             stateWarning = "案件のGoogle Sheets保存機能に接続できません。";
@@ -193,10 +202,11 @@ export function DiaryOpsConsole() {
         if (cancelled) return;
         // Never present unregistered new leads as zero-revenue operational
         // records. Sheets may lag the Forms intake by up to five minutes.
-        const complete = canSave && incoming.every(lead => persisted.has(lead.id)) &&
-          !("partial" in body && body.partial === true);
+        const complete = canSave && hasCompleteOpsSnapshot(
+          incoming.map(lead => lead.id), [...persisted.keys()],
+          "partial" in body && body.partial === true);
         if (canSave && !complete && !stateWarning) {
-          stateWarning = "新着案件がSheetsに未登録、または一覧が一部未取得です。運用数値と保存を保留しています。";
+          stateWarning = "NetlifyとSheetsの受付IDが不一致、または一部未取得です。金額集計と保存を停止しました。";
         }
         stateVersions.current = complete ? stateVersions.current : new Map();
         setStateConnected(complete);
@@ -222,7 +232,11 @@ export function DiaryOpsConsole() {
         setLastSyncedAt(new Date().toLocaleTimeString("ja-JP"));
         setLiveError(("partial" in body && body.partial === true) ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : stateWarning);
       } catch {
-        if (!cancelled) setLiveError("ネットワークエラーのため再接続を待っています。");
+        if (!cancelled) {
+          setStateConnected(false);
+          stateVersions.current.clear();
+          setLiveError("ネットワークエラーのため再接続を待っています。");
+        }
       } finally {
         if (!cancelled) setSyncing(false);
       }
@@ -526,7 +540,7 @@ export function DiaryOpsConsole() {
                 {screen === "overview" && (
                   <>
                     <div className="ops-metrics">
-                      <div><span>総受付件数</span><strong>{items.length}<small> 件</small></strong><p>読み込まれた案件</p></div>
+                      <div><span>表示中の受付件数</span><strong>{items.length}<small> 件</small></strong><p>取得した案件のみ。全件数とは限りません</p></div>
                       {opsReady ? <>
                         <div><span>未対応</span><strong>{pending}<small> 件</small></strong><p>最優先で確認</p></div>
                         <div className={late ? "ops-metric-warning" : ""}><span>期限超過</span><strong>{late}<small> 件</small></strong><p>対応期限を再確認</p></div>
