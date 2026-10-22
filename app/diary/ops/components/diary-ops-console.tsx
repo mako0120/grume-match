@@ -200,7 +200,7 @@ export function DiaryOpsConsole() {
         }
         stateVersions.current = complete ? stateVersions.current : new Map();
         setStateConnected(complete);
-        setItems(previous => {
+        setItems(() => {
           const updated = incoming.map(lead => {
             const ops = complete ? persisted.get(lead.id) : undefined;
             return {
