@@ -108,7 +108,7 @@ export function DiaryOpsConsole() {
         });
         setImportedFile("NETLIFY LIVE / " + new Date().toLocaleTimeString("ja-JP"));
         setLastSyncedAt(new Date().toLocaleTimeString("ja-JP"));
-        setLiveError(body.partial === true ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : "");
+        setLiveError(("partial" in body && body.partial === true) ? "申込みが500件を超えています。過去分はNetlify本体で確認してください。" : "");
       } catch {
         if (!cancelled) setLiveError("ネットワークエラーのため再接続を待っています。");
       } finally {
