@@ -166,7 +166,7 @@ function diaryReconcileBoard_(ss, sourceRows) {
 function diaryNotifyFailure_() {
   const props = PropertiesService.getScriptProperties();
   const email = props.getProperty('DIARY_ALERT_EMAIL');
-  if (!email || !/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(email)) return;
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
   const now = Date.now();
   const last = Number(props.getProperty('DIARY_LAST_ALERT_AT') || 0);
   if (Number.isFinite(last) && now - last < 6 * 60 * 60 * 1000) return;
