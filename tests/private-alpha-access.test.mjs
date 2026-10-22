@@ -15,8 +15,8 @@ test("private alpha signup requires an operator access code", async () => {
   assert.match(env, /PRIVATE_ALPHA_ACCESS_CODE=/);
 });
 
-test("private alpha renders exactly one invite-code input", () => {
-  const page = read("app/signup/page.tsx");
+test("private alpha renders exactly one invite-code input", async () => {
+  const page = await readFile("app/signup/page.tsx", "utf8");
   assert.equal((page.match(/name="privateAlphaAccessCode"/g) || []).length, 1);
   assert.doesNotMatch(page, /name="alphaAccessCode"/);
 });
