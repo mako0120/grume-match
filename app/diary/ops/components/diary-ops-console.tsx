@@ -297,7 +297,7 @@ export function DiaryOpsConsole() {
               </form>
             )}
             {liveError && <p className="ops-feedback ops-error" role="alert">{liveError}</p>}
-            {alert && <p className="ops-feedback" role="status">{alert}</p>
+            {alert && <p className="ops-feedback" role="status">{alert}</p>}
 
             {!items.length ? (
               <section className="ops-start">
