@@ -182,3 +182,44 @@ Stripe請求、入金確認の自動実行、自動成約は含みません。
 
 参照: [Google Sheets Apps Script Range](https://developers.google.com/apps-script/reference/spreadsheet/range)
 と [Netlify Identity Functions](https://docs.netlify.com/manage/security/secure-access-to-sites/identity/use-identity-in-functions/)。
+
+---
+
+## G. V2.2 統合検証と専用Gmail移行ゲート
+
+### 自動テスト（実サービスには書き込まない）
+
+`tests/diary-ops-workflow.integration.test.mjs` は同じApps Scriptソース
+(`diary-netlify-sheets-sync.gs`, `diary-ops-state-webapp.gs`) と
+Netlify Functionsを、テスト用のインメモリGoogle Sheets/Netlifyデータで接続します。
+
+検証対象：
+- Netlify Forms新規受付1件 → `07_自動受付` → `01_案件ボード` の1件登録。
+- 管理者の署名付きGET → 進捗更新POST → Google Sheetsへの永続化相当 → GETによる再取得。
+- 5分同期の再試行を模した再実行による重複登録の防止と運用データ保持。
+- 古いリビジョンによる更新拒否、無認証リクエストによる更新拒否。
+- 完了していない監査ジャーナル（BEGINのみ）を検出したときは、一覧や再保存を停止。
+- Web UIでGoogle Sheetsの受付ID未登録・不完全取得・認証失敗のとき、
+  進捗・売上を0円や正常な「未対応」と誤認させず、運用機能の編集・CSV出力を停止。
+
+このテストは**模擬環境**です。Netlifyの本番実行、Google Apps Scriptの実行権限、
+管理者MFA、実ブラウザの動作、ネットワーク遮断時の復元などを証明するものではありません。
+
+### Google Driveの所有者チェック（2026-10-22）
+
+接続済みGoogle Driveの認証アカウントは大学アカウントでした。
+その接続でコピーを作成すると専用Gmail所有になる保証がなく、
+運用移行先として不適切なため**コピーは未作成**です。
+
+オーナー実施手順：
+1. Google Drive接続をグルメ日誌専用Gmailに切り替え、
+   接続ユーザーのメールアドレスを確認。
+2. そのアカウントで大学所有の共有ボードの「コピーを作成」を実施。
+   コピーには適切な所有者と「制限付き」共有設定があることを確認。
+3. Apps ScriptのScript Propertiesと監査ログ、テスト用申込みだけをまず設定。
+4. HMAC認証、否認系、途中失敗、変更履歴、再読込、データ削除/復元の実環境試験。
+5. オーナーによる本番公開承認前はfeature flagsをOFFのまま維持。
+
+大学アカウント側のGoogle Drive共有・権限は変更しない。
+権限変更、本番設定、トークン発行/登録、Webアプリ公開、
+トリガー有効化、本番マージは事前承認が必要です。
