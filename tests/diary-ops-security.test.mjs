@@ -69,13 +69,14 @@ test("CSV export neutralizes untrusted Excel/Sheets formula execution", () => {
   assert.ok(output.startsWith("\uFEFF"));
 });
 
-test("no automatic network reads, client persistence or homemade authentication", () => {
+test("owner console cannot persist or embed Netlify credentials", () => {
   const src = readFileSync("app/diary/ops/components/diary-ops-console.tsx", "utf8");
-  assert.doesNotMatch(src, /\bfetch\s*\(/);
+  assert.match(src, /diary-ops-feed/);
+  assert.match(src, /credentials: "omit"/);
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB/);
-  assert.doesNotMatch(src, /Bearer|api[_-]?token|DIARY_OPS_PASSWORD/i);
+  assert.doesNotMatch(src, /DIARY_NETLIFY_API_TOKEN|DIARY_NETLIFY_SITE_ID|DIARY_OPS_PASSWORD/);
   assert.match(src, /file\.text\(\)/);
-  assert.match(src, /CSVで保存/);
+  assert.match(src, /CSV書き出し|CSVを書き出す|CSVで保存/);
   assert.doesNotMatch(helperSource, /createHmac|SESSION_SECRET|DIARY_OPS_PASSWORD/);
 });
 
