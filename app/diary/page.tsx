@@ -71,7 +71,7 @@ export default function DiaryHomePage() {
           </div>
         </section>
 
-        <section className="diary-v2-section diary-v2-proof" id="results" aria-labelledby="diary-v2-results-title">
+        {process.env.DIARY_METRICS_VERIFIED === "true" && <section className="diary-v2-section diary-v2-proof" id="results" aria-labelledby="diary-v2-results-title">
           <div className="diary-v2-container">
             <div className="diary-v2-section-head">
               <div><span className="diary-v2-section-label">01 / TRACK RECORD</span><h2 id="diary-v2-results-title">投稿の先に、<br /><em>出会いがある。</em></h2></div>
@@ -82,7 +82,7 @@ export default function DiaryHomePage() {
             </div>
             <p className="diary-v2-data-note">※ Instagramインサイト（2026年9月16日〜10月15日の30日間）。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
           </div>
-        </section>
+        </section>}
 
         <section className="diary-v2-section diary-v2-instagram" id="work" aria-labelledby="diary-v2-posts-title">
           <div className="diary-v2-container">

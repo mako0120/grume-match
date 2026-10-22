@@ -18,8 +18,8 @@ const REGISTERED_FIELDS = [
 ] as const;
 
 const SERVICE_OPTIONS = [
-  { value: "instagram_feed", title: "Instagram写真フィード1投稿（8,000円・税込）" },
-  { value: "instagram_feed_video", title: "写真フィード＋ショート動画（15,000円〜・税込）" },
+  { value: "instagram_feed", title: "Instagram写真フィード1投稿" },
+  { value: "instagram_feed_video", title: "写真フィード＋ショート動画" },
   { value: "instagram_reel", title: "リール単体（個別見積もり）" },
   { value: "instagram_stories", title: "ストーリーズ（個別見積もり）" },
   { value: "photo_video", title: "写真・動画素材の撮影（個別見積もり）" },
@@ -30,16 +30,28 @@ export function NetlifyDiaryInquiryForm({
   initialService = "",
   initialKind = "consultation",
   initialGoal = "",
+  photoFeedPriceYen,
+  videoPackageStartYen,
 }: {
   initialService?: string;
   initialKind?: "consultation" | "application";
   initialGoal?: string;
+  photoFeedPriceYen: number;
+  videoPackageStartYen: number;
 }) {
   const router = useRouter();
   const [kind, setKind] = useState<"consultation" | "application">(initialKind);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
-  const selectedService = SERVICE_OPTIONS.some((entry) => entry.value === initialService)
+  // Prices come from the server-side verified pricing snapshot shown on the
+  // landing page; never maintain a second hardcoded quote in a client form.
+  const serviceOptions = SERVICE_OPTIONS.map(option =>
+    option.value === "instagram_feed"
+      ? { ...option, title: option.title + "（" + photoFeedPriceYen.toLocaleString("ja-JP") + "円・税込）" }
+      : option.value === "instagram_feed_video"
+        ? { ...option, title: option.title + "（" + videoPackageStartYen.toLocaleString("ja-JP") + "円〜・税込）" }
+        : option);
+  const selectedService = serviceOptions.some((entry) => entry.value === initialService)
     ? initialService : (initialKind === "application" ? "instagram_feed" : "consultation");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -145,7 +157,7 @@ export function NetlifyDiaryInquiryForm({
         </label>
         <label>PRのご希望 <em>必須</em>
           <select name="service" defaultValue={selectedService} required>
-            {SERVICE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.title}</option>)}
+            {serviceOptions.map((item) => <option key={item.value} value={item.value}>{item.title}</option>)}
           </select>
         </label>
       </div>
