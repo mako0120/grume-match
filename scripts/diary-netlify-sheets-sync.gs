@@ -116,9 +116,17 @@ function diaryReconcileBoard_(ss, sourceRows) {
   const maxRows = board.getMaxRows();
   const restaurants = maxRows > 5 ?
     board.getRange(6, 3, maxRows - 5, 1).getDisplayValues() : [];
+  const caseKeys = maxRows > 5 ?
+    board.getRange(6, 1, maxRows - 5, 1).getDisplayValues() : [];
+  const statuses = maxRows > 5 ?
+    board.getRange(6, 4, maxRows - 5, 1).getDisplayValues() : [];
+  const receptionIds = maxRows > 5 ?
+    board.getRange(6, 21, maxRows - 5, 1).getDisplayValues() : [];
+  // Preserve a partially filled manual entry even if its restaurant is blank.
+  const occupied = i => [restaurants, caseKeys, statuses, receptionIds]
+    .some(column => String(column[i] && column[i][0] || '').trim());
   let nextRow = 6;
-  while (nextRow - 6 < restaurants.length &&
-      String(restaurants[nextRow - 6][0] || '').trim()) nextRow++;
+  while (nextRow - 6 < restaurants.length && occupied(nextRow - 6)) nextRow++;
 
   let added = 0;
   for (const received of sourceRows) {
@@ -146,8 +154,7 @@ function diaryReconcileBoard_(ss, sourceRows) {
     ids.add(id);
     added++;
     nextRow++;
-    while (nextRow - 6 < restaurants.length &&
-        String(restaurants[nextRow - 6][0] || '').trim()) nextRow++;
+    while (nextRow - 6 < restaurants.length && occupied(nextRow - 6)) nextRow++;
   }
   return added;
 }
