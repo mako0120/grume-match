@@ -130,8 +130,36 @@ function diaryOpsRows_(sheet) {
   if (actualRows > 1000) throw Error('unavailable');
   return actualRows ? sheet.getRange(6, 1, actualRows, 26).getValues() : [];
 }
+/**
+ * Detect interrupted edits before allowing another write or returning a
+ * supposedly consistent operational snapshot. BEGIN entries MUST have a
+ * matching COMMITTED entry for the same case/field set/base revision.
+ * A pending journal needs human reconciliation; this function never guesses.
+ */
+function diaryOpsRequireCleanJournal_(audit, targetId) {
+  if (!audit) throw Error('unavailable');
+  const entries = Math.max(0, audit.getLastRow() - 1);
+  if (entries > 5000) throw Error('unavailable');
+  if (!entries) return;
+  // B:F holds receipt ID, changed fields, before and after revisions, status.
+  const events = audit.getRange(2, 2, entries, 5).getValues();
+  const pending = new Map();
+  events.forEach(row => {
+    const id = String(row[0] || '');
+    if (targetId && id !== targetId) return;
+    const status = String(row[4] || '');
+    const key = JSON.stringify([id, String(row[1] || ''), String(row[2] || '')]);
+    if (status === 'BEGIN') pending.set(key, (pending.get(key) || 0) + 1);
+    else if (status === 'COMMITTED') pending.set(key, (pending.get(key) || 0) - 1);
+    else if (id) throw Error('conflict');
+  });
+  if ([...pending.values()].some(value => value !== 0)) throw Error('conflict');
+}
+
 function diaryOpsList_() {
-  const records = diaryOpsRows_(diaryOpsOpen_());
+  const sheet = diaryOpsOpen_();
+  diaryOpsRequireCleanJournal_(sheet.getParent().getSheetByName(DIARY_OPS_AUDIT_));
+  const records = diaryOpsRows_(sheet);
   const ids = new Set();
   const items = [];
   records.forEach(row => {
@@ -151,6 +179,7 @@ function diaryOpsUpdate_(payload) {
   const sheet = diaryOpsOpen_();
   const audit = sheet.getParent().getSheetByName(DIARY_OPS_AUDIT_);
   if (!audit) throw Error('unavailable'); // An unlogged write is forbidden.
+  diaryOpsRequireCleanJournal_(audit, payload.id);
   const rows = diaryOpsRows_(sheet);
   const matches = [];
   rows.forEach((row, i) => { if (String(row[20] || '') === payload.id) matches.push(i); });
@@ -200,7 +229,7 @@ function setupDiaryOpsAuditSheet() {
   let audit = ss.getSheetByName(DIARY_OPS_AUDIT_);
   if (!audit) audit = ss.insertSheet(DIARY_OPS_AUDIT_);
   if (!audit.getLastRow()) {
-    audit.appendRow(['変更日時', 'Netlify受付ID', '変更フィールド', '変更前バージョン', '変更後バージョン']);
+    audit.appendRow(['変更日時', 'Netlify受付ID', '変更フィールド', '変更前バージョン', '変更後バージョン', '記録状態']);
   }
 }
 /**
