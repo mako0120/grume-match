@@ -61,6 +61,8 @@ export function DiaryOpsConsole() {
   const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const editingBaseline = useRef<DiaryOpsCase | null>(null);
+  const latestItems = useRef(items);
+  useEffect(() => { latestItems.current = items; }, [items]);
 
   // Owner-only live data is never kept visible after logout or role revocation.
   function clearLiveData() {
@@ -271,7 +273,7 @@ export function DiaryOpsConsole() {
   function closeDetail() {
     if (!selectedId) return;
     const baseline = editingBaseline.current;
-    const current = items.find(item => item.id === selectedId);
+    const current = latestItems.current.find(item => item.id === selectedId);
     const opsFields: Array<keyof DiaryOpsCase> = [
       "status", "nextAction", "dueDate", "visitDate", "postDate",
       "agreedFee", "paidAmount", "note", "postUrl",
