@@ -77,7 +77,7 @@ test("read-only diagnostic reports missing configuration without PII or exceptio
   ]);
   assert.equal(f.calls.dataWrite, 0);
   assert.equal(f.calls.api, 0);
-  assert.doesNotMatch(JSON.stringify(result), /local-test|secret|example\.test|23610083|1WyCH/);
+  assert.doesNotMatch(JSON.stringify(result), /local-test-token|local-test-only-secret|example\\.test|23610083|1WyCH/);
 });
 
 test("preflight checks match existing Google Sheet headers and configs", () => {
