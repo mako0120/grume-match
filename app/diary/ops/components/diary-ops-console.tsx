@@ -12,7 +12,7 @@ import {
   type DiaryOpsStatus,
 } from "@/lib/diary/ops";
 
-type Screen = "overview" | "pipeline" | "cases" | "finance";
+type Screen = "overview" | "pipeline" | "cases" | "calendar" | "finance";
 const formatYen = (n: number) => new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(n);
 const readableDate = (value: string) => {
   if (!value) return "未設定";
@@ -39,6 +39,10 @@ export function DiaryOpsConsole() {
   const [alert, setAlert] = useState("");
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<Screen>("overview");
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const date = new Date();
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+  });
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("すべて");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -257,6 +261,22 @@ export function DiaryOpsConsole() {
   }), [items, search, status]);
 
   const selected = items.find(item => item.id === selectedId);
+  const calendarDays = useMemo(() => {
+    const [year, month] = calendarMonth.split("-").map(Number);
+    const offset = new Date(year, month - 1, 1).getDay();
+    const days = new Date(year, month, 0).getDate();
+    return [...Array<null>(offset).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
+  }, [calendarMonth]);
+  const calendarEvents = useMemo(() => items.flatMap(item => [
+    ...(item.visitDate ? [{ item, day: item.visitDate.slice(0, 10), label: "来店" }] : []),
+    ...(item.postDate ? [{ item, day: item.postDate.slice(0, 10), label: "投稿" }] : []),
+  ]).filter(event => event.day.startsWith(calendarMonth))
+    .sort((a, b) => a.day.localeCompare(b.day)), [items, calendarMonth]);
+  function moveCalendarMonth(offset: number) {
+    const [year, month] = calendarMonth.split("-").map(Number);
+    const date = new Date(year, month - 1 + offset, 1);
+    setCalendarMonth(date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0"));
+  }
   const open = items.filter(item => !closed(item.status));
   const pending = open.filter(item => item.status === "未対応").length;
   const late = open.filter(overdue).length;
@@ -382,6 +402,7 @@ export function DiaryOpsConsole() {
               ["overview", "◫", "概要・ダッシュボード"],
               ["pipeline", "▥", "進捗パイプライン"],
               ["cases", "≡", "案件一覧"],
+              ["calendar", "▦", "来店・投稿予定"],
               ["finance", "¥", "売上・入金"],
             ] as const).map(([key, glyph, label]) => (
               <button key={key} type="button" className={screen === key ? "is-active" : ""}
@@ -421,7 +442,7 @@ export function DiaryOpsConsole() {
           <main className="ops-content">
             <div className="ops-page-intro">
               <span className="ops-eyebrow">PR MANAGEMENT / OSAKA</span>
-              <h1>{screen === "overview" ? "案件の全体像" : screen === "pipeline" ? "進捗パイプライン" : screen === "cases" ? "案件を検索・整理" : "売上・入金管理"}</h1>
+              <h1>{screen === "overview" ? "案件の全体像" : screen === "pipeline" ? "進捗パイプライン" : screen === "cases" ? "案件を検索・整理" : screen === "calendar" ? "来店・投稿スケジュール" : "売上・入金管理"}</h1>
               <p>問い合わせから投稿、入金まで。今日、何をすべきかを一目で把握。</p>
             </div>
             <div className="ops-safety-note" role="status">
@@ -552,6 +573,54 @@ export function DiaryOpsConsole() {
                       </tr>)}</tbody>
                     </table>
                     {!visible.length && <p className="ops-empty">検索条件に一致する案件はありません。</p>}
+                  </section>
+                )}
+                {screen === "calendar" && (
+                  <section className="ops-panel ops-calendar">
+                    <div className="ops-calendar-toolbar">
+                      <div><span className="ops-eyebrow">VISIT & PUBLISH / SCHEDULE</span>
+                        <h2>{calendarMonth.replace("-", "年")}月の予定</h2>
+                        <p>来店日と投稿日を確認。予定を選ぶと案件詳細が開きます。</p>
+                      </div>
+                      <div className="ops-calendar-controls">
+                        <button type="button" className="ops-button ops-secondary"
+                          onClick={() => moveCalendarMonth(-1)} aria-label="前の月">←</button>
+                        <label><span className="ops-visually-hidden">表示する月</span>
+                          <input type="month" value={calendarMonth}
+                            onChange={event => { if (/^\d{4}-\d{2}$/.test(event.target.value)) setCalendarMonth(event.target.value); }}/></label>
+                        <button type="button" className="ops-button ops-secondary"
+                          onClick={() => moveCalendarMonth(1)} aria-label="次の月">→</button>
+                      </div>
+                    </div>
+                    <div className="ops-calendar-grid" aria-label={calendarMonth + "の来店・投稿予定"}>
+                      {["日", "月", "火", "水", "木", "金", "土"].map(weekday =>
+                        <span key={weekday} className="ops-calendar-weekday">{weekday}</span>)}
+                      {calendarDays.map((day, idx) => {
+                        const key = calendarMonth + "-" + String(day ?? "").padStart(2, "0");
+                        const daily = day ? calendarEvents.filter(event => event.day === key) : [];
+                        return <div key={idx} className={"ops-calendar-day" + (day ? "" : " is-blank")}>
+                          {day && <><strong>{day}</strong>
+                            {daily.map((event, eventIndex) =>
+                              <button key={event.item.id + event.label + eventIndex} type="button"
+                                className={event.label === "来店" ? "ops-calendar-visit" : "ops-calendar-post"}
+                                onClick={() => setSelectedId(event.item.id)}
+                                title={event.label + "・" + event.item.restaurant}>
+                                <span>{event.label}</span> {event.item.restaurant}
+                              </button>)}
+                          </>}
+                        </div>;
+                      })}
+                    </div>
+                    <div className="ops-calendar-agenda">
+                      {calendarEvents.map((event, index) =>
+                        <button key={event.item.id + event.label + index} type="button"
+                          onClick={() => setSelectedId(event.item.id)}>
+                          <time dateTime={event.day}>{readableDate(event.day)}</time>
+                          <span>{event.label}</span><strong>{event.item.restaurant}</strong>
+                          <span aria-hidden="true">↗</span>
+                        </button>)}
+                    </div>
+                    {!calendarEvents.length && <p className="ops-empty">この月の来店・投稿予定はまだありません。</p>}
                   </section>
                 )}
                 {screen === "finance" && (
