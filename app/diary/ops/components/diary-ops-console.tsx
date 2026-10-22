@@ -110,7 +110,13 @@ export function DiaryOpsConsole() {
         if (!response.ok) {
           const err = typeof body === "object" && body !== null && "error" in body ? String(body.error) : "unknown";
           if (response.status === 401 || response.status === 403) {
-            clearLiveData();
+            setAccessToken("");
+            setItems([]);
+            setSelectedId(null);
+            setImportedFile("");
+            setLastSyncedAt("");
+            setEmail("");
+            setPassword("");
             setLiveError("本人認証の有効期限が切れたか、管理者権限がありません。再ログインしてください。");
           } else {
             setLiveError("自動同期に失敗しました（" + err + "）。Netlifyの設定と接続を確認してください。");
