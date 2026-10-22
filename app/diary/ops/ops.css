@@ -168,3 +168,7 @@
   .ops-calendar-agenda strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 @media(prefers-reduced-motion:reduce){.diary-ops *{scroll-behavior:auto!important;transition-duration:0s!important;animation-duration:0s!important}}
+
+/* Form fieldset is used to make incomplete live data strictly read-only. */
+.ops-detail-fields{margin:0;padding:0;border:0;min-width:0}
+.ops-detail-fields:disabled{opacity:.72}
