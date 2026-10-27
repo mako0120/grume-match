@@ -1,0 +1,32 @@
+name: Diary Identity SDK install (one-shot, verified)
+on:
+  push:
+    branches: [codex/diary-identity-onboarding-20261027]
+    paths: [.github/workflows/diary-identity-sdk-install-once.yml]
+permissions:
+  contents: write
+jobs:
+  install:
+    if: github.repository == 'mako0120/grume-match'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install official Netlify Identity SDK with reproducible npm lockfile
+        run: npm install @netlify/identity@2.0.0 --save-exact
+      - name: Verify production dependency security and deterministic install
+        run: npm ci && npm audit --omit=dev --audit-level=high
+      - name: Check types, lint, all unit tests, and compilation
+        run: npm run typecheck && npm run lint && npm run test && npm run build
+      - name: Commit validated dependency changes only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(identity): install verified Netlify Identity SDK"
+            git push origin HEAD:refs/heads/codex/diary-identity-onboarding-20261027
+          fi
