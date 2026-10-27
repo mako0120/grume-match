@@ -13,5 +13,6 @@ test("authenticated and financial pages are served with no-store caching", async
 
 test("Next.js is pinned to the current security patch line", async () => {
   const pkg = JSON.parse(await readFile("package.json", "utf8"));
-  assert.equal(pkg.dependencies.next, "16.3.8");
+  assert.equal(pkg.dependencies.next, "16.4.3");
+  assert.equal(pkg.devDependencies["eslint-config-next"], "16.4.3");
 });
