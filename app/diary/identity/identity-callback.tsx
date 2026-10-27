@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { acceptInvite, handleAuthCallback, updateUser } from "@netlify/identity";
 
 type Flow = "idle" | "processing" | "invite" | "recovery" | "complete" | "failed";
@@ -18,13 +18,17 @@ export function DiaryIdentityCallback({ children }: { children: ReactNode }) {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const callbackStarted = useRef(false);
 
   useEffect(() => {
-    if (!HASH.test(window.location.hash)) return;
-    let cancelled = false;
-    setFlow("processing");
-    void handleAuthCallback().then(result => {
-      if (cancelled) return;
+    if (callbackStarted.current || !HASH.test(window.location.hash)) return;
+    callbackStarted.current = true;
+    // Defer state updates out of the synchronous effect phase, and only
+    // exchange an invite/recovery token once under React StrictMode.
+    void Promise.resolve().then(async () => {
+      setFlow("processing");
+      return handleAuthCallback();
+    }).then(result => {
       if (!result) { setFlow("failed"); return; }
       if (result.type === "invite") {
         if (typeof result.token !== "string" || !result.token) { setFlow("failed"); return; }
@@ -36,10 +40,7 @@ export function DiaryIdentityCallback({ children }: { children: ReactNode }) {
         // Confirmations and provider callbacks are already processed.
         setFlow("complete");
       }
-    }).catch(() => {
-      if (!cancelled) setFlow("failed");
-    });
-    return () => { cancelled = true; };
+    }).catch(() => { setFlow("failed"); });
   }, []);
 
   async function savePassword(event: FormEvent<HTMLFormElement>) {
