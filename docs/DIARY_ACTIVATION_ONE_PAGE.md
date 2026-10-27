@@ -1,6 +1,6 @@
 # グルメ日誌｜Google Sheets案件管理を本番接続する最短手順
 
-> 2026-10-22 / グルメ日誌専用。Google Drive/Sheetの移行なし。
+> 2026-10-27 / グルメ日誌専用。Google Drive/Sheetの移行なし。
 > **コード・モックE2Eは完成。以下のアカウント操作はこのGitHub PR内でまだ実行していません。**
 > Netlify Identityの有効化、秘密鍵発行、Apps Scriptウェブアプリ公開、トリガー設置、最終E2Eは管理者による実操作が必須。
 
@@ -15,6 +15,20 @@
   - `node scripts/build-diary-install-bundle.mjs` で再生成し、CIテストで一致確認。統合版と個別版を**同時に貼り付けない**（関数の二重定義になる）。
 - バックアップ機能は別の `scripts/diary-ops-backup.gs`。自動バックアップは初期OFF。
 - GitHubとWeb画面に実際のNetlify APIトークンやHMAC秘密値を書かない。Netlify/Apps Scriptの**秘密設定画面だけ**に登録。
+
+## 0. Netlifyの本番サイトを一般公開できる状態にする（P0）
+
+2026-10-27の匿名外部HTTP監査では、`/diary` と `/diary/request` がともに **401** でした。
+GitHubのビルド成功だけでは相談窓口は公開できていません。
+
+1. [Netlify Project visibility](https://app.netlify.com/projects/brilliant-custard-364003/configuration/general/#project-visibility) を開く。
+2. 一般向けPR紹介・相談サイトを公開する準備が整っている場合のみ、**Production visibility: Public**、**Deploy Previews: Private** を選ぶ。
+3. Netlify Identityの管理APIは公開フラグとは独立して認証必須です。プロジェクトをPublicにしても `diary-ops-feed` と `diary-ops-state` の未認証アクセス拒否は維持します。
+4. シークレットや個人情報を含むテスト用プレビューは非公開のままにする。
+5. 変更後は**ログアウト状態/シークレットウィンドウ**で`/diary` と `/diary/request` のHTTP200、および管理APIのHTTP401/503を確認する。
+6. もしすでにProductionがPublicなのに401なら、サイト保護/SSO/IPフィルターなど別の訪問者アクセス制御を調査し、無条件に保護を全面解除しない。
+
+ここでの**Netlifyの管理画面操作はGitHubからは実行できず、所有者本人による操作が必要**です。
 
 ## 1. 既存Google SheetsでApps Scriptを設定
 
@@ -34,8 +48,10 @@
 ## 2. Netlify Identity（オーナー限定のログイン）
 
 1. Netlifyのプロジェクトの Identity を有効化。Registrationは **Invite only**。
-2. 実際の運営者メールアドレスを招待し、本人確認完了後、アカウントに `admin` ロールを与える。Google Sheetsの所有者メールと一致させる必要はない。
-3. 未認証401・別メール/非admin403・トークン期限切れ・ログアウトの動作を確認。NetlifyアカウントとGoogleアカウントにはパスキー/MFAを設定。
+2. 実際の運営者メールアドレスを招待する。**招待メールのリンクから公開サイトに戻ると、初期パスワード設定画面が表示される**（2026-10-27に`@netlify/identity`公式SDKで実装）。リンクを共有・転載しない。
+3. 初期パスワードを設定してログイン可能になったら、そのIdentityユーザーへ`admin`ロールを付与。Netlifyサイトのチーム管理者とIdentityユーザーの`admin`ロールは別概念です。Google Sheets所有者メールと一致させる必要はありません。
+4. `/diary/ops` に管理者メール・パスワードでログインする。ログイン失敗時の**「パスワードを再設定」**から届くメールのリンクでも設定画面へ戻れます。
+5. 未認証401・別メール/非admin403・トークン期限切れ・ログアウトの動作を確認。Netlifyチーム管理者とGoogleアカウントには利用可能なMFAを設定。
 4. Netlify環境変数のProduction設定（Netlify Functionsが読めるサーバー側。**NEXT_PUBLIC_を付けない**）:
    - `DIARY_OPS_OWNER_EMAIL`: 上記で登録したIdentity管理者メール
    - `DIARY_NETLIFY_SITE_ID`: 同じSite API ID

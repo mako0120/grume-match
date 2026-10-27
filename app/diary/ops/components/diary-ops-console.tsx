@@ -1,6 +1,7 @@
 "use client";
 
 import { hasCompleteOpsSnapshot } from "@/lib/diary/ops-sync-integrity";
+import { requestPasswordRecovery } from "@netlify/identity";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -247,6 +248,25 @@ export function DiaryOpsConsole() {
     document.addEventListener("visibilitychange", onVisible);
     return () => { cancelled = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); };
   }, [accessToken, selectedId]);
+
+  async function recoverAdminPassword() {
+    const requestedEmail = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(requestedEmail)) {
+      setLiveError("管理者メールアドレスを先に入力してください。");
+      return;
+    }
+    if (loginPending) return;
+    setLoginPending(true);
+    setLiveError("");
+    try {
+      await requestPasswordRecovery(requestedEmail);
+      setAlert("登録されている場合は、パスワード再設定の案内メールが届きます。");
+    } catch {
+      setLiveError("パスワード再設定メールを送信できませんでした。Netlify Identityの設定を確認してください。");
+    } finally {
+      setLoginPending(false);
+    }
+  }
 
   async function loginToLive(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -513,6 +533,8 @@ export function DiaryOpsConsole() {
                   <input type="password" autoComplete="current-password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} />
                 </label>
                 <button type="submit" className="ops-button ops-primary" disabled={loginPending}>{loginPending ? "確認中…" : "本人確認して自動同期"}</button>
+                <button type="button" className="ops-button ops-secondary" disabled={loginPending}
+                  onClick={() => { void recoverAdminPassword(); }}>パスワードを再設定</button>
               </form>
             )}
             {liveError && <p className="ops-feedback ops-error" role="alert">{liveError}</p>}
