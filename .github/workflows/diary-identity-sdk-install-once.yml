@@ -32,3 +32,5 @@ jobs:
           fi
 
 # Validation rerun after React effect-safe callback fix.
+
+# Rerun after aligning account recovery assertion with normalized input.
