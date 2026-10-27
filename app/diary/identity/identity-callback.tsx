@@ -29,9 +29,15 @@ export function DiaryIdentityCallback({ children }: { children: ReactNode }) {
       setFlow("processing");
       return handleAuthCallback();
     }).then(result => {
-      if (!result) { setFlow("failed"); return; }
+      if (!result) {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+        setFlow("failed"); return;
+      }
       if (result.type === "invite") {
-        if (typeof result.token !== "string" || !result.token) { setFlow("failed"); return; }
+        if (typeof result.token !== "string" || !result.token) {
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+          setFlow("failed"); return;
+        }
         setInvite(result.token);
         setFlow("invite");
       } else if (result.type === "recovery") {
@@ -40,7 +46,10 @@ export function DiaryIdentityCallback({ children }: { children: ReactNode }) {
         // Confirmations and provider callbacks are already processed.
         setFlow("complete");
       }
-    }).catch(() => { setFlow("failed"); });
+    }).catch(() => {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      setFlow("failed");
+    });
   }, []);
 
   async function savePassword(event: FormEvent<HTMLFormElement>) {
