@@ -289,8 +289,8 @@ export function DiaryOpsConsole() {
   }), [items, search, status]);
 
   const selected = items.find(item => item.id === selectedId);
-  function closeDetail() {
-    if (!selectedId) return;
+  function closeDetail(): boolean {
+    if (!selectedId) return true;
     const baseline = editingBaseline.current;
     const current = latestItems.current.find(item => item.id === selectedId);
     const opsFields: Array<keyof DiaryOpsCase> = [
@@ -299,11 +299,12 @@ export function DiaryOpsConsole() {
     ];
     if (baseline && current &&
       opsFields.some(field => baseline[field] !== current[field])) {
-      if (!window.confirm("変更内容がGoogle Sheetsに保存されていません。破棄して閉じますか？")) return;
+      if (!window.confirm("変更内容が保存されていません。破棄して閉じますか？")) return false;
       setItems(previous => previous.map(item => item.id === selectedId ? baseline : item));
     }
     editingBaseline.current = null;
     setSelectedId(null);
+    return true;
   }
   const calendarDays = useMemo(() => {
     const [year, month] = calendarMonth.split("-").map(Number);
@@ -335,6 +336,7 @@ export function DiaryOpsConsole() {
 
   async function importCsv(file: File | undefined) {
     if (!file) return;
+    if (accessToken) { setAlert("自動同期中はCSVを読み込めません。先にログアウトしてください。"); return; }
     if (file.size > LIMIT_FILE_BYTES || !/\.csv$/i.test(file.name)) {
       setAlert("CSVファイル（2MB以下）を選んでください。");
       return;
@@ -419,7 +421,7 @@ export function DiaryOpsConsole() {
   }
 
   function exportCsv() {
-    if (!items.length) return;
+    if ((accessToken && !stateConnected) || !items.length) return;
     const blob = new Blob([diaryOpsExportCsv(items)], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -433,8 +435,8 @@ export function DiaryOpsConsole() {
   }
 
   function setScreenTo(nextScreen: Screen) {
+    if (selectedId && !closeDetail()) return;
     setScreen(nextScreen);
-    setSelectedId(null);
   }
 
   return (
@@ -458,8 +460,8 @@ export function DiaryOpsConsole() {
             ))}
           </nav>
           <div className="ops-sidebar-bottom">
-            <span className="ops-security-dot" aria-hidden="true" /> ローカル処理モード
-            <p>選択したCSVは端末のメモリで処理されます。送信・自動保存は行いません。</p>
+            <span className="ops-security-dot" aria-hidden="true" /> {accessToken ? stateConnected ? "管理者専用・Sheets接続中" : "管理者専用・保存停止中" : "ローカル処理モード"}
+            <p>{accessToken ? stateConnected ? "保存するとGoogle Sheetsへ反映されます。" : "データ不一致・障害時は編集とCSV出力を停止します。" : "CSVは端末内で処理し、自動保存しません。"}</p>
             <Link href="/diary">← 公開サイトに戻る</Link>
           </div>
         </aside>
@@ -470,7 +472,7 @@ export function DiaryOpsConsole() {
             <div className="ops-top-actions">
               <span className="ops-private-pill">{accessToken ? (stateConnected ? "● LIVE / SHEETS接続" : "● LIVE / 受付のみ") : "● PRIVATE MODE"}</span>
               <button type="button" className="ops-button ops-secondary"
-                onClick={() => { if (accessToken) { clearLiveData(); setLiveError(""); }
+                onClick={() => { if (accessToken) { if (selectedId && !closeDetail()) return; clearLiveData(); setLiveError(""); }
                   else setShowLiveLogin(!showLiveLogin); }}>
                 {accessToken ? "自動同期を終了" : "自動同期ログイン"}
               </button>
@@ -521,11 +523,15 @@ export function DiaryOpsConsole() {
                 <div className="ops-start-icon" aria-hidden="true">◈</div>
                 <span className="ops-eyebrow">AUTOMATIC SYNC / BACKUP CSV</span>
                 <h2>{accessToken ? "案件を安全に取得中…" : "まず、申込みCSVを読み込みましょう。"}</h2>
-                <p>自動同期は右上の「自動同期ログイン」。設定前はNetlify管理画面の <strong>Forms → diary-pr-inquiry</strong> からCSVを読み込めます。CSVはサーバーにアップロードされません。</p>
-                <button type="button" className="ops-button ops-primary" onClick={() => picker.current?.click()}>
-                  CSVを選択する <span aria-hidden="true">↗</span>
-                </button>
-                <div className="ops-start-footer">
+                <p>{accessToken
+                   ? liveError ? "受付の取得に失敗しました。Netlifyの接続を確認してください。" : lastSyncedAt
+                     ? "取得した受付は0件です。新着相談は自動表示されます。"
+                     : "管理者認証後の受付とSheetsの照合を行っています。"
+                   : <>自動同期は右上の「自動同期ログイン」。設定前はNetlify管理画面の <strong>Forms → diary-pr-inquiry</strong> からCSVを読み込めます。CSVはサーバーにアップロードされません。</>}</p>
+                 {!accessToken && <button type="button" className="ops-button ops-primary" onClick={() => picker.current?.click()}>
+                   CSVを選択する <span aria-hidden="true">↗</span>
+                 </button>}
+                 <div className="ops-start-footer">
                   <span>✓ 専用データベース不要</span>
                   <span>✓ CSV用トークン不要</span>
                   <span>✓ 認証後は自動同期可能</span>
@@ -535,7 +541,7 @@ export function DiaryOpsConsole() {
               <>
                 <div className="ops-loaded-status">
                   <span>{items.length}件を読込済み　/　{importedFile}</span>
-                  <span>{stateConnected ? "進捗・金額は「Google Sheetsに保存」で永続化できます。" : "進捗・金額はまだ端末内のみ。CSV保存が必要です。"}</span>
+                  <span>{stateConnected ? "進捗・金額は「Google Sheetsに保存」で永続化できます。" : accessToken ? "Sheets未接続：編集・出力を停止しています。" : "端末内のみ。CSV保存が必要です。"}</span>
                 </div>
                 {screen === "overview" && (
                   <>
@@ -733,18 +739,21 @@ export function DiaryOpsConsole() {
             </div>
           </div>
           <footer><p>{stateConnected
-            ? "保存するとGoogle Sheetsの案件管理正本へ反映します。成約・入金は確認した内容のみ入力してください。"
-            : "編集は端末内のみ。変更後はCSVを保存してください。"}
-          </p>
-            {stateConnected
-              ? <button className="ops-button ops-primary" disabled={savingState}
-                  onClick={() => { void persistSelectedCase(); }}>
-                  {savingState ? "保存中…" : "Google Sheetsに保存 ↗"}
-                </button>
-              : <button className="ops-button ops-primary" onClick={() => { exportCsv(); editingBaseline.current = null; setSelectedId(null); }}>
-                  変更内容をCSV保存 ↗
-                </button>}
-          </footer>
+             ? "保存するとGoogle Sheetsへ反映します。合意・着金を確認した内容のみ入力してください。"
+             : accessToken ? "Sheetsと照合できるまで編集・保存・CSV出力を停止しています。"
+             : "編集は端末内のみ。変更後はCSVを保存してください。"}
+           </p>
+             {stateConnected
+               ? <button className="ops-button ops-primary" disabled={savingState}
+                   onClick={() => { void persistSelectedCase(); }}>
+                   {savingState ? "保存中…" : "Google Sheetsに保存 ↗"}
+                 </button>
+               : accessToken
+                 ? <button className="ops-button ops-primary" disabled>Sheets接続確認待ち</button>
+                 : <button className="ops-button ops-primary" onClick={() => { exportCsv(); editingBaseline.current = null; setSelectedId(null); }}>
+                     変更内容をCSV保存 ↗
+                   </button>}
+           </footer>
         </section>
       </div>}
     </div>

@@ -446,18 +446,35 @@ function diaryOpsRequireCleanJournal_(audit, targetId) {
   if (entries > 5000) throw Error('unavailable');
   if (!entries) return;
   // B:F holds receipt ID, changed fields, before and after revisions, status.
+  // Process events IN ORDER: a COMMITTED without its earlier BEGIN must
+  // never be cancelled by a later BEGIN or another unrelated operation.
   const events = audit.getRange(2, 2, entries, 5).getValues();
-  const pending = new Map();
+  const pending = new Set();
+  const legalFields = /^(?:status|nextAction|dueDate|agreedFee|visitDate|postDate|paidAmount|postUrl|note)(?:,(?:status|nextAction|dueDate|agreedFee|visitDate|postDate|paidAmount|postUrl|note))*$/;
   events.forEach(row => {
     const id = String(row[0] || '');
     if (targetId && id !== targetId) return;
+    const fields = String(row[1] || '');
+    const beforeVersion = String(row[2] || '');
+    const afterVersion = String(row[3] || '');
     const status = String(row[4] || '');
-    const key = JSON.stringify([id, String(row[1] || ''), String(row[2] || '')]);
-    if (status === 'BEGIN') pending.set(key, (pending.get(key) || 0) + 1);
-    else if (status === 'COMMITTED') pending.set(key, (pending.get(key) || 0) - 1);
-    else if (id) throw Error('conflict');
+    if (!/^[A-Za-z0-9-]{8,128}$/.test(id) ||
+        !legalFields.test(fields) ||
+        !/^[a-f0-9]{64}$/.test(beforeVersion) ||
+        !/^[a-f0-9]{64}$/.test(afterVersion) ||
+        beforeVersion === afterVersion) throw Error('conflict');
+    const key = JSON.stringify([id, fields, beforeVersion]);
+    if (status === 'BEGIN') {
+      if (pending.has(key)) throw Error('conflict');
+      pending.add(key);
+    } else if (status === 'COMMITTED') {
+      if (!pending.has(key)) throw Error('conflict');
+      // Apps Script normalizes dates/text, so the final hash may differ
+      // from the planned hash in BEGIN. Both still must be valid hashes.
+      pending.delete(key);
+    } else throw Error('conflict');
   });
-  if ([...pending.values()].some(value => value !== 0)) throw Error('conflict');
+  if (pending.size) throw Error('conflict');
 }
 
 function diaryOpsList_() {
