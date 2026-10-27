@@ -41,3 +41,5 @@ jobs:
             git commit -m "fix(security): upgrade Next.js and ESLint config to 16.4.3"
             git push origin HEAD:refs/heads/codex/diary-ops-final-hardening-20261027
           fi
+
+# Re-run with the corresponding security-baseline test updated to Next 16.4.3.
