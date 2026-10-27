@@ -29,7 +29,7 @@ test("recover password allows secure reset and contains no open signup", () => {
   assert.match(s,/await updateUser\(\{ password \}\)/);
   assert.doesNotMatch(s,/\bsignup\s*\(/);
   const console = read("app/diary/ops/components/diary-ops-console.tsx");
-  assert.match(console,/requestPasswordRecovery\(email\.trim\(\)\)/);
+  assert.match(console,/requestPasswordRecovery\(requestedEmail\)/);
   assert.match(console,/パスワードを再設定/);
 });
 
