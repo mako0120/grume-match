@@ -211,3 +211,47 @@ test("matching journal completion re-enables safe reads", () => {
   assert.equal(safe.ok, true);
   assert.equal(safe.items.length, 1);
 });
+
+test("orphan COMMITTED marker immediately blocks reads and writes", () => {
+  const env = fixture();
+  const version = env.context.diaryOpsItem_(env.cells[5]).version;
+  env.audits.push([new Date(), ID, "status", version, "b".repeat(64), "COMMITTED"]);
+  const read = env.send(signSheetRequest("list", {}, SECRET));
+  assert.equal(read.error, "conflict");
+  const write = env.send(signSheetRequest("update", {
+    id: ID, expectedVersion: version, patch: { status: "成約" },
+  }, SECRET));
+  assert.equal(write.error, "conflict");
+  assert.equal(env.cells[5][3], "未対応");
+});
+
+test("COMMITTED followed by BEGIN cannot cancel invalid journal sequence", () => {
+  const env = fixture();
+  const version = env.context.diaryOpsItem_(env.cells[5]).version;
+  env.audits.push([new Date(), ID, "status", version, "b".repeat(64), "COMMITTED"]);
+  env.audits.push([new Date(), ID, "status", version, "b".repeat(64), "BEGIN"]);
+  assert.equal(env.send(signSheetRequest("list", {}, SECRET)).error, "conflict");
+});
+
+test("two BEGIN records sharing the same source revision are ambiguous", () => {
+  const env = fixture();
+  const version = env.context.diaryOpsItem_(env.cells[5]).version;
+  env.audits.push([new Date(), ID, "status", version, "b".repeat(64), "BEGIN"]);
+  env.audits.push([new Date(), ID, "status", version, "c".repeat(64), "BEGIN"]);
+  env.audits.push([new Date(), ID, "status", version, "b".repeat(64), "COMMITTED"]);
+  env.audits.push([new Date(), ID, "status", version, "c".repeat(64), "COMMITTED"]);
+  assert.equal(env.send(signSheetRequest("list", {}, SECRET)).error, "conflict");
+});
+
+test("audit rows with malformed versions or unexpected statuses fail closed", () => {
+  for (const bad of [
+    ["status", "not-a-hash", "b".repeat(64), "BEGIN"],
+    ["unknownField", "a".repeat(64), "b".repeat(64), "BEGIN"],
+    ["status", "a".repeat(64), "b".repeat(64), "FORGED"],
+    ["status", "a".repeat(64), "a".repeat(64), "BEGIN"],
+  ]) {
+    const env = fixture();
+    env.audits.push([new Date(), ID, ...bad]);
+    assert.equal(env.send(signSheetRequest("list", {}, SECRET)).error, "conflict");
+  }
+});
