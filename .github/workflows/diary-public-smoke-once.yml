@@ -22,7 +22,10 @@ jobs:
           for (const path of paths) {
             try {
               const r = await fetch(origin + path, { signal: AbortSignal.timeout(12000), redirect: 'follow' });
-              console.log(path, 'HTTP', r.status, 'final-origin', new URL(r.url).origin);
+              console.log(path, 'HTTP', r.status, 'final-origin', new URL(r.url).origin,
+                'auth-challenge', r.headers.get('www-authenticate') ? 'present' : 'absent',
+                'server', r.headers.get('server') || 'none',
+                'content-type', r.headers.get('content-type') || 'none');
               if (r.status !== 200 || new URL(r.url).origin !== origin) errors++;
               await r.body?.cancel();
             } catch (e) {
