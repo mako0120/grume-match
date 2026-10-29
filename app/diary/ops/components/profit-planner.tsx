@@ -32,7 +32,7 @@ export function DiaryProfitPlanner() {
         <h2 id="ops-profit-planner-heading">月次売上・利益シミュレーション</h2>
       </div>
     </div>
-    <p>以下は**架空の販売数と原価仮定**による事業計画です。実際の成約件数・MRR・未入金額ではありません。入力情報は保存・外部送信しません。</p>
+    <p>以下は<strong>架空の販売数と原価仮定</strong>による事業計画です。実際の成約件数・MRR・未入金額ではありません。入力情報は保存・外部送信しません。</p>
     <div className="ops-profit-inputs">
       {fields.map(f => <label key={f.key}>{f.label}
         <input type="number" min={0} max={f.max} step={f.key.startsWith("monthly") || f.key === "oneOffVideo" ? 1 : 500}
@@ -54,6 +54,6 @@ export function DiaryProfitPlanner() {
       <div><span>固定経費</span><strong>−{yen(result.fixedMonthlyExpenseYen)}</strong></div>
       <div className="ops-profit-surplus"><span>労務費を引いた概算事業利益（税引前）</span><strong>{yen(result.operatingSurplusAfterOwnerLaborYen)}</strong></div>
     </div>
-    <p className="ops-profit-note">前提：1店舗・月1回来店。写真プランは5時間＋経費2,500円、写真＋動画は9時間＋経費4,500円、単発動画は5時間＋経費3,000円の**仮定**です。単発価格はモデル用15,000円。食材費、外注費、税務、実際の原価は案件ごとに確認してください。赤字でも結果をそのまま表示します。</p>
+    <p className="ops-profit-note">前提：1店舗・月1回来店。写真プランは5時間＋経費2,500円、写真＋動画は9時間＋経費4,500円、単発動画は5時間＋経費3,000円の<strong>仮定</strong>です。単発価格はモデル用15,000円。食材費、外注費、税務、実際の原価は案件ごとに確認してください。赤字でも結果をそのまま表示します。</p>
   </section>;
 }
