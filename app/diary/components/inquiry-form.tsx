@@ -5,6 +5,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InstagramDmFallback } from "./instagram-dm-fallback";
+import { DIARY_RETAINER_PLANS } from "@/lib/diary/retainers";
 import { NetlifyDiaryInquiryForm } from "./netlify-inquiry-form";
 
 export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialService = "", initialKind = "consultation", initialGoal = "", photoFeedPriceYen, videoPackageStartYen }: {
@@ -117,8 +118,8 @@ export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialServi
                 <option value="" disabled>選択してください</option>
                 <option value="instagram_feed">写真フィードPR：1投稿{photoFeedPriceYen.toLocaleString("ja-JP")}円（税込）</option>
                 <option value="instagram_feed_video">フィード投稿＋ショート動画：{videoPackageStartYen.toLocaleString("ja-JP")}円〜（税込）</option>
-                <option value="monthly_photo">毎月フォトPR：29,800円／月（税込・ご相談）</option>
-                <option value="monthly_growth">毎月フォト＋リールPR：49,800円／月（税込・ご相談）</option>
+                <option value="monthly_photo">毎月フォトPR：{DIARY_RETAINER_PLANS[0].priceYenInclTax.toLocaleString("ja-JP")}円／月（税込・ご相談）</option>
+                <option value="monthly_growth">毎月フォト＋リールPR：{DIARY_RETAINER_PLANS[1].priceYenInclTax.toLocaleString("ja-JP")}円／月（税込・ご相談）</option>
                 <option value="instagram_reel">Instagramリール：お見積もり</option>
                 <option value="instagram_stories">ストーリーズ：お見積もり</option>
                 <option value="photo_video">写真・動画素材の撮影：お見積もり</option>
