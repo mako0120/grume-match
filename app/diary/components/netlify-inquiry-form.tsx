@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { DIARY_RETAINER_PLANS } from "@/lib/diary/retainers";
 import { useRouter } from "next/navigation";
 import { detectProhibitedPRRequest, validateDiaryInquiry } from "@/lib/diary/inquiry";
 
@@ -20,6 +21,8 @@ const REGISTERED_FIELDS = [
 const SERVICE_OPTIONS = [
   { value: "instagram_feed", title: "Instagram写真フィード1投稿" },
   { value: "instagram_feed_video", title: "写真フィード＋ショート動画" },
+  { value: "monthly_photo", title: `毎月フォトPR（月${DIARY_RETAINER_PLANS[0].priceYenInclTax.toLocaleString("ja-JP")}円・税込／ご相談）` },
+  { value: "monthly_growth", title: `毎月フォト＋リールPR（月${DIARY_RETAINER_PLANS[1].priceYenInclTax.toLocaleString("ja-JP")}円・税込／ご相談）` },
   { value: "instagram_reel", title: "リール単体（個別見積もり）" },
   { value: "instagram_stories", title: "ストーリーズ（個別見積もり）" },
   { value: "photo_video", title: "写真・動画素材の撮影（個別見積もり）" },

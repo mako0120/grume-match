@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./diary.css";
 import "./modern.css";
+import "./retainers.css";
 
 export const metadata: Metadata = {
   title: "グルメ日誌｜大阪 — お店のPR・撮影のご依頼",

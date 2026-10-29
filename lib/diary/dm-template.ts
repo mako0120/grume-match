@@ -5,6 +5,8 @@
 const SERVICE_LABELS: Record<string, string> = {
   instagram_feed: "写真フィードPR（Instagram投稿1件）",
   instagram_feed_video: "写真フィード＋ショート動画",
+  monthly_photo: "毎月フォトPR（月29,800円・税込、事前相談）",
+  monthly_growth: "毎月フォト＋リールPR（月49,800円・税込、事前相談）",
   instagram_reel: "リール動画",
   instagram_stories: "ストーリーズ",
   photo_video: "店舗の写真・動画素材",

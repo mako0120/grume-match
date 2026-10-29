@@ -172,3 +172,21 @@
 /* Form fieldset is used to make incomplete live data strictly read-only. */
 .ops-detail-fields{margin:0;padding:0;border:0;min-width:0}
 .ops-detail-fields:disabled{opacity:.72}
+
+
+/* Cost-based owner planning. No customer records or local-storage persistence. */
+.ops-profit-planner{margin-top:22px;border:1px solid var(--ops-border,#d6ded8);border-radius:18px;background:var(--ops-card,#fff);padding:clamp(19px,3vw,30px);color:inherit}
+.ops-profit-planner>p{font-size:13px;line-height:1.85;color:#5c6e65}
+.ops-profit-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:22px 0}
+.ops-profit-inputs label{display:grid;gap:8px;font-size:12px;font-weight:750}
+.ops-profit-inputs input[type=number]{width:100%;min-width:0;max-width:100%;background:#fff;border:1px solid #c6d5cc;border-radius:10px;padding:11px 12px;color:#193d2f;font:inherit;font-weight:800}
+.ops-profit-inputs .ops-profit-tax{grid-column:1/-1;display:flex;align-items:start;gap:10px;line-height:1.7;font-weight:600}
+.ops-profit-tax input[type=checkbox]{width:18px;height:18px;flex:none;margin-top:2px;accent-color:#214631}
+.ops-profit-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.ops-profit-results>div{display:grid;gap:7px;padding:15px;border-radius:11px;background:#f1f5f1}
+.ops-profit-results span{font-size:11px;color:#475f52}
+.ops-profit-results strong{font-size:clamp(15px,2vw,19px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ops-profit-results .ops-profit-surplus{grid-column:1/-1;background:#deece1}
+.ops-profit-results .ops-profit-surplus strong{font-size:clamp(21px,3vw,30px);color:#17492e}
+.ops-profit-note{margin:17px 0 0;font-size:11px!important}
+@media(max-width:650px){.ops-profit-inputs,.ops-profit-results{grid-template-columns:1fr}.ops-profit-results .ops-profit-surplus{grid-column:auto}}

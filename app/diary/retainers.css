@@ -1,0 +1,26 @@
+/* Scoped recurring-plan section; keeps the current Diary visual identity. */
+.diary-v2 .diary-retainers{padding:clamp(64px,9vw,108px) 0;background:#f4f6ef;color:#20352c}
+.diary-v2 .diary-retainer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:35px}
+.diary-v2 .diary-retainer-card{min-width:0;display:flex;flex-direction:column;padding:clamp(25px,4vw,42px);border:1px solid #c9d6c8;border-radius:24px;background:#fff;box-shadow:0 15px 45px #2146310b}
+.diary-v2 .diary-retainer-card-featured{background:#203b2c;color:#fff;border-color:#203b2c}
+.diary-v2 .diary-retainer-card-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:800;font-size:11px;letter-spacing:.08em}
+.diary-v2 .diary-retainer-pill{padding:7px 12px;border:1px solid currentColor;border-radius:100px;font-size:10px;letter-spacing:0;white-space:nowrap}
+.diary-v2 .diary-retainer-card h3{font-size:clamp(21px,2.5vw,29px);margin:20px 0 9px;letter-spacing:-.02em}
+.diary-v2 .diary-retainer-card>p{font-size:14px;opacity:.85;line-height:1.8;margin:0}
+.diary-v2 .diary-retainer-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:24px 0 18px;border-bottom:1px solid #d4dfd0}
+.diary-v2 .diary-retainer-card-featured .diary-retainer-price{border-color:#ffffff44}
+.diary-v2 .diary-retainer-price strong{font-size:clamp(30px,4vw,43px);letter-spacing:-.05em;font-weight:900}
+.diary-v2 .diary-retainer-price span{font-size:12px;font-weight:700;opacity:.8}
+.diary-v2 .diary-retainer-card ul{list-style:none;padding:17px 0 25px;margin:0;display:grid;gap:11px;flex:1}
+.diary-v2 .diary-retainer-card li{position:relative;padding-left:22px;font-size:13px;line-height:1.75}
+.diary-v2 .diary-retainer-card li::before{content:"✓";position:absolute;left:0;font-weight:900}
+.diary-v2 .diary-retainer-cta{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:50px;padding:13px 18px;background:#214631;color:#fff;border-radius:11px;font-size:13px;font-weight:850;text-decoration:none}
+.diary-v2 .diary-retainer-card-featured .diary-retainer-cta{background:#e4d1b7;color:#203b2c}
+.diary-v2 .diary-retainer-cta:hover{opacity:.88}
+.diary-v2 .diary-retainer-conditions{margin-top:24px;padding:21px 24px;border-radius:13px;background:#e8ede2}
+.diary-v2 .diary-retainer-conditions strong{font-size:14px}
+.diary-v2 .diary-retainer-conditions ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
+.diary-v2 .diary-retainer-conditions li{font-size:12px;line-height:1.75;color:#4d6051}
+.diary-v2 .diary-retainer-conditions a{display:inline-block;margin-top:12px;color:#214631;font-weight:800;text-decoration:underline;font-size:12px}
+@media(max-width:760px){.diary-v2 .diary-retainer-grid{grid-template-columns:1fr;gap:15px}.diary-v2 .diary-retainer-card{border-radius:19px}}
+@media(prefers-reduced-motion:reduce){.diary-v2 .diary-retainer-cta{transition:none}}

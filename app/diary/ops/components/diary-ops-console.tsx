@@ -2,6 +2,7 @@
 
 import { hasCompleteOpsSnapshot } from "@/lib/diary/ops-sync-integrity";
 import { requestPasswordRecovery } from "@netlify/identity";
+import { DiaryProfitPlanner } from "./profit-planner";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -26,6 +27,8 @@ const readableDate = (value: string) => {
 const serviceLabels: Record<string, string> = {
   instagram_feed: "Instagram フィード",
   instagram_feed_video: "フィード＋動画",
+  monthly_photo: "継続・毎月フォトPR",
+  monthly_growth: "継続・毎月フォト＋リールPR",
   instagram_reel: "Instagram リール",
   instagram_stories: "ストーリーズ",
   photo_video: "写真・動画撮影",
@@ -724,6 +727,7 @@ export function DiaryOpsConsole() {
                     <p className="ops-finance-disclaimer">※ 決済・請求書の発行は行いません。入金額は銀行などで着金を確認してから入力してください。</p>
                   </section>
                 )}
+                {screen === "finance" && <DiaryProfitPlanner />}
               </>
             )}
           </main>

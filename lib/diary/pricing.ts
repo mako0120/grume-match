@@ -1,3 +1,5 @@
+import { retainerPlan } from "./retainers.ts";
+
 /**
  * First-party グルメ日誌 direct PR pricing.
  * This is an operator's proposed future price ladder, not an automatic
@@ -24,6 +26,8 @@ export function videoIncludedPriceForFollowers(followers: number): number {
 }
 
 export function priceForDiaryService(service: string, followers: number): number | null {
+  const monthly = retainerPlan(service);
+  if (monthly) return monthly.priceYenInclTax;
   if (service === "instagram_feed") return priceForFollowers(followers);
   if (service === "instagram_feed_video") {
     return videoIncludedPriceForFollowers(followers);
