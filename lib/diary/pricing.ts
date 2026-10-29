@@ -1,4 +1,4 @@
-import { retainerPlan } from "./retainers";
+import { retainerPlan } from "./retainers.ts";
 
 /**
  * First-party グルメ日誌 direct PR pricing.
