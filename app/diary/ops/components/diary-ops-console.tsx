@@ -2,6 +2,7 @@
 
 import { hasCompleteOpsSnapshot } from "@/lib/diary/ops-sync-integrity";
 import { requestPasswordRecovery } from "@netlify/identity";
+import { DiaryProfitPlanner } from "./profit-planner";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -726,6 +727,7 @@ export function DiaryOpsConsole() {
                     <p className="ops-finance-disclaimer">※ 決済・請求書の発行は行いません。入金額は銀行などで着金を確認してから入力してください。</p>
                   </section>
                 )}
+                {screen === "finance" && <DiaryProfitPlanner />}
               </>
             )}
           </main>
