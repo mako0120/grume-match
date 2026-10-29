@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PostShowcase } from "../components/post-showcase";
 import { DiaryPricingPanel } from "../components/pricing-panel";
 import { DiaryHeader, DiaryMobileCTA } from "../components/site-header";
+import { DiaryRetainerPricing } from "../components/retainer-pricing";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
 export const metadata = {
@@ -71,6 +72,8 @@ export default function DiaryServices() {
             <DiaryPricingPanel />
           </div>
         </section>
+
+        <DiaryRetainerPricing />
 
         <section className="diary-services-layout diary-v2-service-details" id="details">
           <div className="diary-v2-container">
