@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DiaryRetainerPricing } from "./components/retainer-pricing";
 import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
@@ -121,6 +122,8 @@ export default function DiaryHomePage() {
             <div className="diary-v2-package-foot"><span>ストーリーズ・撮影素材・リール単体も個別見積もりで対応</span><Link href="/diary/services">すべてのサービスを見る ↗</Link></div>
           </div>
         </section>
+
+        <DiaryRetainerPricing compact />
 
         <section className="diary-v2-section diary-v2-story" id="philosophy">
           <div className="diary-v2-container diary-v2-story-grid">
