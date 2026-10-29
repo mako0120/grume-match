@@ -26,6 +26,8 @@ const readableDate = (value: string) => {
 const serviceLabels: Record<string, string> = {
   instagram_feed: "Instagram フィード",
   instagram_feed_video: "フィード＋動画",
+  monthly_photo: "継続・毎月フォトPR",
+  monthly_growth: "継続・毎月フォト＋リールPR",
   instagram_reel: "Instagram リール",
   instagram_stories: "ストーリーズ",
   photo_video: "写真・動画撮影",
