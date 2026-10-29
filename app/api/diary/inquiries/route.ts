@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validateDiaryInquiry } from "@/lib/diary/inquiry";
 import { currentDiaryPricing, priceForDiaryService } from "@/lib/diary/pricing";
+import { retainerPlan } from "@/lib/diary/retainers";
 
 export const runtime = "nodejs";
 
@@ -81,14 +82,15 @@ export async function POST(request: NextRequest) {
     // Compute server-side, never trust prices or follower counts from the client.
     const pricing = currentDiaryPricing();
     const priceReference = priceForDiaryService(checked.data.service, pricing.followers);
+    const monthlyPlan = retainerPlan(checked.data.service);
     // A consultation never becomes a contract or consumes a calendar slot.
     // Only approved applications can progress to a proposed visit.
     const { error } = await admin.from("diary_pr_inquiries").insert({
       ...details,
       post_price_reference_yen: priceReference,
-      followers_at_inquiry: priceReference !== null ? pricing.followers : null,
-      follower_snapshot_verified_at: priceReference !== null ? pricing.asOf : null,
-      price_policy_version: priceReference !== null ? "2026-10-16-follower-video-tiers-v2" : null,
+      followers_at_inquiry: priceReference !== null && !monthlyPlan ? pricing.followers : null,
+      follower_snapshot_verified_at: priceReference !== null && !monthlyPlan ? pricing.asOf : null,
+      price_policy_version: monthlyPlan ? "2026-10-29-retainer-monthly-v1" : priceReference !== null ? "2026-10-16-follower-video-tiers-v2" : null,
       privacy_consented_at: new Date().toISOString(),
       compliance_confirmed_at: new Date().toISOString(),
     });
