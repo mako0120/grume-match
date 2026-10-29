@@ -3,6 +3,7 @@ import { DiaryInquiryForm } from "../components/inquiry-form";
 import { DiaryHeader } from "../components/site-header";
 import { DIARY_SERVICES } from "@/lib/diary/inquiry";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
+import { DIARY_RETAINER_PLANS } from "@/lib/diary/retainers";
 
 // The intake toggle must be evaluated in the server runtime, never in a cached page.
 export const dynamic = "force-dynamic";
@@ -41,7 +42,8 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
         <div className="diary-v2-request-summary">
           <div><span>写真フィードPR</span><strong>1投稿 {formatDiaryYen(price.amountYen)}</strong><small>税込・画像枚数による追加料金なし</small></div>
           <div><span>動画込みPR</span><strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong><small>税込・制作内容は個別見積もり</small></div>
-          <Link href="/diary/services#pricing">プランを見る ↗</Link>
+          <div><span>毎月の継続PR</span><strong>{formatDiaryYen(DIARY_RETAINER_PLANS[0].priceYenInclTax)}〜 / 月</strong><small>税込・月ごとに制作内容を事前合意</small></div>
+          <Link href="/diary/services#monthly-pr">継続プランを見る ↗</Link>
         </div>
         {goalLabel ? <p className="diary-v2-goal-context">ご相談テーマ：<strong>{goalLabel}</strong>（内容は自由に変更できます）</p> : null}
         <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> {acceptingForm ? "無料のフォームからご相談いただけます。送信時点では契約は成立しません。" : "現在はInstagramのDMから無料でご相談いただけます。DMを送っただけでは契約は成立しません。"} 日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
