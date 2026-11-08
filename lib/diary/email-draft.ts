@@ -29,12 +29,16 @@ export type DiaryEmailDraftInput = {
 };
 
 function cleanMailText(value: string | undefined, max: number): string {
-  return (value ?? "").replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ").trim().slice(0, max);
+  return (value ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, max);
+}
+
+function cleanMailBody(value: string, max: number): string {
+  return value.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ").trim().slice(0, max);
 }
 
 export function diaryEmailDraft(subject: string, body: string): DiaryEmailDraft {
   const safeSubject = cleanMailText(subject, 150);
-  const safeBody = cleanMailText(body, 2200);
+  const safeBody = cleanMailBody(body, 2200);
   const encodedSubject = encodeURIComponent(safeSubject);
   const encodedBody = encodeURIComponent(safeBody);
   return {
