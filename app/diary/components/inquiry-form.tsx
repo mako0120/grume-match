@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { InstagramDmFallback } from "./instagram-dm-fallback";
+import { DiaryEmailInquiryFallback } from "./email-inquiry-fallback";
 import { NetlifyDiaryInquiryForm } from "./netlify-inquiry-form";
 
 export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialService = "", initialKind = "consultation", initialGoal = "", photoFeedPriceYen, videoPackageStartYen }: {
@@ -21,7 +21,7 @@ export function DiaryInquiryForm({ enabled, netlifyEnabled = false, initialServi
     if (netlifyEnabled) {
       return <NetlifyDiaryInquiryForm initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} photoFeedPriceYen={photoFeedPriceYen} videoPackageStartYen={videoPackageStartYen} />;
     }
-    return <InstagramDmFallback initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} />;
+    return <DiaryEmailInquiryFallback initialService={initialService} initialKind={initialKind} initialGoal={initialGoal} photoFeedPriceYen={photoFeedPriceYen} videoPackageStartYen={videoPackageStartYen} />;
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
