@@ -38,7 +38,7 @@ test("Netlify lead intake does not activate before dashboard enablement", () => 
   assert.match(env, /DIARY_NETLIFY_FORMS_ENABLED=false/);
   assert.match(mainForm, /if \(netlifyEnabled\)/);
   assert.match(mainForm, /<NetlifyDiaryInquiryForm/);
-  assert.match(mainForm, /<InstagramDmFallback/);
+  assert.match(mainForm, /<DiaryEmailInquiryFallback/);
   const api = read("app/api/diary/inquiries/route.ts");
   assert.match(api, /DIARY_INQUIRIES_ENABLED !== "true"/);
 });
