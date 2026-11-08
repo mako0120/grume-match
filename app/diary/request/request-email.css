@@ -25,3 +25,13 @@
 .diary-v2 .diary-email-footer a{color:#2c6648;text-decoration:underline;font-weight:850}
 @media(max-width:650px){.diary-v2 .diary-email-fallback{padding:20px 15px;border-radius:14px}.diary-v2 .diary-email-actions{flex-direction:column;align-items:stretch}.diary-v2 .diary-email-actions .diary-button{width:100%;text-align:center}.diary-v2 .diary-email-alt{text-align:center;padding:8px}}
 @media(prefers-reduced-motion:reduce){.diary-v2 .diary-email-fallback *{transition:none!important}}
+
+/* Always-available Gmail route, even when Netlify Forms is on. */
+.diary-v2 .diary-gmail-quick-link{display:flex;align-items:center;justify-content:space-between;gap:17px;flex-wrap:wrap;margin:20px 0;padding:19px 22px;border:1px solid #c9d9c8;background:#f1f7ee;border-radius:14px}
+.diary-v2 .diary-gmail-quick-link>div{display:grid;gap:7px}
+.diary-v2 .diary-gmail-quick-link strong{font-size:15px;color:#214631}
+.diary-v2 .diary-gmail-quick-link span{font-size:12px;line-height:1.8;color:#58705d}
+.diary-v2 .diary-gmail-quick-link>a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:9px;padding:13px 18px;background:#214631;color:#fff;font-size:13px;font-weight:850;min-height:47px}
+.diary-v2 .diary-gmail-quick-link>a:hover{background:#30634a}
+.diary-v2 .diary-gmail-quick-link>a:focus-visible{outline:3px solid #c08850;outline-offset:3px}
+@media(max-width:650px){.diary-v2 .diary-gmail-quick-link>a{width:100%}}
