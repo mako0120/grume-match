@@ -72,3 +72,13 @@ test("fallback uses secure manual handoff, preserves hosted form gates and price
   assert.doesNotMatch(emailFallback, /fetch\(|localStorage|sessionStorage|window\.open/i);
   assert.doesNotMatch(emailFallback, /29,800|49,800|monthly_growth/);
 });
+
+test("direct Gmail link remains visible even when hosted intake is enabled", () => {
+  const page = read("app/diary/request/page.tsx");
+  const css = read("app/diary/request/request-email.css");
+  assert.match(page, /buildDiaryConsultationEmail/);
+  assert.match(page, /href={emailContact.gmailUrl}/);
+  assert.match(page, /Gmailで直接相談する/);
+  assert.match(page, /<DiaryInquiryForm/);
+  assert.match(css, /diary-gmail-quick-link/);
+});

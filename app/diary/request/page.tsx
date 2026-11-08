@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buildDiaryConsultationEmail } from "@/lib/diary/email-draft";
 import "./request-email.css";
 import { DiaryInquiryForm } from "../components/inquiry-form";
 import { DiaryHeader } from "../components/site-header";
@@ -29,6 +30,7 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
   // Keep the form closed unless that runtime flag is positively enabled.
   const netlifyEnabled = process.env.DIARY_NETLIFY_FORMS_ENABLED === "true";
   const acceptingForm = enabled || netlifyEnabled;
+  const emailContact = buildDiaryConsultationEmail();
 
   return (
     <div className="diary-v2">
@@ -44,6 +46,7 @@ export default async function DiaryRequestPage({ searchParams }: { searchParams:
           <div><span>動画込みPR</span><strong>{formatDiaryYen(videoIncludedPriceForFollowers(price.followers))}〜</strong><small>税込・制作内容は個別見積もり</small></div>
           <Link href="/diary/services#pricing">プランを見る ↗</Link>
         </div>
+        <div className="diary-gmail-quick-link"><div><strong>Gmailで直接相談する</strong><span>入力フォームを使わずに、メールでご相談いただくこともできます。</span></div><a href={emailContact.gmailUrl} target="_blank" rel="noopener noreferrer">Gmailを開く ↗</a></div>
         {goalLabel ? <p className="diary-v2-goal-context">ご相談テーマ：<strong>{goalLabel}</strong>（内容は自由に変更できます）</p> : null}
         <div className="diary-v2-request-note"><span aria-hidden="true">✳</span> {acceptingForm ? "無料のフォームからご相談いただけます。送信時点では契約は成立しません。" : "Gmailから無料相談できます。内容が決まっている場合は店舗情報を入力し、メールの下書きを作成できます。メールはご自身で送信してください。"} 日時・制作範囲・最終料金に双方が合意したあとに確定します。</div>
         <DiaryInquiryForm enabled={enabled} netlifyEnabled={netlifyEnabled} initialService={initialService} initialKind={initialKind} initialGoal={goalLabel} photoFeedPriceYen={price.amountYen} videoPackageStartYen={videoIncludedPriceForFollowers(price.followers)} />
