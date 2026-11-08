@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { buildDiaryConsultationEmail } from "@/lib/diary/email-draft";
 import { PostShowcase } from "../components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "../components/site-header";
 import {
@@ -33,6 +34,7 @@ export default function DiaryOneOffPrPage() {
   const pricing = currentDiaryPricing();
   const photo = formatDiaryYen(pricing.amountYen);
   const video = formatDiaryYen(videoIncludedPriceForFollowers(pricing.followers));
+  const emailContact = buildDiaryConsultationEmail();
   return (
     <div className="diary-v2 diary-pr-page">
       <DiaryHeader active="services" />
@@ -45,7 +47,7 @@ export default function DiaryOneOffPrPage() {
               <p className="diary-pr-hero-lead">グルメ日誌｜大阪のInstagramで、お店や料理をPRしませんか？ ご依頼は<strong>1案件・1投稿から</strong>。グルメ日誌本人が、来店・撮影・編集・投稿まで対応します。</p>
               <div className="diary-pr-hero-actions">
                 <Link href="/diary/request?service=instagram_feed&intent=application" className="diary-v2-button diary-v2-button-accent">PRを依頼・相談する ↗</Link>
-                <a className="diary-v2-text-link" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る ↗</a>
+                <a className="diary-v2-text-link" href={emailContact.gmailUrl} target="_blank" rel="noopener noreferrer">Gmailで直接相談する ↗</a>
               </div>
               <p className="diary-pr-hero-note">相談・見積もり無料 ／ 自動契約・自動課金なし ／ 料金は事前に合意</p>
             </div>
@@ -142,12 +144,12 @@ export default function DiaryOneOffPrPage() {
           <div className="diary-v2-container">
             <span className="diary-v2-section-label">LET&apos;S WORK TOGETHER</span>
             <h2>お店のPR、<br />まずは1件から。</h2>
-            <p>ご相談・お見積もりは無料です。フォームの受付準備中は、InstagramのDMからお問い合わせいただけます。</p>
+            <p>ご相談・お見積もりは無料です。フォームとGmailの両方から、1案件ごとのPRをご相談いただけます。</p>
             <div className="diary-pr-final-buttons">
               <Link className="diary-v2-button diary-v2-button-accent" href="/diary/request?intent=consultation">無料でPR相談する ↗</Link>
-              <a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramから相談する ↗</a>
+              <a href={emailContact.gmailUrl} target="_blank" rel="noopener noreferrer">Gmailで直接相談する ↗</a>
             </div>
-            <p className="diary-pr-legal"><Link href="/diary/policy">PR・撮影方針</Link><Link href="/legal/privacy">プライバシーポリシー</Link><Link href="/legal/operator">運営者情報</Link></p>
+            <p className="diary-pr-legal"><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramの実際の投稿を見る ↗</a><Link href="/diary/policy">PR・撮影方針</Link><Link href="/legal/privacy">プライバシーポリシー</Link><Link href="/legal/operator">運営者情報</Link></p>
           </div>
         </section>
       </main>

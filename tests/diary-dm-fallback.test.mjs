@@ -37,19 +37,23 @@ test("unknown service and goal parameters cannot be injected into copied message
   assert.match(text, /料理やお店の魅力を知ってもらいたい/);
 });
 
-test("disabled intake uses only a manual Instagram DM handoff", () => {
+test("disabled native intake exposes manual Gmail composition and a structured application form", () => {
   const form = read("app/diary/components/inquiry-form.tsx");
   const request = read("app/diary/request/page.tsx");
-  const fallback = read("app/diary/components/instagram-dm-fallback.tsx");
+  const fallback = read("app/diary/components/email-inquiry-fallback.tsx");
   assert.match(form, /if \(!enabled \|\| !siteKey\)/);
-  assert.match(form, /return <InstagramDmFallback initialService=\{initialService\} initialKind=\{initialKind\} initialGoal=\{initialGoal\} \/>/);
-  assert.match(fallback, /navigator\.clipboard\.writeText\(message\)/);
-  assert.match(fallback, /textRef\.current\?\.select\(\)/);
-  assert.match(fallback, /www\.instagram\.com\/gurunavi_diary\//);
-  assert.match(fallback, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(fallback, /当サイトのサーバーに送信されません/);
-  assert.match(request, /DMを送っただけでは契約は成立しません/);
-  assert.doesNotMatch(fallback, /canva\.com|localStorage|sessionStorage|fetch\(/i);
+  assert.match(form, /<DiaryEmailInquiryFallback/);
+  assert.match(fallback, /buildDiaryConsultationEmail/);
+  assert.match(fallback, /buildDiaryApplicationEmail/);
+  assert.match(fallback, /validateDiaryInquiry/);
+  assert.match(fallback, /name="restaurant_name" required/);
+  assert.match(fallback, /name="email" type="email" required/);
+  assert.match(fallback, /name="consent" required/);
+  assert.match(fallback, /name="compliance_confirmed" required/);
+  assert.match(fallback, /メールは送信されません/);
+  assert.match(fallback, /当サイトのサーバーへ送信されません/);
+  assert.match(request, /メールの下書きを作成できます/);
+  assert.doesNotMatch(fallback, /localStorage|sessionStorage|fetch\(/i);
 });
 
 test("both modes preserve the privacy and anti-spam gates", () => {
