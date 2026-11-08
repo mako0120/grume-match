@@ -149,7 +149,7 @@ export default function DiaryOneOffPrPage() {
               <Link className="diary-v2-button diary-v2-button-accent" href="/diary/request?intent=consultation">無料でPR相談する ↗</Link>
               <a href={emailContact.gmailUrl} target="_blank" rel="noopener noreferrer">Gmailで直接相談する ↗</a>
             </div>
-            <p className="diary-pr-legal"><Link href="/diary/policy">PR・撮影方針</Link><Link href="/legal/privacy">プライバシーポリシー</Link><Link href="/legal/operator">運営者情報</Link></p>
+            <p className="diary-pr-legal"><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramの実際の投稿を見る ↗</a><Link href="/diary/policy">PR・撮影方針</Link><Link href="/legal/privacy">プライバシーポリシー</Link><Link href="/legal/operator">運営者情報</Link></p>
           </div>
         </section>
       </main>
