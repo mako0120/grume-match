@@ -13,7 +13,7 @@ jobs:
       - name: Check only public site and no authentication bypass
         run: |
           node --input-type=module <<'NODE'
-          for(const path of ['/diary','/diary/pr','/diary/request','/.netlify/functions/diary-ops-feed']){
+          for(const path of ['/diary','/diary/pr','/diary/request','/diary/request?service=instagram_feed&intent=application','/.netlify/functions/diary-ops-feed']){
             try {
               const res=await fetch('https://brilliant-custard-364003.netlify.app'+path,{
                 redirect:'manual',signal:AbortSignal.timeout(15000),
@@ -26,6 +26,12 @@ jobs:
                 hasGmail:html.includes('Gmailで無料相談') || html.includes('Gmailで直接相談する'),
                 hasApplicationChoice:html.includes('依頼内容が決まっている'),
                 hasOneOffPricing:html.includes('8,000円') && html.includes('15,000円'),
+                hasGmailRecipient:html.includes('23610083grume1@gmail.com'),
+                hasNetlifyForm:html.includes('diary-netlify-inquiry'),
+                hasTurnstileForm:html.includes('cf-turnstile'),
+                hasDmOnlyFallback:html.includes('diary-v2-dm-fallback'),
+                hasEmailFallback:html.includes('diary-email-fallback'),
+                hasHydrationError:html.includes('Application error'),
               };
               console.log('PR_LIVE_CHECK '+JSON.stringify(check));
             }catch(e){console.log('PR_LIVE_CHECK '+JSON.stringify({path,error:e?.name||'request_failed'}))}
