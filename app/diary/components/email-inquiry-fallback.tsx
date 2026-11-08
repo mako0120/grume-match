@@ -179,7 +179,7 @@ export function DiaryEmailInquiryFallback({
           <div className="diary-privacy-box">
             <label className="diary-privacy-check">
               <input type="checkbox" name="consent" required />
-              <span><Link href="/legal/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</Link>に同意します。入力内容はメールの下書き作成にだけ利用し、このフォームからサーバーには送信されません。</span>
+              <span><Link href="/legal/privacy" target="_blank" rel="noopener noreferrer">プライバシーポリシー</Link>に同意します。入力内容はメールの下書き作成にだけ利用し、このフォームから当サイトのサーバーへ送信されません。</span>
             </label>
             <label className="diary-privacy-check">
               <input type="checkbox" name="compliance_confirmed" required />
