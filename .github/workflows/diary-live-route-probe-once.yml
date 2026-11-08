@@ -1,0 +1,39 @@
+name: Diary live route diagnosis read-only
+on:
+  push:
+    branches: [codex/diary-live-http-diagnose-20261108]
+    paths: [.github/workflows/diary-live-route-probe-once.yml]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Check production & preview anonymously without modifying site
+        run: |
+          node --input-type=module <<'NODE'
+          const origins=[
+            'https://brilliant-custard-364003.netlify.app',
+            'https://deploy-preview-30--brilliant-custard-364003.netlify.app'
+          ];
+          for(const origin of origins){
+            for(const path of ['/','/diary','/diary/pr','/diary/services','/diary/request','/.netlify/functions/diary-ops-feed']){
+              try{
+                const res=await fetch(origin+path,{
+                  redirect:'manual',signal:AbortSignal.timeout(12000),
+                  headers:{Accept:'text/html'},
+                });
+                const body=(await res.text()).slice(0,240)
+                  .replace(/[\\r\\n]+/g,' ').replace(/\\"/g,"'");
+                console.log('RESULT '+JSON.stringify({
+                  origin,path,status:res.status,server:res.headers.get('server'),
+                  contentType:res.headers.get('content-type'),
+                  location:res.headers.get('location'),
+                  nfRequestId:res.headers.get('x-nf-request-id'),
+                  body,
+                }));
+              }catch(e){console.log('RESULT '+JSON.stringify({origin,path,error:String(e).slice(0,150)}));}
+            }
+          }
+          NODE
