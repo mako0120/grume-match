@@ -140,7 +140,7 @@ export default function DiaryOneOffPrPage() {
 
         <section className="diary-pr-final">
           <div className="diary-v2-container">
-            <span className="diary-v2-section-label">LET'S WORK TOGETHER</span>
+            <span className="diary-v2-section-label">LET&apos;S WORK TOGETHER</span>
             <h2>お店のPR、<br />まずは1件から。</h2>
             <p>ご相談・お見積もりは無料です。フォームの受付準備中は、InstagramのDMからお問い合わせいただけます。</p>
             <div className="diary-pr-final-buttons">
