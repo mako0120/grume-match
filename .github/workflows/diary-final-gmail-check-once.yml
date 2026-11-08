@@ -1,0 +1,38 @@
+name: Final public PR Gmail and Netlify form check
+on:
+  push:
+    branches: [codex/diary-live-http-diagnose-20261108]
+    paths: [.github/workflows/diary-final-gmail-check-once.yml]
+permissions: {contents: read}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify live public PR paths and both enquiry channels
+        run: |
+          node --input-type=module <<'NODE'
+          const origin='https://brilliant-custard-364003.netlify.app';
+          const pages=['/diary/pr','/diary/request','/diary/request?service=instagram_feed&intent=application'];
+          let failed=false;
+          for(const path of pages){
+            const response=await fetch(origin+path,{signal:AbortSignal.timeout(16000),headers:{Accept:'text/html'}});
+            const html=await response.text();
+            const result={
+              path,status:response.status,
+              gmailQuickLink:html.includes('diary-gmail-quick-link'),
+              gmailDirect:html.includes('Gmailで直接相談する'),
+              netlifyIntake:html.includes('diary-netlify-inquiry'),
+              pricePhoto:html.includes('8,000円'),
+              priceVideo:html.includes('15,000円')
+            };
+            console.log('LIVE_PR_RESULT '+JSON.stringify(result));
+            if(response.status!==200 || !result.pricePhoto || !result.priceVideo)failed=true;
+            if(path.startsWith('/diary/request')&&(!result.gmailQuickLink||!result.gmailDirect||!result.netlifyIntake))failed=true;
+            if(path==='/diary/pr'&&!result.gmailDirect)failed=true;
+          }
+          const admin=await fetch(origin+'/.netlify/functions/diary-ops-feed',{signal:AbortSignal.timeout(16000)});
+          console.log('LIVE_PR_ADMIN '+JSON.stringify({status:admin.status,notPublic:admin.status!==200}));
+          if(admin.status===200)failed=true;
+          if(failed)process.exitCode=1;
+          NODE
