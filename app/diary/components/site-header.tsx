@@ -12,6 +12,7 @@ export function DiaryHeader({ active = "home" }: { active?: "home" | "services" 
             <span>グルメ日誌 <small>GOURMET DIARY / OSAKA</small></span>
           </Link>
           <nav className="diary-v2-nav" aria-label="グルメ日誌サイトメニュー">
+            <Link href="/diary/pr">PRのご依頼</Link>
             <Link href="/diary#work">Instagram実績</Link>
             <Link href="/diary/services" aria-current={active === "services" ? "page" : undefined}>プランと料金</Link>
             <Link href="/diary#flow">ご依頼の流れ</Link>
