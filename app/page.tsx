@@ -13,6 +13,12 @@ export default function HomePage() {
           店舗も候補時間をタップするだけで、応募から来店確定まで進められます。
         </p>
 
+        <div className="feature-card" style={{ marginTop: 18, borderColor: "#c6b394", background: "#fff8ea" }}>
+          <strong>グルメ日誌｜大阪に直接PRを依頼したい店舗様へ</strong>
+          <p>グルメ日誌本人が撮影・制作・投稿まで対応。店舗様向けの専用相談窓口をご用意しています。</p>
+          <Link className="primary-button" href="/diary" style={{ marginTop: 12 }}>グルメ日誌のPR相談サイトへ ↗</Link>
+        </div>
+
         <div className="hero-actions">
           <Link className="primary-button" href="/signup">
             無料で始める

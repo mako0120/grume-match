@@ -1,0 +1,17 @@
+# Netlify auto-detects Next.js 16 and installs its OpenNext adapter.
+# Avoid adding SPA fallback redirects or pinning a legacy Next.js plugin.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Only the first-party Grume Diary production site redirects its homepage.
+# DIARY_SITE_MODE remains false in non-Netlify deployments.
+[context.production.environment]
+  DIARY_SITE_MODE = "true"
+
+# Native Netlify Scheduled Function (UTC), independent of Vercel-only vercel.json.
+[functions."diary-reconcile"]
+  schedule = "5 * * * *"

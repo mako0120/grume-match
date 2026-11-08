@@ -12,6 +12,7 @@ import {
   validText,
 } from "@/lib/commercial-limits";
 import { japanLocalDateTimeToIso } from "@/lib/japan-datetime";
+import { detectProhibitedPRRequest } from "@/lib/diary/inquiry";
 import { createClient } from "@/lib/supabase/server";
 
 function toInt(value: FormDataEntryValue | null, fallback: number) {
@@ -112,6 +113,16 @@ export async function createCampaign(formData: FormData) {
     redirect(
       "/restaurant/campaigns/new?message=" +
         encodeURIComponent("来店期間を確認してください。"),
+    );
+  }
+
+  // Marketplace campaigns must obey the same zero-tolerance PR policy
+  // as first-party グルメ日誌 inquiries. Validate server-side as well.
+  const prohibited = detectProhibitedPRRequest([category, description, foodOffer].join(" "));
+  if (prohibited || formData.get("prPolicyConfirmed") !== "on") {
+    redirect(
+      "/restaurant/campaigns/new?message=" +
+        encodeURIComponent(prohibited || "PRガイドラインへの確認・同意が必要です。"),
     );
   }
 
