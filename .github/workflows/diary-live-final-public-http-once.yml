@@ -1,0 +1,31 @@
+name: Diary final public URL anonymous verification
+on:
+  push:
+    branches: [codex/diary-live-http-diagnose-20261108]
+    paths: [.github/workflows/diary-live-final-public-http-once.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check only public site and no authentication bypass
+        run: |
+          node --input-type=module <<'NODE'
+          for(const path of ['/diary','/diary/pr','/diary/request','/.netlify/functions/diary-ops-feed']){
+            try {
+              const res=await fetch('https://brilliant-custard-364003.netlify.app'+path,{
+                redirect:'manual',signal:AbortSignal.timeout(15000),
+                headers:{Accept:'text/html'}
+              });
+              console.log('PR_LIVE_CHECK '+JSON.stringify({
+                path,status:res.status,
+                location:res.headers.get('location'),
+                server:res.headers.get('server'),
+                contentType:res.headers.get('content-type')
+              }));
+              await res.body?.cancel();
+            }catch(e){console.log('PR_LIVE_CHECK '+JSON.stringify({path,error:e?.name||'request_failed'}))}
+          }
+          NODE
