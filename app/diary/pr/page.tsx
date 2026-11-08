@@ -11,7 +11,7 @@ import "./pr.css";
 
 export const metadata: Metadata = {
   title: "飲食店PRのご依頼｜1案件から依頼できるグルメ日誌｜大阪",
-  description: "大阪の飲食店向けInstagram PR。月額契約不要・1案件ごとに依頼できます。写真フィード1投稿8,000円（税込）から、動画込みPRは15,000円（税込）から。無料でご相談いただけます。",
+  description: "大阪の飲食店向けInstagram PR。月額契約不要・1案件ごとに依頼できます。写真フィード・動画込みPRの料金と制作内容を確認し、無料でご相談いただけます。",
   alternates: { canonical: "/diary/pr" },
   openGraph: {
     title: "大阪の飲食店PR｜グルメ日誌",
