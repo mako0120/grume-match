@@ -11,6 +11,17 @@
 
 ## Source of truth for metrics
 
+Custom period 2026-09-01 to 11-11 (screenshots supplied by operator on
+November 27, 2026), compared by Instagram with the period ending 08-31:
+- Views 353,419 (+437.5%), viewers 147,281 (+829.1%)
+- Views by followers 65,178 (+113.4%), by non-followers 288,221 (+718.7%)
+- Profile visits 1.2万
+Shown as proof: three cropped, unedited regions
+(`public/diary/instagram-insights-20260901-1111-{overview,audience,profile}.webp`).
+Not published: link taps (0), address taps (0), per-format views and
+interactions. Note: the earlier "49,0…" card was views by followers, not
+the follower count.
+
 Screenshot supplied by operator on November 27, 2026 (Instagram dashboard,
 7 days 2026-10-30 to 11-05). Published as daily averages (views ÷ 7):
 - Views by followers 7,648 + by non-followers 33,166 = 40,814

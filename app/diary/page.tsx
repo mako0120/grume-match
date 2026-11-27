@@ -4,14 +4,42 @@ import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
-// Instagram Insights, 7 days 2026-10-30〜11-05, supplied by the operator on
-// 2026-11-27 and shown as daily averages; see docs/DIARY_DIRECT_PR.md.
-// Views: followers 7,648 + non-followers 33,166 = 40,814.
-const metrics = [
-  { value: "5,831", unit: "回", label: "1日平均の閲覧数" },
-  { value: "4,738", unit: "回", label: "フォロワー以外への1日平均閲覧数" },
-  { value: "81", unit: "%", label: "閲覧のうちフォロワー以外の割合" },
-];
+// Instagram Insights screenshots supplied by the operator on 2026-11-27.
+// Only regions are cropped; nothing inside a shown region is edited.
+// Sources and what was left out: docs/DIARY_DIRECT_PR.md.
+const proofs = [
+  {
+    key: "growth",
+    title: "9月1日〜11月11日",
+    lead: "前の同じ期間（8月31日まで）と比べて、すべての指標が大きく伸びています。",
+    shots: [
+      { src: "/diary/instagram-insights-20260901-1111-overview.webp", width: 900, height: 1135, alt: "Instagramインサイトの画面。9月1日〜11月11日の再生数353,419（前の期間比+437.5%）、閲覧者147,281（+829.1%）と、日別の再生数グラフ。" },
+      { src: "/diary/instagram-insights-20260901-1111-audience.webp", width: 900, height: 245, alt: "同じ期間のフォロワーによる閲覧数65,178（+113.4%）、フォロワー以外による閲覧数288,221（+718.7%）。" },
+      { src: "/diary/instagram-insights-20260901-1111-profile.webp", width: 900, height: 225, alt: "同じ期間のプロフィールへのアクセス1.2万。" },
+    ],
+    caption: "実際のInstagramインサイト画面（カスタム期間 2026年9月1日〜11月11日）。3枚の画面から該当部分をそのまま切り出しています。",
+    metrics: [
+      { value: "353,419", unit: "回", label: "再生数（前の期間比 +437.5%）" },
+      { value: "147,281", unit: "人", label: "閲覧者数（前の期間比 +829.1%）" },
+      { value: "288,221", unit: "回", label: "フォロワー以外による閲覧数（+718.7%）" },
+      { value: "1.2万", unit: "回", label: "プロフィールへのアクセス" },
+    ],
+  },
+  {
+    key: "week",
+    title: "1週間（10月30日〜11月5日）の1日平均",
+    lead: "フォロワー以外の方に、毎日多く届いています。",
+    shots: [
+      { src: "/diary/instagram-insights-20261030-1105.webp", width: 900, height: 1142, alt: "Instagramインサイトの画面。7日間（10月30日〜11月5日）のフォロワーによる閲覧数7,648、フォロワー以外による閲覧数33,166と、日別の閲覧数グラフ。" },
+    ],
+    caption: "実際のInstagramインサイト画面（2026年10月30日〜11月5日の7日間）。画面上部の時刻表示と、下部の形式別内訳は省いています。カードの数値は閲覧数を7で割った1日平均です（フォロワー7,648＋フォロワー以外33,166＝40,814）。",
+    metrics: [
+      { value: "5,831", unit: "回", label: "1日平均の閲覧数" },
+      { value: "4,738", unit: "回", label: "フォロワー以外への1日平均閲覧数" },
+      { value: "81", unit: "%", label: "閲覧のうちフォロワー以外の割合" },
+    ],
+  },
+] as const;
 
 const processSteps = [
   { number: "01", title: "相談・ご依頼", description: "お店の特徴や伝えたい魅力をフォームから送信。ご相談だけでも歓迎です。" },
@@ -81,22 +109,23 @@ export default function DiaryHomePage() {
               <div><span className="diary-v2-section-label">01 / TRACK RECORD</span><h2 id="diary-v2-results-title">投稿の先に、<br /><em>出会いがある。</em></h2></div>
               <p>見られた回数だけでなく、まだ知らないお店に興味を持ってもらうこと。その第一歩を大切にしています。</p>
             </div>
-            <div className="diary-v2-proof-layout">
-              <figure className="diary-v2-proof-shot">
-                <Image
-                  src="/diary/instagram-insights-20261030-1105.webp"
-                  width={900}
-                  height={1142}
-                  sizes="(max-width: 700px) 100vw, 420px"
-                  alt="Instagramインサイトの画面。7日間（10月30日〜11月5日）のフォロワーによる閲覧数7,648、フォロワー以外による閲覧数33,166と、日別の閲覧数グラフ。"
-                />
-                <figcaption>実際のInstagramインサイト画面（2026年10月30日〜11月5日の7日間）。画面上部の時刻表示と、下部の形式別内訳は省いています。</figcaption>
-              </figure>
-              <div className="diary-v2-metrics">
-                {metrics.map((m) => <article className="diary-v2-metric" key={m.label}><span className="diary-v2-metric-label">{m.label}</span><div><strong>{m.value}</strong><span>{m.unit}</span></div><span className="diary-v2-metric-decoration" aria-hidden="true">↗</span></article>)}
+            {proofs.map((proof) => (
+              <div className="diary-v2-proof-block" key={proof.key}>
+                <div className="diary-v2-proof-head"><h3>{proof.title}</h3><p>{proof.lead}</p></div>
+                <div className="diary-v2-proof-layout">
+                  <figure className="diary-v2-proof-shot">
+                    {proof.shots.map((shot) => (
+                      <Image key={shot.src} src={shot.src} width={shot.width} height={shot.height} sizes="(max-width: 700px) 100vw, 420px" alt={shot.alt} />
+                    ))}
+                    <figcaption>{proof.caption}</figcaption>
+                  </figure>
+                  <div className="diary-v2-metrics">
+                    {proof.metrics.map((m) => <article className="diary-v2-metric" key={m.label}><span className="diary-v2-metric-label">{m.label}</span><div><strong>{m.value}</strong><span>{m.unit}</span></div><span className="diary-v2-metric-decoration" aria-hidden="true">↗</span></article>)}
+                  </div>
+                </div>
               </div>
-            </div>
-            <p className="diary-v2-data-note">※ Instagramインサイト（2026年10月30日〜11月5日の7日間）の閲覧数を7で割った1日平均。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
+            ))}
+            <p className="diary-v2-data-note">※ 数値はInstagramインサイトの過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
           </div>
         </section>}
 
