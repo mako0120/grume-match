@@ -11,14 +11,15 @@
 
 ## Source of truth for metrics
 
-Screenshots supplied by operator on November 27, 2026 (Instagram dashboard).
-The operator asked to publish only the figures that show strengths:
-- Views, 60 days to 2026-11-26: 285,971 (+173.8% vs the previous 60 days)
-- Viewers, same period: 125,066 (+215.3%)
-- Best single post, 180 days to 2026-11-26: 4.4万 views (as displayed)
+Screenshot supplied by operator on November 27, 2026 (Instagram dashboard,
+7 days 2026-10-30 to 11-05). Published as daily averages (views ÷ 7):
+- Views by followers 7,648 + by non-followers 33,166 = 40,814
+- Daily average views: 5,831
+- Daily average views by non-followers: 4,738
+- Share of views from non-followers: 81% (33,166 / 40,814)
 
-Not published on purpose: the follower card (cut off in the screenshot),
-per-format views (stories / reels / live) and the daily trend.
+Not published on purpose: week-over-week changes that fell (non-followers
+-22.9%, the cut-off card -23.9%), per-format views and the follower count.
 Follower count for pricing is a separate verified value
 (`DIARY_VERIFIED_FOLLOWERS`); the October 16 figure was approximately 5,000.
 
