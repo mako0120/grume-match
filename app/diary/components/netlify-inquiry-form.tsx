@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { detectProhibitedPRRequest, validateDiaryInquiry } from "@/lib/diary/inquiry";
+import { MessageTemplatePicker } from "./message-template-picker";
 
 /**
  * Netlify Forms stores these leads in the site's protected Netlify dashboard.
@@ -43,6 +44,7 @@ export function NetlifyDiaryInquiryForm({
   const [kind, setKind] = useState<"consultation" | "application">(initialKind);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const messageRef = useRef<HTMLTextAreaElement>(null);
   // Prices come from the server-side verified pricing snapshot shown on the
   // landing page; never maintain a second hardcoded quote in a client form.
   const serviceOptions = SERVICE_OPTIONS.map(option =>
@@ -162,8 +164,9 @@ export function NetlifyDiaryInquiryForm({
         </label>
       </div>
       <div className="diary-form-section-title"><span>02</span><h2>紹介したい内容</h2></div>
+      <MessageTemplatePicker target={messageRef} />
       <label>ご相談内容 <em>必須</em>
-        <textarea name="message" required minLength={10} maxLength={2000} rows={5} placeholder={initialGoal ? `例：${initialGoal}です。詳細な撮影はお任せしたいので、料金と日程をご相談したいです。` : "例：新しいランチメニューをInstagramで紹介してほしいです。料金と来店できる日を教えてください。"} />
+        <textarea ref={messageRef} name="message" required minLength={10} maxLength={2000} rows={5} placeholder={initialGoal ? `例：${initialGoal}です。詳細な撮影はお任せしたいので、料金と日程をご相談したいです。` : "例：新しいランチメニューをInstagramで紹介してほしいです。料金と来店できる日を教えてください。"} />
       </label>
       <details className="diary-extra-details">
         <summary>紹介メニューや来店候補日も伝える（任意） <span aria-hidden="true">＋</span></summary>
