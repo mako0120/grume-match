@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
@@ -80,8 +81,20 @@ export default function DiaryHomePage() {
               <div><span className="diary-v2-section-label">01 / TRACK RECORD</span><h2 id="diary-v2-results-title">投稿の先に、<br /><em>出会いがある。</em></h2></div>
               <p>見られた回数だけでなく、まだ知らないお店に興味を持ってもらうこと。その第一歩を大切にしています。</p>
             </div>
-            <div className="diary-v2-metrics">
-              {metrics.map((m) => <article className="diary-v2-metric" key={m.label}><span className="diary-v2-metric-label">{m.label}</span><div><strong>{m.value}</strong><span>{m.unit}</span></div><span className="diary-v2-metric-decoration" aria-hidden="true">↗</span></article>)}
+            <div className="diary-v2-proof-layout">
+              <figure className="diary-v2-proof-shot">
+                <Image
+                  src="/diary/instagram-insights-20261030-1105.webp"
+                  width={900}
+                  height={1142}
+                  sizes="(max-width: 700px) 100vw, 420px"
+                  alt="Instagramインサイトの画面。7日間（10月30日〜11月5日）のフォロワーによる閲覧数7,648、フォロワー以外による閲覧数33,166と、日別の閲覧数グラフ。"
+                />
+                <figcaption>実際のInstagramインサイト画面（2026年10月30日〜11月5日の7日間）。画面上部の時刻表示と、下部の形式別内訳は省いています。</figcaption>
+              </figure>
+              <div className="diary-v2-metrics">
+                {metrics.map((m) => <article className="diary-v2-metric" key={m.label}><span className="diary-v2-metric-label">{m.label}</span><div><strong>{m.value}</strong><span>{m.unit}</span></div><span className="diary-v2-metric-decoration" aria-hidden="true">↗</span></article>)}
+              </div>
             </div>
             <p className="diary-v2-data-note">※ Instagramインサイト（2026年10月30日〜11月5日の7日間）の閲覧数を7で割った1日平均。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
           </div>

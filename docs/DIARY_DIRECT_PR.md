@@ -18,7 +18,12 @@ Screenshot supplied by operator on November 27, 2026 (Instagram dashboard,
 - Daily average views by non-followers: 4,738
 - Share of views from non-followers: 81% (33,166 / 40,814)
 
-Not published on purpose: week-over-week changes that fell (non-followers
+The screenshot itself is shown as proof
+(`public/diary/instagram-insights-20261030-1105.webp`): status bar and the
+lower per-format section cropped off, nothing inside the shown area edited,
+so its own week-over-week figures stay visible. Metadata stripped.
+
+Not published as cards: week-over-week changes that fell (non-followers
 -22.9%, the cut-off card -23.9%), per-format views and the follower count.
 Follower count for pricing is a separate verified value
 (`DIARY_VERIFIED_FOLLOWERS`); the October 16 figure was approximately 5,000.
