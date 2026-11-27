@@ -11,11 +11,36 @@
 
 ## Source of truth for metrics
 
-Screenshot supplied by operator on October 16, 2026: preceding 30 days
-- Content views: 176,473 (display: 17.6万回)
-- Content viewers: 76,876
-- Net follower increase: +1,335
-- Followers: approximately 5,000, operator supplied.
+Custom period 2026-09-01 to 11-11 (screenshots supplied by operator on
+November 27, 2026), compared by Instagram with the period ending 08-31:
+- Views 353,419 (+437.5%), viewers 147,281 (+829.1%)
+- Views by followers 65,178 (+113.4%), by non-followers 288,221 (+718.7%)
+- Profile visits 1.2万
+Shown as proof: three cropped, unedited regions
+(`public/diary/instagram-insights-20260901-1111-{overview,audience,profile}.webp`).
+Not published: link taps (0), address taps (0), per-format views and
+interactions. Note: the earlier "49,0…" card was views by followers, not
+the follower count.
+
+Screenshot supplied by operator on November 27, 2026 (Instagram dashboard,
+7 days 2026-10-30 to 11-05). Published as daily averages (views ÷ 7):
+- Views by followers 7,648 + by non-followers 33,166 = 40,814
+- Daily average views: 5,831
+- Daily average views by non-followers: 4,738
+- Share of views from non-followers: 81% (33,166 / 40,814)
+
+The screenshot itself is shown as proof
+(`public/diary/instagram-insights-20261030-1105.webp`): status bar and the
+lower per-format section cropped off, nothing inside the shown area edited,
+so its own week-over-week figures stay visible. Metadata stripped.
+
+Not published as cards: week-over-week changes that fell (non-followers
+-22.9%, the cut-off card -23.9%), per-format views and the follower count.
+Follower count for pricing is a separate verified value
+(`DIARY_VERIFIED_FOLLOWERS`); the October 16 figure was approximately 5,000.
+
+Previous set (October 16, 2026, 30 days): 176,473 views, 76,876 viewers,
++1,335 net followers.
 These are **dated historical results**, not live metrics, attributed conversions, or guaranteed reach.
 Never automatically refresh them without verified first-party Insights data.
 
