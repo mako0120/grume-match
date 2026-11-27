@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { validateDiaryInquiry } from "@/lib/diary/inquiry";
 import {
@@ -9,7 +9,6 @@ import {
   type DiaryEmailDraft,
   DIARY_PR_EMAIL,
 } from "@/lib/diary/email-draft";
-import { MessageTemplatePicker } from "./message-template-picker";
 
 const SERVICES = [
   ["instagram_feed", "Instagram写真フィードPR"],
@@ -37,7 +36,6 @@ export function DiaryEmailInquiryFallback({
   const [draft, setDraft] = useState<DiaryEmailDraft | null>(null);
   const [error, setError] = useState("");
   const [copyStatus, setCopyStatus] = useState("");
-  const messageRef = useRef<HTMLTextAreaElement>(null);
   const consultDraft = buildDiaryConsultationEmail();
   const startingService = SERVICES.some(([id]) => id === initialService) ? initialService : "instagram_feed";
 
@@ -170,9 +168,8 @@ export function DiaryEmailInquiryFallback({
               <input name="visit_preference" maxLength={190} placeholder="例：平日18時以降" />
             </label>
           </div>
-          <MessageTemplatePicker target={messageRef} onApply={() => setDraft(null)} />
           <label>依頼内容・ご相談の詳細 <em>必須</em>
-            <textarea ref={messageRef} name="message" required minLength={10} maxLength={600} rows={4} placeholder="具体的なご希望や、質問などをご記入ください。" />
+            <textarea name="message" required minLength={10} maxLength={600} rows={4} placeholder="具体的なご希望や、質問などをご記入ください。" />
           </label>
           <details className="diary-compliance diary-policy-details">
             <summary>受注ポリシーを確認する</summary>
