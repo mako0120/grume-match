@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { MobileFold } from "./components/mobile-fold";
 import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
@@ -90,6 +91,7 @@ export default function DiaryHomePage() {
 
         <section className="diary-v2-section diary-usecases" id="consultation-themes" aria-labelledby="diary-usecases-title">
           <div className="diary-v2-container">
+            <MobileFold id="consultation-themes" title="相談できること">
             <div className="diary-v2-section-head">
               <div><span className="diary-v2-section-label">WHAT WOULD YOU LIKE TO SHARE?</span><h2 id="diary-usecases-title">こんな「伝えたい」から、<br /><em>気軽に相談できます。</em></h2></div>
               <p>まだ企画が固まっていなくても大丈夫。お店の目的を伺い、適切な見せ方を相談します。</p>
@@ -100,11 +102,13 @@ export default function DiaryHomePage() {
               <article className="diary-usecase"><span>03 / STORYTELLING</span><h3>料理やお店のこだわりを<br />伝えたい</h3><p>素材や調理法、空間づくりなど、価格だけでは伝わらない魅力を見せたい店舗様へ。</p><Link href="/diary/request?intent=consultation&goal=story">この内容を相談する ↗</Link></article>
             </div>
             <div className="diary-value-stripe" aria-label="PR依頼の安心ポイント"><div><b>01</b><span>ご相談・見積もり無料</span></div><div><b>02</b><span>合意するまで契約なし</span></div><div><b>03</b><span>公開後7日以内の後払い</span></div></div>
+            </MobileFold>
           </div>
         </section>
 
         {process.env.DIARY_METRICS_VERIFIED === "true" && <section className="diary-v2-section diary-v2-proof" id="results" aria-labelledby="diary-v2-results-title">
           <div className="diary-v2-container">
+            <MobileFold id="results" title="実績（Instagramの数値）">
             <div className="diary-v2-section-head">
               <div><span className="diary-v2-section-label">01 / TRACK RECORD</span><h2 id="diary-v2-results-title">投稿の先に、<br /><em>出会いがある。</em></h2></div>
               <p>見られた回数だけでなく、まだ知らないお店に興味を持ってもらうこと。その第一歩を大切にしています。</p>
@@ -126,21 +130,25 @@ export default function DiaryHomePage() {
               </div>
             ))}
             <p className="diary-v2-data-note">※ 数値はInstagramインサイトの過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
+            </MobileFold>
           </div>
         </section>}
 
         <section className="diary-v2-section diary-v2-instagram" id="work" aria-labelledby="diary-v2-posts-title">
           <div className="diary-v2-container">
+            <MobileFold id="work" title="投稿例">
             <div className="diary-v2-section-head diary-v2-section-head-light">
               <div><span className="diary-v2-section-label">02 / ON INSTAGRAM</span><h2 id="diary-v2-posts-title">作品は、<br /><em>Instagramで。</em></h2></div>
               <div className="diary-v2-section-aside"><p>公開済みの実際の投稿から、写真・構成・言葉づかいをご覧いただけます。編集データや未公開素材は掲載していません。</p><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer" className="diary-v2-inline-arrow">@gurunavi_diary を見る ↗</a></div>
             </div>
             <PostShowcase />
+            </MobileFold>
           </div>
         </section>
 
         <section className="diary-v2-section diary-v2-packages" id="services" aria-labelledby="diary-v2-services-title">
           <div className="diary-v2-container">
+            <MobileFold id="services" title="料金プラン">
             <div className="diary-v2-section-head">
               <div><span className="diary-v2-section-label">03 / OUR SERVICES</span><h2 id="diary-v2-services-title">伝えたい魅力に、<br /><em>ちょうどいい形を。</em></h2></div>
               <p>投稿そのものを、一つの作品として。基本料金は投稿件数を基準に、制作内容はお店ごとに相談して決めます。</p>
@@ -164,25 +172,31 @@ export default function DiaryHomePage() {
               </article>
             </div>
             <div className="diary-v2-package-foot"><span>ストーリーズ・撮影素材・リール単体も個別見積もりで対応</span><Link href="/diary/services">すべてのサービスを見る ↗</Link></div>
+            </MobileFold>
           </div>
         </section>
 
         <section className="diary-v2-section diary-v2-story" id="philosophy">
           <div className="diary-v2-container diary-v2-story-grid">
+            <MobileFold id="philosophy" title="こだわり">
             <div className="diary-v2-story-visual" aria-hidden="true"><span>食べることが、<br />好きだから。</span><b>食</b><small>MADE WITH CURIOSITY / OSAKA</small></div>
             <div className="diary-v2-story-copy"><span className="diary-v2-section-label">04 / OUR PHILOSOPHY</span><h2>一皿の魅力を、<br /><em>きちんと伝える。</em></h2><p>「こんなお店があったんだ」。そんな小さな発見が、誰かの次の食事のきっかけになる。グルメ日誌は、実際に見て、食べて、感じたことを大切に制作しています。</p><p>表現の自由とお店への敬意を両立し、広告・提供関係は明確にお伝えします。一般のお客様が特定される姿や会話などを無断で掲載しないよう、撮影から公開まで配慮します。</p><Link href="/diary/policy" className="diary-v2-inline-arrow">PR制作のポリシー ↗</Link></div>
+            </MobileFold>
           </div>
         </section>
 
         <section className="diary-v2-section diary-v2-process" id="flow">
           <div className="diary-v2-container">
+            <MobileFold id="flow" title="ご依頼の流れ">
             <div className="diary-v2-section-head"><div><span className="diary-v2-section-label">05 / HOW IT WORKS</span><h2>相談から投稿まで、<br /><em>シンプルに。</em></h2></div><p>お問い合わせのみでは契約になりません。内容・費用・日程に双方が合意してから進みます。</p></div>
             <ol className="diary-v2-process-grid">{processSteps.map((step) => <li key={step.number}><span>{step.number}</span><h3>{step.title}</h3><p>{step.description}</p></li>)}</ol>
+            </MobileFold>
           </div>
         </section>
 
         <section className="diary-v2-section diary-v2-faq" id="faq">
           <div className="diary-v2-container diary-v2-faq-grid">
+            <MobileFold id="faq" title="よくある質問">
             <div><span className="diary-v2-section-label">06 / FAQ</span><h2>よくある<br /><em>ご質問。</em></h2><p>事前に確認しておきたい点をまとめました。</p></div>
             <div className="diary-v2-questions">
               <details><summary>写真の枚数によって料金は変わりますか？<span aria-hidden="true">＋</span></summary><p>いいえ。基本料金はInstagramのフィード投稿1件あたりです。写真の枚数に応じた料金表ではありません。制作内容は事前に相談して決定します。</p></details>
@@ -191,6 +205,7 @@ export default function DiaryHomePage() {
               <details><summary>店内にいるお客様の顔は映りますか？<span aria-hidden="true">＋</span></summary><p>料理や店内を中心に撮影し、一般のお客様やスタッフが識別できる映像は、必要な許可なく公開しません。写り込みがある場合は撮り直し・トリミング・ぼかし等で対応し、十分に配慮できない素材は掲載しません。</p></details>
               <details><summary>PR表記は入りますか？<span aria-hidden="true">＋</span></summary><p>はい。広告・提供関係が分かる適切な表記を行います。高評価の保証や口コミサイトへの対価付き投稿などはお受けしていません。</p></details>
             </div>
+            </MobileFold>
           </div>
         </section>
 
