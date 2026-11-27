@@ -11,11 +11,19 @@
 
 ## Source of truth for metrics
 
-Screenshot supplied by operator on October 16, 2026: preceding 30 days
-- Content views: 176,473 (display: 17.6万回)
-- Content viewers: 76,876
-- Net follower increase: +1,335
-- Followers: approximately 5,000, operator supplied.
+Screenshots supplied by operator on November 27, 2026 (Instagram dashboard).
+The operator asked to publish only the figures that show strengths:
+- Views, 60 days to 2026-11-26: 285,971 (+173.8% vs the previous 60 days)
+- Viewers, same period: 125,066 (+215.3%)
+- Best single post, 180 days to 2026-11-26: 4.4万 views (as displayed)
+
+Not published on purpose: the follower card (cut off in the screenshot),
+per-format views (stories / reels / live) and the daily trend.
+Follower count for pricing is a separate verified value
+(`DIARY_VERIFIED_FOLLOWERS`); the October 16 figure was approximately 5,000.
+
+Previous set (October 16, 2026, 30 days): 176,473 views, 76,876 viewers,
++1,335 net followers.
 These are **dated historical results**, not live metrics, attributed conversions, or guaranteed reach.
 Never automatically refresh them without verified first-party Insights data.
 

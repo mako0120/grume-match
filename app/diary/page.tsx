@@ -3,10 +3,12 @@ import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
 
+// Instagram Insights screenshots supplied by the operator on 2026-11-27.
+// Only the figures the operator chose to feature; see docs/DIARY_DIRECT_PR.md.
 const metrics = [
-  { value: "17.6万", unit: "回", label: "コンテンツ再生数" },
-  { value: "76,876", unit: "人", label: "閲覧者数" },
-  { value: "+1,335", unit: "人", label: "フォロワー純増" },
+  { value: "285,971", unit: "回", label: "再生数（直近60日・前期比+173.8%）" },
+  { value: "125,066", unit: "人", label: "閲覧者数（直近60日・前期比+215.3%）" },
+  { value: "4.4万", unit: "回", label: "1投稿の最高再生数（直近180日）" },
 ];
 
 const processSteps = [
@@ -80,7 +82,7 @@ export default function DiaryHomePage() {
             <div className="diary-v2-metrics">
               {metrics.map((m) => <article className="diary-v2-metric" key={m.label}><span className="diary-v2-metric-label">{m.label}</span><div><strong>{m.value}</strong><span>{m.unit}</span></div><span className="diary-v2-metric-decoration" aria-hidden="true">↗</span></article>)}
             </div>
-            <p className="diary-v2-data-note">※ Instagramインサイト（2026年9月16日〜10月15日の30日間）。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
+            <p className="diary-v2-data-note">※ Instagramインサイト（2026年11月26日までの60日間。最高再生数は同日までの180日間）。前期比は直前の60日間との比較です。数値は過去の実績であり、PRの再生数・集客・売上を保証するものではありません。</p>
           </div>
         </section>}
 
