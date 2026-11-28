@@ -2,6 +2,9 @@
 // Indexing itself stays behind DIARY_PUBLIC_INDEX_ENABLED (app/diary/layout.tsx).
 
 export const DIARY_SITE_NAME = "グルメ日誌｜大阪";
+/** Names people search for, so Google ties them to this site. */
+export const DIARY_ALTERNATE_NAMES = ["グルメ日誌", "グルメ日誌 大阪", "grunavi_diary"];
+
 export const DIARY_INSTAGRAM_URL = "https://www.instagram.com/grunavi_diary/";
 export const DIARY_OG_IMAGE = {
   url: "/diary/og.png",
@@ -54,10 +57,11 @@ export function diaryStructuredData(origin: string | null, photoFeedPriceYen: nu
         "@type": "Organization",
         ...(orgId ? { "@id": orgId } : {}),
         name: DIARY_SITE_NAME,
+        alternateName: DIARY_ALTERNATE_NAMES,
         url: at("/diary"),
         logo: at(DIARY_OG_IMAGE.url),
         sameAs: [DIARY_INSTAGRAM_URL],
-        description: "大阪のグルメInstagramアカウント。飲食店のPR投稿を、来店・撮影・編集・投稿まで本人が担当します。",
+        description: "大阪グルメを紹介するInstagramアカウント。飲食店のPR投稿を、来店・撮影・編集・投稿まで本人が担当します。",
       },
       {
         "@type": "Service",
@@ -81,6 +85,15 @@ export function diaryStructuredData(origin: string | null, photoFeedPriceYen: nu
           name: item.question,
           acceptedAnswer: { "@type": "Answer", text: item.answer },
         })),
+      },
+      {
+        // Lets Google show "グルメ日誌" as the site name in results.
+        "@type": "WebSite",
+        name: "グルメ日誌",
+        alternateName: DIARY_ALTERNATE_NAMES,
+        url: at("/diary"),
+        inLanguage: "ja",
+        ...(orgId ? { publisher: { "@id": orgId } } : {}),
       },
     ],
   };

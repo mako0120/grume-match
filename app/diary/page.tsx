@@ -9,7 +9,7 @@ import { DIARY_FAQS, diarySiteOrigin, diaryStructuredData, toJsonLd } from "@/li
 
 export const metadata: Metadata = {
   // absolute: a layout default title would still get the root PR OS suffix.
-  title: { absolute: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪" },
+  title: { absolute: "グルメ日誌｜大阪グルメ紹介・飲食店のInstagram PR" },
   alternates: { canonical: "/diary" },
 };
 
@@ -72,8 +72,7 @@ export default function DiaryHomePage() {
           <div className="diary-v2-hero-inner">
             <div className="diary-v2-hero-copy">
               <span className="diary-v2-eyebrow"><span aria-hidden="true" className="diary-v2-spark" /> OSAKA × GOURMET × STORYTELLING</span>
-              <p className="diary-v2-hero-kicker">おいしい、を届ける仕事。</p>
-              <h1 id="diary-v2-hero-heading">まだ知らない<br /><span>「おいしい」</span>を、<br />次の出会いへ。</h1>
+              <h1 id="diary-v2-hero-heading"><span className="diary-v2-hero-kicker">大阪グルメ紹介アカウント「グルメ日誌」</span>まだ知らない<br /><span>「おいしい」</span>を、<br />次の出会いへ。</h1>
               <p className="diary-v2-hero-lead">大阪の飲食店向けInstagram PR。グルメ日誌本人が来店し、撮影・編集・投稿まで対応します。写真フィードは1投稿{formatDiaryYen(price.amountYen)}（税込）から。新メニューも、お店ならではの魅力も、丁寧に届けます。</p>
               <div className="diary-v2-hero-actions">
                 <Link className="diary-v2-button diary-v2-button-accent" href="/diary/pr">1案件からのPR依頼はこちら <span aria-hidden="true">↗</span></Link>
