@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./diary/identity/identity-callback.css";
+import { DiaryIdentityCallback } from "./diary/identity/identity-callback";
 
 const publicLaunch = process.env.PUBLIC_LAUNCH_ENABLED === "true";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -32,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>{process.env.DIARY_SITE_MODE === "true" ? <DiaryIdentityCallback>{children}</DiaryIdentityCallback> : children}</body>
     </html>
   );
 }
