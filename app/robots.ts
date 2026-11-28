@@ -19,7 +19,9 @@ export default function robots(): MetadataRoute.Robots {
       rules: {
         userAgent: "*",
         // These public PR information routes can be indexed independently.
-        allow: ["/diary", "/legal/privacy", "/legal/operator"],
+        // The sitemap must be fetchable too, or Search Console reports
+        // "Couldn't fetch" because of the Disallow: / below.
+        allow: ["/diary", "/legal/privacy", "/legal/operator", "/sitemap.xml"],
         // Longest-path match prevents private case pages being indexed even
         // though they live under the public /diary prefix.
         disallow: [

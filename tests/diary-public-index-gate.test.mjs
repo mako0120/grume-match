@@ -19,6 +19,7 @@ test("PR-only launch remains discoverable without exposing marketplace routes", 
     process.env.DIARY_PUBLIC_INDEX_ENABLED = "true";
     const diaryRules = robots().rules;
     assert.ok(diaryRules.allow.includes("/diary"));
+    assert.ok(diaryRules.allow.includes("/sitemap.xml"));
     assert.ok(diaryRules.disallow.includes("/"));
     assert.ok(diaryRules.disallow.includes("/diary/ops"));
     assert.ok(diaryRules.disallow.includes("/diary/confirm/"));
