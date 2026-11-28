@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { detectProhibitedPRRequest, validateDiaryInquiry } from "@/lib/diary/inquiry";
+import { DIARY_HEARD_FROM_OPTIONS } from "@/lib/diary/source";
+import { readCapturedSource } from "./source-capture";
 
 /**
  * Netlify Forms stores these leads in the site's protected Netlify dashboard.
@@ -14,7 +16,7 @@ const FORM_NAME = "diary-pr-inquiry";
 const REGISTERED_FIELDS = [
   "inquiry_kind", "restaurant_name", "contact_name", "email",
   "service", "goal", "featured_menu", "visit_preference", "message",
-  "consent", "compliance_confirmed", "bot-field",
+  "consent", "compliance_confirmed", "bot-field", "source", "heard_from",
 ] as const;
 
 const SERVICE_OPTIONS = [
@@ -104,6 +106,8 @@ export function NetlifyDiaryInquiryForm({
         const value = formData.get(field);
         if (typeof value === "string") body.set(field, value);
       }
+      // Which tagged link (?ref=…) brought this visitor, if any.
+      body.set("source", readCapturedSource());
       // OpenNext requires POST to the physical static HTML form, not a Next.js route.
       const response = await fetch("/__forms.html", {
         method: "POST",
@@ -172,6 +176,12 @@ export function NetlifyDiaryInquiryForm({
           <label>来店の候補日時 <span>任意</span><textarea name="visit_preference" maxLength={600} rows={2} placeholder="例：平日18時以降。未定でも大丈夫です。" /></label>
         </div>
       </details>
+      <label>このサイトを何で知りましたか <span>任意</span>
+        <select name="heard_from" defaultValue="">
+          <option value="">選択しない</option>
+          {DIARY_HEARD_FROM_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+        </select>
+      </label>
       <details className="diary-compliance diary-policy-details">
         <summary>お受けできないPR案件について <span aria-hidden="true">＋</span></summary>
         <p>食べログ・Googleマップへの報酬付き口コミ、高評価の指定、PR表記を隠した投稿はお受けしません。制作時は一般のお客様の顔・声・個人情報の写り込みにも配慮します。</p>
