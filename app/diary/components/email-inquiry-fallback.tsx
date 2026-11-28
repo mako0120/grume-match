@@ -205,7 +205,7 @@ export function DiaryEmailInquiryFallback({
           ) : null}
         </form>
       )}
-      <p className="diary-email-footer">メールアプリが利用できない場合は <a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">InstagramのDM</a> からもお問い合わせいただけます。<strong>ご相談のみで契約は成立しません。</strong></p>
+      <p className="diary-email-footer">メールアプリが利用できない場合は <a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">InstagramのDM</a> からもお問い合わせいただけます。<strong>ご相談のみで契約は成立しません。</strong></p>
     </section>
   );
 }

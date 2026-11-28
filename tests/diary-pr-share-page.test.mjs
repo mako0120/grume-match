@@ -27,7 +27,7 @@ test("both application CTAs lead to existing first-party form by correct service
   assert.match(page, /\/diary\/request\?service=instagram_feed&intent=application/);
   assert.match(page, /\/diary\/request\?service=instagram_feed_video&intent=application/);
   assert.match(page, /\/diary\/request\?intent=consultation/);
-  assert.match(page, /instagram\.com\/gurunavi_diary/);
+  assert.match(page, /instagram\.com\/grunavi_diary/);
   assert.match(page, /<PostShowcase \/>/);
 });
 

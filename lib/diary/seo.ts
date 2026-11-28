@@ -2,7 +2,7 @@
 // Indexing itself stays behind DIARY_PUBLIC_INDEX_ENABLED (app/diary/layout.tsx).
 
 export const DIARY_SITE_NAME = "グルメ日誌｜大阪";
-export const DIARY_INSTAGRAM_URL = "https://www.instagram.com/gurunavi_diary/";
+export const DIARY_INSTAGRAM_URL = "https://www.instagram.com/grunavi_diary/";
 export const DIARY_OG_IMAGE = {
   url: "/diary/og.png",
   width: 1200,

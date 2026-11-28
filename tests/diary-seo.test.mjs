@@ -44,7 +44,7 @@ test("structured data states only facts shown on the page", () => {
   const data = diaryStructuredData(origin, 8000);
   const [org, service] = data["@graph"];
   assert.equal(org["@type"], "Organization");
-  assert.deepEqual(org.sameAs, ["https://www.instagram.com/gurunavi_diary/"]);
+  assert.deepEqual(org.sameAs, ["https://www.instagram.com/grunavi_diary/"]);
   assert.equal(service.areaServed.name, "大阪府");
   assert.equal(service.offers.price, 8000);
   assert.equal(service.offers.priceCurrency, "JPY");
@@ -82,4 +82,20 @@ test("services, request and policy pages share their own title and image", async
     assert.match(source, /openGraph: \{\n    title: "[^"]+｜グルメ日誌｜大阪"/, path);
     assert.match(source, /images: \[DIARY_OG_IMAGE\]/, path);
   }
+});
+
+test("every Instagram link points at the real account @grunavi_diary", async () => {
+  const { readdir } = await import("node:fs/promises");
+  // The old, non-existent handle sent visitors to "Profile isn't available".
+  const stale = [];
+  for (const dir of ["app", "lib", "components"]) {
+    for (const entry of await readdir(dir, { recursive: true, withFileTypes: true })) {
+      if (!entry.isFile() || !/\.(tsx?|mjs)$/.test(entry.name)) continue;
+      const file = `${entry.parentPath}/${entry.name}`;
+      if ((await readFile(file, "utf8")).includes("gurunavi_diary")) stale.push(file);
+    }
+  }
+  assert.deepEqual(stale, []);
+  const home = await readFile("app/diary/page.tsx", "utf8");
+  assert.match(home, /instagram\.com\/grunavi_diary\//);
 });

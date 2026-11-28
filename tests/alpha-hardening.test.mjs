@@ -37,6 +37,6 @@ test("Security migration scopes Creator metrics and one Direct OFFER target", as
 test("Creator profile form has no account-specific seed values", async () => {
   const source = await readFile("app/creator/profile/page.tsx", "utf8");
 
-  assert.doesNotMatch(source, /gurunavi_diary/);
+  assert.doesNotMatch(source, /gu?runavi_diary/);
   assert.doesNotMatch(source, /\?\? 4000/);
 });

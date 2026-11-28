@@ -77,7 +77,7 @@ export default function DiaryHomePage() {
               <p className="diary-v2-hero-lead">大阪の飲食店向けInstagram PR。グルメ日誌本人が来店し、撮影・編集・投稿まで対応します。写真フィードは1投稿{formatDiaryYen(price.amountYen)}（税込）から。新メニューも、お店ならではの魅力も、丁寧に届けます。</p>
               <div className="diary-v2-hero-actions">
                 <Link className="diary-v2-button diary-v2-button-accent" href="/diary/pr">1案件からのPR依頼はこちら <span aria-hidden="true">↗</span></Link>
-                <a className="diary-v2-text-link" href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る <span aria-hidden="true">↗</span></a>
+                <a className="diary-v2-text-link" href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramを見る <span aria-hidden="true">↗</span></a>
               </div>
               <div className="diary-v2-hero-promise"><span aria-hidden="true">✳</span> グルメ日誌本人が直接対応 <span aria-hidden="true">·</span> 相談・見積もり無料</div>
               <div className="diary-hero-trust" aria-label="ご依頼前の安心ポイント"><span>内容・費用は事前に合意</span><span>お客様のプライバシーに配慮</span><span>公開後の後払い</span></div>
@@ -151,7 +151,7 @@ export default function DiaryHomePage() {
             <MobileFold id="work" title="投稿例">
             <div className="diary-v2-section-head diary-v2-section-head-light">
               <div><span className="diary-v2-section-label">02 / ON INSTAGRAM</span><h2 id="diary-v2-posts-title">作品は、<br /><em>Instagramで。</em></h2></div>
-              <div className="diary-v2-section-aside"><p>公開済みの実際の投稿から、写真・構成・言葉づかいをご覧いただけます。編集データや未公開素材は掲載していません。</p><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer" className="diary-v2-inline-arrow">@gurunavi_diary を見る ↗</a></div>
+              <div className="diary-v2-section-aside"><p>公開済みの実際の投稿から、写真・構成・言葉づかいをご覧いただけます。編集データや未公開素材は掲載していません。</p><a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer" className="diary-v2-inline-arrow">@grunavi_diary を見る ↗</a></div>
             </div>
             <PostShowcase />
             </MobileFold>
@@ -228,7 +228,7 @@ export default function DiaryHomePage() {
           </div>
         </section>
       </main>
-      <footer className="diary-v2-footer"><div className="diary-v2-container"><div><Link href="/diary" className="diary-v2-footer-logo">グルメ日誌 <small>OSAKA</small></Link><p>まだ知らない「おいしい」に、出会うきっかけを。</p></div><nav aria-label="フッター"><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><Link href="/diary/services">サービスと料金</Link><Link href="/legal/privacy">プライバシー</Link><Link href="/legal/operator">運営者情報</Link><Link href="/diary/policy">受注ポリシー</Link></nav><span>© 2026 GOURMET DIARY OSAKA</span></div></footer>
+      <footer className="diary-v2-footer"><div className="diary-v2-container"><div><Link href="/diary" className="diary-v2-footer-logo">グルメ日誌 <small>OSAKA</small></Link><p>まだ知らない「おいしい」に、出会うきっかけを。</p></div><nav aria-label="フッター"><a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><Link href="/diary/services">サービスと料金</Link><Link href="/legal/privacy">プライバシー</Link><Link href="/legal/operator">運営者情報</Link><Link href="/diary/policy">受注ポリシー</Link></nav><span>© 2026 GOURMET DIARY OSAKA</span></div></footer>
       <DiaryMobileCTA />
     </div>
   );
