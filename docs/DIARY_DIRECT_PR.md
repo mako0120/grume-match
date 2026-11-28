@@ -180,3 +180,21 @@ Workflow:
 Owner has expressly selected using one Stripe account for two businesses: existing BASE/eBay subscription and グルメ日誌 direct PR. Connected live account verified as `acct_1ULfr6B2xz6AKQNb` (named `base ebay sync`). This supersedes the previous dedicated-account-only proposal. Use service-specific `metadata[diary_source]=gurume_diary_direct`, `metadata[diary_inquiry_id]`, and a separate private Supabase table. NEVER copy or repurpose BASE/eBay products, prices, subscriptions or customers into Diary invoices. Stripe Dashboard totals/payouts are shared, though metadata can segregate reports; invoice branding/issuer details are account-wide unless supported customizations are configured and tested.
 
 **Safety/activation:** A Stripe live product creation action was denied by the platform/user in this turn. Do not retry that write. NO live product, Stripe invoice, or charge has been created. Configuration still defaults to `DIARY_STRIPE_ENABLED=false`. No account key should be checked into GitHub. The Stripe API key must be added securely to deployment secrets by the owner/operator, and account identity verified server-side. Complete Stripe business identity, Japanese invoice/tax settings, sender domain, webhook and sandbox E2E before enabling new invoicing. The code's domain/account gate prevents mistakenly using a different account.
+
+## 流入元の計測（`?ref=`）
+
+貼る場所ごとに URL の末尾を変えると、問い合わせメールの `source` 欄に流入元が入ります。
+決められた値以外（自由な文字列）は保存しません。
+
+| 貼る場所 | URL |
+|---|---|
+| インスタのプロフィールのリンク | `https://brilliant-custard-364003.netlify.app/diary?ref=ig_bio` |
+| ストーリーズのリンクスタンプ | `…/diary?ref=ig_story` |
+| 投稿・リールのキャプション／固定コメント | `…/diary?ref=ig_post` |
+| 飲食店へ送る DM | `…/diary/pr?ref=ig_dm` |
+| LINE | `…/diary?ref=line` |
+| 名刺・チラシの QR コード | `…/diary?ref=card` |
+| 紹介してもらうとき | `…/diary?ref=referral` |
+
+フォームには任意の「このサイトを何で知りましたか」（`heard_from`）もあります。
+`?ref=` 付きでもページの canonical は `/diary` のままなので、検索評価は分散しません。

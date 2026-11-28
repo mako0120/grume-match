@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DIARY_OG_IMAGE, DIARY_SITE_NAME } from "@/lib/diary/seo";
+import { SourceCapture } from "./components/source-capture";
 import "./diary.css";
 import "./modern.css";
 
@@ -30,5 +31,5 @@ export const metadata: Metadata = {
 };
 
 export default function DiaryLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <div className="diary">{children}</div>;
+  return <div className="diary"><SourceCapture />{children}</div>;
 }
