@@ -6,6 +6,8 @@ import { normalizeLeadSource, DIARY_LEAD_SOURCES, DIARY_HEARD_FROM_OPTIONS } fro
 test("only fixed source keys are kept, never free text from a link", () => {
   assert.equal(normalizeLeadSource("ig_bio"), "ig_bio");
   assert.equal(normalizeLeadSource(" IG_Story "), "ig_story");
+  assert.equal(normalizeLeadSource("tiktok"), "tiktok");
+  assert.equal(normalizeLeadSource("X"), "x");
   for (const bad of ["", "tanaka@example.com", "toString", "__proto__", "ig_bio<script>", null, 3]) {
     assert.equal(normalizeLeadSource(bad), "", String(bad));
   }

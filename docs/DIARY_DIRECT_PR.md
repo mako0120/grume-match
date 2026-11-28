@@ -192,6 +192,8 @@ Owner has expressly selected using one Stripe account for two businesses: existi
 | ストーリーズのリンクスタンプ | `…/diary?ref=ig_story` |
 | 投稿・リールのキャプション／固定コメント | `…/diary?ref=ig_post` |
 | 飲食店へ送る DM | `…/diary/pr?ref=ig_dm` |
+| TikTok のプロフィール・動画 | `…/diary?ref=tiktok` |
+| X のプロフィール・ポスト | `…/diary?ref=x` |
 | LINE | `…/diary?ref=line` |
 | 名刺・チラシの QR コード | `…/diary?ref=card` |
 | 紹介してもらうとき | `…/diary?ref=referral` |
