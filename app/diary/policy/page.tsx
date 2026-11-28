@@ -3,6 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "案件受注ポリシー｜グルメ日誌｜大阪",
   description: "グルメ日誌｜大阪のPR制作方針。広告表示を明確にし、店内のお客様やスタッフのプライバシーに配慮して撮影・編集・公開します。",
+  alternates: { canonical: "/diary/policy" },
 };
 
 export default function DiaryPolicyPage() {

@@ -1,9 +1,17 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MobileFold } from "./components/mobile-fold";
 import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
+import { diarySiteOrigin, diaryStructuredData, toJsonLd } from "@/lib/diary/seo";
+
+export const metadata: Metadata = {
+  // absolute: a layout default title would still get the root PR OS suffix.
+  title: { absolute: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪" },
+  alternates: { canonical: "/diary" },
+};
 
 // Instagram Insights screenshots supplied by the operator on 2026-11-27.
 // Only regions are cropped; nothing inside a shown region is edited.
@@ -54,6 +62,10 @@ export default function DiaryHomePage() {
   const videoPrice = videoIncludedPriceForFollowers(price.followers);
   return (
     <div className="diary-v2">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: toJsonLd(diaryStructuredData(diarySiteOrigin(), price.amountYen)) }}
+      />
       <DiaryHeader active="home" />
       <main id="diary-main">
         <section className="diary-v2-hero" aria-labelledby="diary-v2-hero-heading">

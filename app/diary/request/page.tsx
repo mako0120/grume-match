@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata = {
   title: "無料相談・PR申込み｜グルメ日誌｜大阪",
   description: "グルメ日誌へのInstagram PR相談・1案件ごとのお申し込み。Gmailから無料相談、内容が決まったら店舗情報を入力して申込みメールを作成できます。",
+  alternates: { canonical: "/diary/request" },
 };
 
 export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string; goal?: string }> }) {

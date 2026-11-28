@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...(diaryPublic
       ? [
           ["/diary", "weekly", 1],
+          ["/diary/pr", "monthly", 0.9],
           ["/diary/services", "monthly", 0.8],
           ["/diary/request", "monthly", 0.8],
           ["/diary/policy", "monthly", 0.5],

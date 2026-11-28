@@ -24,6 +24,7 @@ Netlify supports Next.js 16 App Router, Server Actions and API route handlers au
 7. Set Cloudflare Turnstile keys with **exact Netlify hostname** allowed; set up Resend verified sender domain/address and `DIARY_OPERATOR_NOTIFY_EMAIL`; verify an end-to-end inquiry, proposal, confirmation and notification to an operator-controlled test mailbox.
 8. Only then set `DIARY_INQUIRIES_ENABLED=true` and redeploy. Stripe live billing is a **separate gate**, left `DIARY_STRIPE_ENABLED=false` until invoice-tax and sandbox end-to-end tests. Existing shared Stripe account ID is `acct_1ULfr6B2xz6AKQNb` ("base ebay sync"). Never change its BASE/eBay price/product/subscriptions.
 9. Audit Japanese seller/tax representation, privacy, cancellation/refund terms, owner-verified Instagram handle, price and social-media figures. Only then set `DIARY_PUBLIC_INDEX_ENABLED=true` and redeploy to enable search indexing.
+10. Google Search Console: add the site as a URL-prefix property for the production URL, choose the **HTML tag** method, put only the `content="…"` value in `GOOGLE_SITE_VERIFICATION`, redeploy, press **Verify**, then submit `/sitemap.xml` and request indexing for `/diary` and `/diary/pr`. With indexing on, every public diary page carries a canonical URL, the share image `public/diary/og.png` and, on `/diary`, schema.org Organization/Service data (`lib/diary/seo.ts`).
 
 ## Environment variables (Netlify Site configuration → Environment variables)
 

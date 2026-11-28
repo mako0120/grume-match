@@ -7,6 +7,7 @@ import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } f
 export const metadata = {
   title: "PRプラン・料金｜グルメ日誌｜大阪",
   description: "Instagramフィード1投稿の基本料金と、動画込みPRなどの制作内容。実際に公開されたInstagram投稿もご覧いただけます。",
+  alternates: { canonical: "/diary/services" },
 };
 
 const offerings = [
