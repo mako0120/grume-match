@@ -8,6 +8,7 @@ import {
   formatDiaryYen,
   videoIncludedPriceForFollowers,
 } from "@/lib/diary/pricing";
+import { DIARY_OG_IMAGE, DIARY_SITE_NAME } from "@/lib/diary/seo";
 import "./pr.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
     url: "/diary/pr",
     type: "website",
     locale: "ja_JP",
+    siteName: DIARY_SITE_NAME,
+    images: [DIARY_OG_IMAGE],
   },
 };
 

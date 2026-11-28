@@ -1,9 +1,17 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MobileFold } from "./components/mobile-fold";
 import { PostShowcase } from "./components/post-showcase";
 import { DiaryHeader, DiaryMobileCTA } from "./components/site-header";
 import { currentDiaryPricing, formatDiaryYen, videoIncludedPriceForFollowers } from "@/lib/diary/pricing";
+import { DIARY_FAQS, diarySiteOrigin, diaryStructuredData, toJsonLd } from "@/lib/diary/seo";
+
+export const metadata: Metadata = {
+  // absolute: a layout default title would still get the root PR OS suffix.
+  title: { absolute: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪" },
+  alternates: { canonical: "/diary" },
+};
 
 // Instagram Insights screenshots supplied by the operator on 2026-11-27.
 // Only regions are cropped; nothing inside a shown region is edited.
@@ -54,6 +62,10 @@ export default function DiaryHomePage() {
   const videoPrice = videoIncludedPriceForFollowers(price.followers);
   return (
     <div className="diary-v2">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: toJsonLd(diaryStructuredData(diarySiteOrigin(), price.amountYen)) }}
+      />
       <DiaryHeader active="home" />
       <main id="diary-main">
         <section className="diary-v2-hero" aria-labelledby="diary-v2-hero-heading">
@@ -199,11 +211,9 @@ export default function DiaryHomePage() {
             <MobileFold id="faq" title="よくある質問">
             <div><span className="diary-v2-section-label">06 / FAQ</span><h2>よくある<br /><em>ご質問。</em></h2><p>事前に確認しておきたい点をまとめました。</p></div>
             <div className="diary-v2-questions">
-              <details><summary>写真の枚数によって料金は変わりますか？<span aria-hidden="true">＋</span></summary><p>いいえ。基本料金はInstagramのフィード投稿1件あたりです。写真の枚数に応じた料金表ではありません。制作内容は事前に相談して決定します。</p></details>
-              <details><summary>相談したら必ず依頼する必要がありますか？<span aria-hidden="true">＋</span></summary><p>ありません。ご相談・お見積もりは無料です。制作内容・料金・訪問日時を確認し、ご納得いただいてから正式なご依頼になります。</p></details>
-              <details><summary>お支払いはいつですか？<span aria-hidden="true">＋</span></summary><p>Instagramへの投稿公開後、7日以内に全額お支払いいただく後払い方式を予定しています。契約時に支払い条件を確認します。</p></details>
-              <details><summary>店内にいるお客様の顔は映りますか？<span aria-hidden="true">＋</span></summary><p>料理や店内を中心に撮影し、一般のお客様やスタッフが識別できる映像は、必要な許可なく公開しません。写り込みがある場合は撮り直し・トリミング・ぼかし等で対応し、十分に配慮できない素材は掲載しません。</p></details>
-              <details><summary>PR表記は入りますか？<span aria-hidden="true">＋</span></summary><p>はい。広告・提供関係が分かる適切な表記を行います。高評価の保証や口コミサイトへの対価付き投稿などはお受けしていません。</p></details>
+              {DIARY_FAQS.map((item) => (
+                <details key={item.question}><summary>{item.question}<span aria-hidden="true">＋</span></summary><p>{item.answer}</p></details>
+              ))}
             </div>
             </MobileFold>
           </div>
