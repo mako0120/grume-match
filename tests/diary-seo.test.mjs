@@ -8,10 +8,10 @@ const read = (path) => readFile(path, "utf8");
 test("diary titles use their own template, never the PR OS brand", async () => {
   const layout = await read("app/diary/layout.tsx");
   assert.match(layout, /template: "%s"/);
-  assert.match(layout, /default: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪"/);
+  assert.match(layout, /default: "グルメ日誌｜大阪グルメ紹介・飲食店のInstagram PR"/);
   assert.doesNotMatch(layout, /GOURMET DIARY PR OS/);
   const home = await read("app/diary/page.tsx");
-  assert.match(home, /title: \{ absolute: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪" \}/);
+  assert.match(home, /title: \{ absolute: "グルメ日誌｜大阪グルメ紹介・飲食店のInstagram PR" \}/);
   // Indexing stays behind its own launch flag.
   assert.match(layout, /index: process\.env\.DIARY_PUBLIC_INDEX_ENABLED === "true"/);
 });
@@ -98,4 +98,15 @@ test("every Instagram link points at the real account @grunavi_diary", async () 
   assert.deepEqual(stale, []);
   const home = await readFile("app/diary/page.tsx", "utf8");
   assert.match(home, /instagram\.com\/grunavi_diary\//);
+});
+
+test("search for 大阪グルメ紹介 or the account name finds this site", async () => {
+  const home = await readFile("app/diary/page.tsx", "utf8");
+  assert.match(home, /title: \{ absolute: "グルメ日誌｜大阪グルメ紹介[^"]*" \}/);
+  assert.match(home, /<h1 id="diary-v2-hero-heading"><span className="diary-v2-hero-kicker">大阪グルメ紹介アカウント「グルメ日誌」<\/span>/);
+  const graph = diaryStructuredData("https://example.netlify.app", 8000)["@graph"];
+  const site = graph.find((node) => node["@type"] === "WebSite");
+  assert.equal(site.name, "グルメ日誌");
+  assert.ok(site.alternateName.includes("grunavi_diary"));
+  assert.ok(graph[0].alternateName.includes("グルメ日誌"));
 });

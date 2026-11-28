@@ -48,6 +48,8 @@
 .diary-v2-hero-kicker { color: #f4c0a1; font-size: 15px; font-weight: 800; margin: 34px 0 15px !important; letter-spacing: .04em; }
 .diary-v2-hero h1 { font-size: clamp(52px,5.8vw,90px); line-height: 1.32; font-weight: 890; white-space: nowrap; }
 .diary-v2-hero h1 span { color: #f0ad84; }
+/* The kicker sits inside the h1 so the heading names who we are (大阪グルメ紹介). */
+.diary-v2-hero h1 .diary-v2-hero-kicker { display: block; color: #f4c0a1; line-height: 1.5; white-space: normal; }
 .diary-v2-hero-lead { max-width: 510px; margin-top: 29px !important; font-size: 14px; line-height: 2.2; color: #c5cdc4; }
 .diary-v2-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 34px; }
 .diary-v2-button { min-height: 56px; padding: 15px 26px; display: inline-flex; align-items: center; justify-content: center; gap: 25px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 900; transition: transform .22s, box-shadow .22s, background .22s; }

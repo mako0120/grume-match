@@ -6,16 +6,16 @@ import "./modern.css";
 export const metadata: Metadata = {
   // Own template: diary pages must not inherit the PR OS brand suffix.
   title: {
-    default: "大阪の飲食店PR・Instagram撮影｜グルメ日誌｜大阪",
+    default: "グルメ日誌｜大阪グルメ紹介・飲食店のInstagram PR",
     template: "%s",
   },
   robots: {
     index: process.env.DIARY_PUBLIC_INDEX_ENABLED === "true",
     follow: process.env.DIARY_PUBLIC_INDEX_ENABLED === "true",
   },
-  description: "大阪の飲食店向けInstagram PR。グルメアカウント「グルメ日誌｜大阪」が来店・撮影・編集・投稿まで担当します。1案件から依頼でき、ご相談・お見積もりは無料です。",
+  description: "大阪グルメを紹介するInstagramアカウント「グルメ日誌」の公式サイト。飲食店さま向けのPR投稿を、来店・撮影・編集・投稿まで担当します。1案件から依頼でき、ご相談・お見積もりは無料です。",
   openGraph: {
-    title: "大阪の飲食店PR・Instagram撮影｜グルメ日誌",
+    title: "グルメ日誌｜大阪グルメ紹介・飲食店のInstagram PR",
     description: "まだ知らない「おいしい」に、出会うきっかけを。1案件から依頼でき、ご相談は無料です。",
     siteName: DIARY_SITE_NAME,
     locale: "ja_JP",
