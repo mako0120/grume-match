@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DIARY_OG_IMAGE, DIARY_SITE_NAME } from "@/lib/diary/seo";
 import { buildDiaryConsultationEmail } from "@/lib/diary/email-draft";
 import "./request-email.css";
 import { DiaryInquiryForm } from "../components/inquiry-form";
@@ -13,6 +14,15 @@ export const metadata = {
   title: "無料相談・PR申込み｜グルメ日誌｜大阪",
   description: "グルメ日誌へのInstagram PR相談・1案件ごとのお申し込み。Gmailから無料相談、内容が決まったら店舗情報を入力して申込みメールを作成できます。",
   alternates: { canonical: "/diary/request" },
+  openGraph: {
+    title: "無料相談・PRのお申し込み｜グルメ日誌｜大阪",
+    description: "大阪の飲食店PRを無料で相談。料金や来店日程の質問だけでも大丈夫です。",
+    url: "/diary/request",
+    type: "website",
+    locale: "ja_JP",
+    siteName: DIARY_SITE_NAME,
+    images: [DIARY_OG_IMAGE],
+  },
 };
 
 export default async function DiaryRequestPage({ searchParams }: { searchParams: Promise<{ service?: string; intent?: string; goal?: string }> }) {

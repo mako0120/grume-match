@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DIARY_OG_IMAGE, DIARY_SITE_NAME } from "@/lib/diary/seo";
 import { PostShowcase } from "../components/post-showcase";
 import { DiaryPricingPanel } from "../components/pricing-panel";
 import { DiaryHeader, DiaryMobileCTA } from "../components/site-header";
@@ -8,6 +9,15 @@ export const metadata = {
   title: "PRプラン・料金｜グルメ日誌｜大阪",
   description: "Instagramフィード1投稿の基本料金と、動画込みPRなどの制作内容。実際に公開されたInstagram投稿もご覧いただけます。",
   alternates: { canonical: "/diary/services" },
+  openGraph: {
+    title: "PRプラン・料金｜グルメ日誌｜大阪",
+    description: "Instagram写真フィード投稿の基本料金と、動画込みPRの制作内容。1案件から依頼できます。",
+    url: "/diary/services",
+    type: "website",
+    locale: "ja_JP",
+    siteName: DIARY_SITE_NAME,
+    images: [DIARY_OG_IMAGE],
+  },
 };
 
 const offerings = [

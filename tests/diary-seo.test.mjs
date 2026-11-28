@@ -61,3 +61,25 @@ test("the PR landing page is in the sitemap once diary indexing is on", async ()
   const diaryBlock = sitemap.slice(sitemap.indexOf("diaryPublic\n"), sitemap.indexOf("marketplacePublic\n      ?"));
   assert.match(diaryBlock, /\["\/diary\/pr", "monthly", 0\.9\]/);
 });
+
+test("the FAQ shown on the page and the FAQ sent to Google come from one list", async () => {
+  const { DIARY_FAQS } = await import("../lib/diary/seo.ts");
+  const faq = diaryStructuredData("https://example.netlify.app", 8000)["@graph"].find((node) => node["@type"] === "FAQPage");
+  assert.equal(faq.mainEntity.length, DIARY_FAQS.length);
+  assert.ok(DIARY_FAQS.length >= 5);
+  faq.mainEntity.forEach((question, i) => {
+    assert.equal(question.name, DIARY_FAQS[i].question);
+    assert.equal(question.acceptedAnswer.text, DIARY_FAQS[i].answer);
+  });
+  const page = await read("app/diary/page.tsx");
+  assert.match(page, /DIARY_FAQS\.map\(/);
+  assert.doesNotMatch(page, /<details><summary>[^{]/);
+});
+
+test("services, request and policy pages share their own title and image", async () => {
+  for (const path of ["app/diary/services/page.tsx", "app/diary/request/page.tsx", "app/diary/policy/page.tsx"]) {
+    const source = await read(path);
+    assert.match(source, /openGraph: \{\n    title: "[^"]+｜グルメ日誌｜大阪"/, path);
+    assert.match(source, /images: \[DIARY_OG_IMAGE\]/, path);
+  }
+});
