@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { buildDiaryDmTemplate } from "@/lib/diary/dm-template";
 
-const INSTAGRAM_PROFILE = "https://www.instagram.com/gurunavi_diary/";
+const INSTAGRAM_PROFILE = "https://www.instagram.com/grunavi_diary/";
 
 export function InstagramDmFallback({
   initialService = "",

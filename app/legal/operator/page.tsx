@@ -18,7 +18,7 @@ export default function OperatorPage() {
           <h2>サービス名</h2><p>グルメ日誌｜大阪（Instagram PR・撮影）</p>
           <h2>運営者</h2><p>{operatorName || "運営者情報を確認中"}</p>
           <h2>お問い合わせ</h2><p>{supportEmail || "正式な窓口の設定が未完了です。下記のInstagramからご相談ください。"}</p>
-          {!supportEmail && <p><a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">グルメ日誌のInstagramへ ↗</a></p>}
+          {!supportEmail && <p><a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">グルメ日誌のInstagramへ ↗</a></p>}
           <h2>提供サービスと料金</h2>
           <p>飲食店向けInstagramフィード投稿のPR制作：{formatDiaryYen(price.amountYen)}（税込）から。動画を含むPR：{formatDiaryYen(videoPrice)}（税込）から。正確な制作範囲・価格・来店日時は契約前に双方で合意します。</p>
           <h2>支払い方法と時期</h2>

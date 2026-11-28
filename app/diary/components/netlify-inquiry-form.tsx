@@ -190,10 +190,10 @@ export function NetlifyDiaryInquiryForm({
           <span><Link href="/diary/policy" target="_blank" rel="noopener noreferrer">案件受注ポリシー</Link>を確認しました。禁止されている口コミ投稿・評価指定・ステルスマーケティングは依頼しません。</span>
         </label>
       </div>
-      {error ? <p role="alert" aria-live="assertive" className="diary-error">{error} <a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramで相談する ↗</a></p> : null}
+      {error ? <p role="alert" aria-live="assertive" className="diary-error">{error} <a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">Instagramで相談する ↗</a></p> : null}
       <button className="diary-button diary-button-primary diary-submit" disabled={pending} type="submit">{pending ? "送信中..." : kind === "consultation" ? "無料でPR相談する" : "PR申込みを送信する"} <span aria-hidden="true">↗</span></button>
       <p className="diary-submit-foot">送信は無料です。内容を確認してメールでお返事します。フォームの送信だけでは契約は成立しません。料金・訪問日時・制作範囲は契約前に合意します。</p>
-      <p className="diary-netlify-fallback">返信が届かない場合は <a href="https://www.instagram.com/gurunavi_diary/" target="_blank" rel="noopener noreferrer">InstagramのDM</a> でもお問い合わせいただけます。</p>
+      <p className="diary-netlify-fallback">返信が届かない場合は <a href="https://www.instagram.com/grunavi_diary/" target="_blank" rel="noopener noreferrer">InstagramのDM</a> でもお問い合わせいただけます。</p>
     </form>
   );
 }
